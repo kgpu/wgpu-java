@@ -2,7 +2,7 @@ plugins {
     id 'java-library'
 }
 
-group 'com.noahcharlton.wpguj'
+group 'com.noahcharlton.wgpuj'
 version '0.1.0'
 
 sourceCompatibility = 11

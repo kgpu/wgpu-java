@@ -1,7 +1,15 @@
 package com.noahcharlton.wgpuj;
 
+import com.noahcharlton.wgpuj.util.SharedLibraryLoader;
+
 public class WgpuJava {
 
-    public static final String VERSION = "0.1.0";
+    public static native String hello(String input);
+
+    static {
+        var loader = new SharedLibraryLoader();
+
+        loader.load("wgpu_jni");
+    }
 
 }

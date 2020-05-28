@@ -10,3 +10,19 @@ sourceCompatibility = 11
 repositories {
     mavenCentral()
 }
+
+task createNatives(type: Copy){
+    from("${projectDir}/wgpu-jni/target/debug") {
+        include 'wgpu_jni.dll'
+        include 'wgpu_jni.so'
+        include 'wgpu_jni.dylib'
+    }
+    into "${projectDir}/src/main/resources"
+}
+
+task cargoBuild(type:Exec) {
+    workingDir "${projectDir}/wgpu-jni"
+    commandLine 'cargo', 'build'
+}
+
+createNatives.dependsOn cargoBuild

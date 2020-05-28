@@ -1,11 +1,11 @@
-package com.noahcharlton.wpguj.examples;
+package com.noahcharlton.wgpuj.examples;
 
 import com.noahcharlton.wgpuj.WgpuJava;
 
 public class Example {
 
     public static void main(String[] args){
-        System.out.println("Version: " + WgpuJava.VERSION);
+        System.out.println("Hello: " + WgpuJava.hello("josh"));
     }
 
 }
