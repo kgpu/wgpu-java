@@ -1,0 +1,16 @@
+plugins {
+    id 'java'
+}
+
+group 'com.noahcharlton.wgpuj'
+version '0.1.0'
+
+sourceCompatibility = 11
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(':core')
+}
