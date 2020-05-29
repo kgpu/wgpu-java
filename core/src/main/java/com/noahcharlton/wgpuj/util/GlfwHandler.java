@@ -2,6 +2,7 @@ package com.noahcharlton.wgpuj.util;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWNativeWin32;
 
 public class GlfwHandler {
 
@@ -23,6 +24,14 @@ public class GlfwHandler {
 
         if(callback != null)
             callback.free();
+    }
+
+    public static long getOsWindowHandle(long handle){
+        if(Platform.isWindows){
+            return GLFWNativeWin32.glfwGetWin32Window(handle);
+        }else{
+            throw new UnsupportedOperationException("Platform not supported");
+        }
     }
 
 }

@@ -1,5 +1,9 @@
 package com.noahcharlton.wgpuj.graphics;
 
+import com.noahcharlton.wgpuj.WgpuJava;
+import com.noahcharlton.wgpuj.util.GlfwHandler;
+import com.noahcharlton.wgpuj.util.Platform;
+import jnr.ffi.Pointer;
 import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWVidMode;
@@ -40,6 +44,17 @@ public class Window {
                     (vidmode.width() - pWidth.get(0)) / 2,
                     (vidmode.height() - pHeight.get(0)) / 2
             );
+        }
+
+        createSurface();
+    }
+
+    private void createSurface() {
+        long osHandle = GlfwHandler.getOsWindowHandle(this.handle);
+
+        if(Platform.isWindows){
+            Pointer hwnd = WgpuJava.createLongPointer(osHandle);
+            var surface = WgpuJava.wgpuNative.wgpu_create_surface_from_windows_hwnd(null, hwnd);
         }
     }
 

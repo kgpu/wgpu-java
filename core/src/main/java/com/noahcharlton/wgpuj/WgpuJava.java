@@ -1,21 +1,39 @@
 package com.noahcharlton.wgpuj;
 
+import com.noahcharlton.wgpuj.jni.LogCallback;
+import com.noahcharlton.wgpuj.jni.WgpuJNI;
+import com.noahcharlton.wgpuj.jni.WgpuLogLevel;
 import com.noahcharlton.wgpuj.util.GlfwHandler;
 import com.noahcharlton.wgpuj.util.SharedLibraryLoader;
 import jnr.ffi.LibraryLoader;
+import jnr.ffi.Pointer;
+import jnr.ffi.Runtime;
 
 public class WgpuJava {
 
+    public static WgpuJNI wgpuNative;
+    private static Runtime runtime;
+
     public static void init(){
         var dll = new SharedLibraryLoader().load("wgpu_native");
-        var lib = LibraryLoader.create(WgpuJNI.class).load(dll.getAbsolutePath());
+        var loader = LibraryLoader.create(WgpuJNI.class);
 
-        printVersionString(lib);
+        wgpuNative = loader.load(dll.getAbsolutePath());
+        runtime = Runtime.getRuntime(wgpuNative);
+
+        printVersionString();
+        setupLog();
         GlfwHandler.init();
     }
 
-    public static void printVersionString(WgpuJNI library){
-        int version = library.wgpu_get_version();
+    private static void setupLog() {
+        //Trace level
+        wgpuNative.wgpu_set_log_callback(LogCallback.createDefault());
+        wgpuNative.wgpu_set_log_level(WgpuLogLevel.TRACE);
+    }
+
+    private static void printVersionString(){
+        int version = wgpuNative.wgpu_get_version();
         int major = (version >> 16) & 0xFF;
         int minor = (version >> 8) & 0xFF;
         int patch = version & 0xff;
@@ -27,4 +45,11 @@ public class WgpuJava {
         GlfwHandler.terminate();
     }
 
+    public static Pointer createLongPointer(long value){
+        return Pointer.wrap(runtime, value);
+    }
+
+    public static Runtime getRuntime() {
+        return runtime;
+    }
 }

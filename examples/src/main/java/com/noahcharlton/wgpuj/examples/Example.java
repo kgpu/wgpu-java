@@ -14,6 +14,7 @@ public class Example {
             window.update();
         }
 
+        window.dispose();
         WgpuJava.destroy();
     }
 

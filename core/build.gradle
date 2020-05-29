@@ -34,7 +34,9 @@ dependencies {
     implementation "org.lwjgl:lwjgl-glfw"
     runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
+
     compile group: 'com.github.jnr', name: 'jnr-ffi', version: '2.1.15'
+    compile group: 'com.github.jnr', name: 'jffi', version: '1.2.23'
 }
 
 // wgpu-native installer
