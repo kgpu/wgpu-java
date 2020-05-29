@@ -3,8 +3,8 @@
 # Edit at https://www.gitignore.io/?templates=java,gradle,eclipse,intellij
 
 ## Rust
-core/wgpu-jni/target/**
-core/wgpu-jni/Cargo.lock
+core/wgpu-native/target/**
+core/wgpu-native/Cargo.lock
 
 ## Libraries
 **.dll

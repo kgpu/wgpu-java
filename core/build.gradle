@@ -34,21 +34,22 @@ dependencies {
     implementation "org.lwjgl:lwjgl-glfw"
     runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
+    compile group: 'com.github.jnr', name: 'jnr-ffi', version: '2.1.15'
 }
 
-// wgpu-jni installer
+// wgpu-native installer
 
 task createNatives(type: Copy){
-    from("${projectDir}/wgpu-jni/target/debug") {
-        include 'wgpu_jni.dll'
-        include 'wgpu_jni.so'
-        include 'wgpu_jni.dylib'
+    from("${projectDir}/wgpu-native/target/debug") {
+        include 'wgpu_native.dll'
+        include 'wgpu_native.so'
+        include 'wgpu_native.dylib'
     }
     into "${projectDir}/src/main/resources"
 }
 
 task cargoBuild(type:Exec) {
-    workingDir "${projectDir}/wgpu-jni"
+    workingDir "${projectDir}/wgpu-native"
     commandLine 'cargo', 'build'
 }
 
