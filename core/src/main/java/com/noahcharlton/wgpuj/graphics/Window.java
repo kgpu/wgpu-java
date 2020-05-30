@@ -1,6 +1,8 @@
 package com.noahcharlton.wgpuj.graphics;
 
 import com.noahcharlton.wgpuj.WgpuJava;
+import com.noahcharlton.wgpuj.jni.WGPUPowerPreference;
+import com.noahcharlton.wgpuj.jni.WgpuStructs;
 import com.noahcharlton.wgpuj.util.GlfwHandler;
 import com.noahcharlton.wgpuj.util.Platform;
 import jnr.ffi.Pointer;
@@ -46,16 +48,27 @@ public class Window {
             );
         }
 
-        createSurface();
+        var surface = createSurface();
+        var options = WgpuStructs.createWgpuRequestAdapterOptions(WGPUPowerPreference.LOW, surface);
+
+        WgpuJava.wgpuNative.wgpu_request_adapter_async(
+                options,
+                2 | 4 | 8,
+                (received, userData) -> System.out.println("Adapter: " + received),
+                WgpuJava.createNullPointer()
+        );
     }
 
-    private void createSurface() {
+    private long createSurface() {
         long osHandle = GlfwHandler.getOsWindowHandle(this.handle);
 
         if(Platform.isWindows){
             Pointer hwnd = WgpuJava.createLongPointer(osHandle);
-            var surface = WgpuJava.wgpuNative.wgpu_create_surface_from_windows_hwnd(null, hwnd);
+
+            return WgpuJava.wgpuNative.wgpu_create_surface_from_windows_hwnd(WgpuJava.createNullPointer(), hwnd);
         }
+
+        throw new UnsupportedOperationException();
     }
 
     public void update(){

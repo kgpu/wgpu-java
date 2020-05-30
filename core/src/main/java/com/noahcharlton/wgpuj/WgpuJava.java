@@ -9,6 +9,8 @@ import jnr.ffi.LibraryLoader;
 import jnr.ffi.Pointer;
 import jnr.ffi.Runtime;
 
+import java.nio.ByteBuffer;
+
 public class WgpuJava {
 
     public static WgpuJNI wgpuNative;
@@ -29,7 +31,7 @@ public class WgpuJava {
     private static void setupLog() {
         //Trace level
         wgpuNative.wgpu_set_log_callback(LogCallback.createDefault());
-        wgpuNative.wgpu_set_log_level(WgpuLogLevel.TRACE);
+        wgpuNative.wgpu_set_log_level(WgpuLogLevel.WARN);
     }
 
     private static void printVersionString(){
@@ -47,6 +49,10 @@ public class WgpuJava {
 
     public static Pointer createLongPointer(long value){
         return Pointer.wrap(runtime, value);
+    }
+
+    public static Pointer createNullPointer(){
+        return Pointer.wrap(WgpuJava.getRuntime(), ByteBuffer.allocate(0));
     }
 
     public static Runtime getRuntime() {
