@@ -11,7 +11,9 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.system.MemoryStack;
 
+import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static org.lwjgl.system.MemoryUtil.NULL;
 
@@ -50,13 +52,32 @@ public class Window {
 
         var surface = createSurface();
         var options = WgpuStructs.createWgpuRequestAdapterOptions(WGPUPowerPreference.LOW, surface);
+        var adapter = requestAdapter(options);
+
+        var descriptor = WgpuStructs.createWgpuDeviceDescriptor(false, 1);
+        var device = requestDevice(adapter, descriptor);
+    }
+
+    private long requestDevice(long adapter, Pointer desc) {
+        ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+        buffer.putLong(adapter);
+
+        return WgpuJava.wgpuNative.wgpu_adapter_request_device(adapter, desc, null);
+    }
+
+    private long requestAdapter(Pointer options) {
+        AtomicLong adapter = new AtomicLong(0);
 
         WgpuJava.wgpuNative.wgpu_request_adapter_async(
                 options,
-                2 | 4 | 8,
-                (received, userData) -> System.out.println("Adapter: " + received),
+                2 | 4 | 8, //Backends for Vulkan, Metal, Dx12
+                (received, userData) -> {
+                    adapter.set(received);
+                },
                 WgpuJava.createNullPointer()
         );
+
+        return adapter.get();
     }
 
     private long createSurface() {

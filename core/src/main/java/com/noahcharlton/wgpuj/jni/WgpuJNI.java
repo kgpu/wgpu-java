@@ -2,6 +2,7 @@ package com.noahcharlton.wgpuj.jni;
 
 import jnr.ffi.Pointer;
 import jnr.ffi.types.u_int32_t;
+import jnr.ffi.types.u_int64_t;
 
 public interface WgpuJNI {
 
@@ -18,4 +19,7 @@ public interface WgpuJNI {
                                     @u_int32_t int backendMask,
                                     RequestAdapterCallback callback,
                                     Pointer userdata);
+
+    @u_int64_t
+    long wgpu_adapter_request_device(@u_int64_t long buffer, Pointer description, String tracePath);
 }

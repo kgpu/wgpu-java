@@ -13,4 +13,11 @@ public class WgpuStructs {
         return pointer;
     }
 
+    public static Pointer createWgpuDeviceDescriptor(boolean anisotropicFiltering, int maxBindGroups) {
+        var pointer = WgpuJava.getRuntime().getMemoryManager().allocateDirect(5);
+        pointer.putByte(0, (byte) (anisotropicFiltering ? 1 : 0));
+        pointer.putInt(1, maxBindGroups);
+
+        return pointer;
+    }
 }
