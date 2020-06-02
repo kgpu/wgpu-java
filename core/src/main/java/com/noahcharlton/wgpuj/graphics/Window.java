@@ -2,6 +2,7 @@ package com.noahcharlton.wgpuj.graphics;
 
 import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.jni.WGPUPowerPreference;
+import com.noahcharlton.wgpuj.jni.WgpuShaderModuleDescription;
 import com.noahcharlton.wgpuj.jni.WgpuStructs;
 import com.noahcharlton.wgpuj.util.GlfwHandler;
 import com.noahcharlton.wgpuj.util.Platform;
@@ -20,6 +21,7 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 public class Window {
 
     private final long handle;
+    private final long device;
 
     public Window() {
         this.handle = GLFW.glfwCreateWindow(300, 300, "Title", NULL, NULL);
@@ -27,6 +29,20 @@ public class Window {
         if(this.handle == NULL)
             throw new RuntimeException("Failed to create window!");
 
+        initializeGlfwWindow();
+        device = createDevice();
+
+        loadShaders();
+    }
+
+    private void loadShaders() {
+        var vertex = WgpuShaderModuleDescription.fromFile("triangle.vert").load(device);
+        var frag = WgpuShaderModuleDescription.fromFile("triangle.frag").load(device);
+
+        System.out.printf("Shaders {vertex = %d, frag = %d} \n", vertex, frag);
+    }
+
+    private void initializeGlfwWindow() {
         GLFW.glfwSetKeyCallback(handle, (window, key, scancode, action, mods) -> {
             if ( key == GLFW.GLFW_KEY_ESCAPE && action == GLFW.GLFW_RELEASE )
                 GLFW.glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
@@ -49,13 +65,15 @@ public class Window {
                     (vidmode.height() - pHeight.get(0)) / 2
             );
         }
+    }
 
+    private long createDevice() {
         var surface = createSurface();
         var options = WgpuStructs.createWgpuRequestAdapterOptions(WGPUPowerPreference.LOW, surface);
         var adapter = requestAdapter(options);
-
         var descriptor = WgpuStructs.createWgpuDeviceDescriptor(false, 1);
-        var device = requestDevice(adapter, descriptor);
+
+        return requestDevice(adapter, descriptor);
     }
 
     private long requestDevice(long adapter, Pointer desc) {

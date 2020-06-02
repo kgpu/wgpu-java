@@ -31,7 +31,7 @@ public class WgpuJava {
     private static void setupLog() {
         //Trace level
         wgpuNative.wgpu_set_log_callback(LogCallback.createDefault());
-        wgpuNative.wgpu_set_log_level(WgpuLogLevel.WARN);
+        wgpuNative.wgpu_set_log_level(WgpuLogLevel.TRACE);
     }
 
     private static void printVersionString(){
