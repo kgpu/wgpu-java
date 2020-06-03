@@ -3,6 +3,7 @@ package com.noahcharlton.wgpuj.graphics;
 import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.jni.WgpuPresentMode;
 import com.noahcharlton.wgpuj.jni.WgpuSwapChainDescriptor;
+import com.noahcharlton.wgpuj.jni.WgpuSwapChainOutput;
 import com.noahcharlton.wgpuj.jni.WgpuSwapChainStatus;
 import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
 import com.noahcharlton.wgpuj.util.Dimension;
@@ -16,12 +17,14 @@ public class SwapChain {
     }
 
     public void update(){
-        System.out.println("Swap Chain run: " + Long.toBinaryString(chainID));
-        var output = WgpuJava.wgpuNative.wgpu_swap_chain_get_next_texture(chainID);
-        var status = output.getStatus();
+        var output = new WgpuSwapChainOutput();
 
-        if(status != WgpuSwapChainStatus.GOOD){
-            throw new RuntimeException("Swap chain not good: " + status);
+        WgpuJava.wgpuNative.wgpu_swap_chain_get_next_texture_jnr_hack(chainID, output.getPointerTo());
+
+        if(output.getStatus() != WgpuSwapChainStatus.GOOD){
+            throw new RuntimeException("Wgpu Swap Chain has a bad status: " + output.getStatus());
+        }else if(output.getTextureViewID() == 0){
+            throw new RuntimeException();
         }
     }
 
@@ -34,7 +37,6 @@ public class SwapChain {
 
         var id = WgpuJava.wgpuNative.wgpu_device_create_swap_chain(device, surface, descriptor.getPointerTo());
 
-        System.out.println("Swap Chain created: " + id);
         return new SwapChain(id);
     }
 }

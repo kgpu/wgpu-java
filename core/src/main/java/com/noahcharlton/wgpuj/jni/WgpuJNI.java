@@ -43,5 +43,5 @@ public interface WgpuJNI {
     long wgpu_device_create_swap_chain(@u_int64_t long device, @u_int64_t long surfaceID,
                                        Pointer wgpuWSwapChainDescriptor);
 
-    WgpuSwapChainOutput wgpu_swap_chain_get_next_texture(@u_int64_t long swapChain);
+    void wgpu_swap_chain_get_next_texture_jnr_hack(@u_int64_t long swapChain, Pointer output);
 }
