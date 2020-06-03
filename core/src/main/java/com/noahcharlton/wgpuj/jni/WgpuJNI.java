@@ -34,4 +34,7 @@ public interface WgpuJNI {
 
     @u_int64_t
     long wgpu_device_create_pipeline_layout(@u_int64_t long device, Pointer wgpuPipelineLayoutDescriptor);
+
+    @u_int64_t
+    long wgpu_device_create_render_pipeline(@u_int64_t long device, Pointer wgpuRenderPipelineDescriptor);
 }

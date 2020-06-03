@@ -52,7 +52,7 @@ public class WgpuJava {
     }
 
     public static Pointer createNullPointer(){
-        return Pointer.wrap(WgpuJava.getRuntime(), ByteBuffer.allocate(0));
+        return Pointer.wrap(runtime, 0x00);
     }
 
     public static Pointer createByteBufferPointer(ByteBuffer buffer) {

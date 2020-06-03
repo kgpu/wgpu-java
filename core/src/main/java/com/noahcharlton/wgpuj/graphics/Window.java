@@ -4,10 +4,20 @@ import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.jni.WGPUPowerPreference;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutDescriptor;
+import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
+import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
+import com.noahcharlton.wgpuj.jni.WgpuColorStateDescriptor;
+import com.noahcharlton.wgpuj.jni.WgpuCullMode;
 import com.noahcharlton.wgpuj.jni.WgpuDeviceDescriptor;
+import com.noahcharlton.wgpuj.jni.WgpuFrontFace;
+import com.noahcharlton.wgpuj.jni.WgpuIndexFormat;
 import com.noahcharlton.wgpuj.jni.WgpuPipelineLayoutDescriptor;
+import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
+import com.noahcharlton.wgpuj.jni.WgpuProgrammableStageDescriptor;
+import com.noahcharlton.wgpuj.jni.WgpuRasterizationStateDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuRequestAdapterOptions;
 import com.noahcharlton.wgpuj.jni.WgpuShaderModuleDescription;
+import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
 import com.noahcharlton.wgpuj.util.GlfwHandler;
 import com.noahcharlton.wgpuj.util.Platform;
 import jnr.ffi.Pointer;
@@ -25,6 +35,9 @@ public class Window {
 
     private final long handle;
     private final long device;
+
+    private long vertexModule;
+    private long fragmentModule;
 
     public Window() {
         this.handle = GLFW.glfwCreateWindow(300, 300, "Title", NULL, NULL);
@@ -44,22 +57,51 @@ public class Window {
         var bindGroupLayout = WgpuJava.wgpuNative.wgpu_device_create_bind_group_layout(device,
                 layoutDescriptor.getPointerTo());
         var groupDescriptor = new WgpuBindGroupDescriptor("bind group", bindGroupLayout);
-        System.out.println("Bind Group Layout: " + bindGroupLayout);
         var bindGroup = WgpuJava.wgpuNative.wgpu_device_create_bind_group(device, groupDescriptor.getPointerTo());
         var pipelineLayoutDescriptor = new WgpuPipelineLayoutDescriptor(bindGroupLayout);
         var pipelineLayoutID = WgpuJava.wgpuNative.wgpu_device_create_pipeline_layout(device,
                 pipelineLayoutDescriptor.getPointerTo());
+        var pipelineSettings = createPipelineSettings(pipelineLayoutID).build().getPointerTo();
+        var pipelineId = WgpuJava.wgpuNative.wgpu_device_create_render_pipeline(device, pipelineSettings);
 
         System.out.println("Bind Group Layout: " + bindGroupLayout);
         System.out.println("Bind Group: " + bindGroup);
         System.out.println("Pipeline Layout: " + pipelineLayoutID);
+        System.out.println("Pipeline: " + pipelineId);
+    }
+
+    private PipelineSettings createPipelineSettings(long pipelineLayout){
+        var fragment = new WgpuProgrammableStageDescriptor(fragmentModule, "main").getPointerTo();
+
+        return new PipelineSettings()
+                .setLayout(pipelineLayout)
+                .setVertexModule(vertexModule)
+                .setVertexEntryPoint("main")
+                .setFragmentStage(fragment)
+                .setRasterizationState(new WgpuRasterizationStateDescriptor(
+                        WgpuFrontFace.COUNTER_CLOCKWISE,
+                        WgpuCullMode.NONE,
+                        0,
+                        0.0f,
+                        0.0f).getPointerTo())
+                .setPrimitiveTopology(WgpuPrimitiveTopology.TriangleList)
+                .setColorStates(new WgpuColorStateDescriptor(
+                        WgpuTextureFormat.Bgra8Unorm,
+                        new BlendDescriptor(WgpuBlendFactor.One, WgpuBlendFactor.Zero, WgpuBlendOperation.ADD),
+                        new BlendDescriptor(WgpuBlendFactor.One, WgpuBlendFactor.Zero, WgpuBlendOperation.ADD),
+                        WgpuColorStateDescriptor.ALL))
+                .setDepthStencilState(WgpuJava.createNullPointer())
+                .setVertexIndexFormat(WgpuIndexFormat.Uint16)
+                .setSampleCount(1)
+                .setSampleMask(0)
+                .setAlphaToCoverage(false);
     }
 
     private void loadShaders() {
-        var vertex = WgpuShaderModuleDescription.fromFile("triangle.vert").load(device);
-        var frag = WgpuShaderModuleDescription.fromFile("triangle.frag").load(device);
+        vertexModule = WgpuShaderModuleDescription.fromFile("triangle.vert").load(device);
+        fragmentModule = WgpuShaderModuleDescription.fromFile("triangle.frag").load(device);
 
-        System.out.printf("Shaders {vertex = %d, frag = %d} \n", vertex, frag);
+        System.out.printf("Shaders {vertex = %d, frag = %d} \n", vertexModule, fragmentModule);
     }
 
     private void initializeGlfwWindow() {
