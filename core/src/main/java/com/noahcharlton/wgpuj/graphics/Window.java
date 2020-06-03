@@ -5,6 +5,7 @@ import com.noahcharlton.wgpuj.jni.WGPUPowerPreference;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuDeviceDescriptor;
+import com.noahcharlton.wgpuj.jni.WgpuPipelineLayoutDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuRequestAdapterOptions;
 import com.noahcharlton.wgpuj.jni.WgpuShaderModuleDescription;
 import com.noahcharlton.wgpuj.util.GlfwHandler;
@@ -15,7 +16,6 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.system.MemoryStack;
 
-import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -43,11 +43,16 @@ public class Window {
         var layoutDescriptor = new WgpuBindGroupLayoutDescriptor("bind group layout");
         var bindGroupLayout = WgpuJava.wgpuNative.wgpu_device_create_bind_group_layout(device,
                 layoutDescriptor.getPointerTo());
-        System.out.println("Bind Group Layout: " + bindGroupLayout);
         var groupDescriptor = new WgpuBindGroupDescriptor("bind group", bindGroupLayout);
+        System.out.println("Bind Group Layout: " + bindGroupLayout);
         var bindGroup = WgpuJava.wgpuNative.wgpu_device_create_bind_group(device, groupDescriptor.getPointerTo());
+        var pipelineLayoutDescriptor = new WgpuPipelineLayoutDescriptor(bindGroupLayout);
+        var pipelineLayoutID = WgpuJava.wgpuNative.wgpu_device_create_pipeline_layout(device,
+                pipelineLayoutDescriptor.getPointerTo());
 
+        System.out.println("Bind Group Layout: " + bindGroupLayout);
         System.out.println("Bind Group: " + bindGroup);
+        System.out.println("Pipeline Layout: " + pipelineLayoutID);
     }
 
     private void loadShaders() {
@@ -92,9 +97,6 @@ public class Window {
     }
 
     private long requestDevice(long adapter, WgpuDeviceDescriptor desc) {
-        ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
-        buffer.putLong(adapter);
-
         return WgpuJava.wgpuNative.wgpu_adapter_request_device(adapter, desc.getPointerTo(), null);
     }
 

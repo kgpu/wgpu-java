@@ -5,33 +5,13 @@ import jnr.ffi.Struct;
 
 public class WgpuDeviceDescriptor extends WgpuJavaStruct {
 
-    private final WgpuExtensions extensions;
-    private final WgpuLimits limits;
+    private final Struct.Boolean anisotropicFiltering = new Struct.Boolean();
+    private final Struct.Unsigned32 maxBindGroups = new Struct.Unsigned32();
 
     public WgpuDeviceDescriptor(boolean anisotropicFiltering, int maxBindGroups) {
         useDirectMemory();
 
-        this.extensions = inner(new WgpuExtensions(anisotropicFiltering));
-        this.limits = inner(new WgpuLimits(maxBindGroups));
-    }
-
-    static class WgpuExtensions extends WgpuJavaStruct{
-        private Struct.Boolean anisotropicFiltering = new Struct.Boolean();
-
-        protected WgpuExtensions(boolean anisotropicFiltering) {
-            useDirectMemory();
-
-            this.anisotropicFiltering.set(anisotropicFiltering);
-        }
-    }
-
-    static class WgpuLimits extends WgpuJavaStruct {
-        private Struct.Unsigned32 maxBindGroups = new Struct.Unsigned32();
-
-        protected WgpuLimits(int maxBindGroups) {
-            useDirectMemory();
-
-            this.maxBindGroups.set(maxBindGroups);
-        }
+        this.anisotropicFiltering.set(anisotropicFiltering);
+        this.maxBindGroups.set(maxBindGroups);
     }
 }

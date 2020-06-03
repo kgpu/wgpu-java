@@ -31,7 +31,7 @@ public class WgpuJava {
     private static void setupLog() {
         //Trace level
         wgpuNative.wgpu_set_log_callback(LogCallback.createDefault());
-        wgpuNative.wgpu_set_log_level(WgpuLogLevel.DEBUG);
+        wgpuNative.wgpu_set_log_level(WgpuLogLevel.WARN);
     }
 
     private static void printVersionString(){
@@ -60,7 +60,15 @@ public class WgpuJava {
             throw new IllegalArgumentException("Buffer must be direct!");
         }
 
+        if(buffer.position() > 0){
+            throw new IllegalArgumentException("Buffer should have a position of zero!");
+        }
+
         return Pointer.wrap(runtime, buffer);
+    }
+
+    public static Pointer createDirectPointer(int size) {
+        return runtime.getMemoryManager().allocateDirect(size);
     }
 
     public static Runtime getRuntime() {
