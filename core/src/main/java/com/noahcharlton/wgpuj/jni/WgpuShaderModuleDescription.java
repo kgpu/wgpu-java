@@ -1,28 +1,30 @@
 package com.noahcharlton.wgpuj.jni;
 
 import com.noahcharlton.wgpuj.WgpuJava;
+import com.noahcharlton.wgpuj.util.WgpuJavaStruct;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-public class WgpuShaderModuleDescription {
+public class WgpuShaderModuleDescription extends WgpuJavaStruct {
 
-    private final ByteBuffer byteBuffer;
-    private final int length;
+    private final WgpuU32Array code;
 
     private WgpuShaderModuleDescription(byte[] data) {
-        byteBuffer = ByteBuffer.allocateDirect(data.length).put(data).position(0);
-        this.length = data.length / 4;
+        useDirectMemory();
+
+        var buffer = ByteBuffer.allocateDirect(data.length).put(data).position(0);
+        var length = data.length / 4;
+
+        code = inner(new WgpuU32Array(buffer, length));
     }
 
-    public long load(long device){
-        var array = WgpuStructs.createWgpuU32Array(byteBuffer, length);
-
-        return WgpuJava.wgpuNative.wgpu_device_create_shader_module(device, array);
+    public long load(long device) {
+        return WgpuJava.wgpuNative.wgpu_device_create_shader_module(device, this.getPointerTo());
     }
 
-    public static WgpuShaderModuleDescription fromFile(String name){
-        String path = "/shaders/" + name + ".spv";
+    public static WgpuShaderModuleDescription fromFile(java.lang.String name){
+        java.lang.String path = "/shaders/" + name + ".spv";
         var inputStream = WgpuShaderModuleDescription.class.getResourceAsStream(path);
 
         if(inputStream == null){

@@ -55,6 +55,14 @@ public class WgpuJava {
         return Pointer.wrap(WgpuJava.getRuntime(), ByteBuffer.allocate(0));
     }
 
+    public static Pointer createByteBufferPointer(ByteBuffer buffer) {
+        if(!buffer.isDirect()){
+            throw new IllegalArgumentException("Buffer must be direct!");
+        }
+
+        return Pointer.wrap(runtime, buffer);
+    }
+
     public static Runtime getRuntime() {
         return runtime;
     }

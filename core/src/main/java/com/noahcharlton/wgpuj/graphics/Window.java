@@ -2,8 +2,9 @@ package com.noahcharlton.wgpuj.graphics;
 
 import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.jni.WGPUPowerPreference;
+import com.noahcharlton.wgpuj.jni.WgpuDeviceDescriptor;
+import com.noahcharlton.wgpuj.jni.WgpuRequestAdapterOptions;
 import com.noahcharlton.wgpuj.jni.WgpuShaderModuleDescription;
-import com.noahcharlton.wgpuj.jni.WgpuStructs;
 import com.noahcharlton.wgpuj.util.GlfwHandler;
 import com.noahcharlton.wgpuj.util.Platform;
 import jnr.ffi.Pointer;
@@ -69,25 +70,25 @@ public class Window {
 
     private long createDevice() {
         var surface = createSurface();
-        var options = WgpuStructs.createWgpuRequestAdapterOptions(WGPUPowerPreference.LOW, surface);
+        var options = new WgpuRequestAdapterOptions(WGPUPowerPreference.DEFAULT, surface);
         var adapter = requestAdapter(options);
-        var descriptor = WgpuStructs.createWgpuDeviceDescriptor(false, 1);
+        var descriptor = new WgpuDeviceDescriptor(false, 1);
 
         return requestDevice(adapter, descriptor);
     }
 
-    private long requestDevice(long adapter, Pointer desc) {
+    private long requestDevice(long adapter, WgpuDeviceDescriptor desc) {
         ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
         buffer.putLong(adapter);
 
-        return WgpuJava.wgpuNative.wgpu_adapter_request_device(adapter, desc, null);
+        return WgpuJava.wgpuNative.wgpu_adapter_request_device(adapter, desc.getPointerTo(), null);
     }
 
-    private long requestAdapter(Pointer options) {
+    private long requestAdapter(WgpuRequestAdapterOptions options) {
         AtomicLong adapter = new AtomicLong(0);
 
         WgpuJava.wgpuNative.wgpu_request_adapter_async(
-                options,
+                options.getPointerTo(),
                 2 | 4 | 8, //Backends for Vulkan, Metal, Dx12
                 (received, userData) -> {
                     adapter.set(received);
