@@ -3,6 +3,9 @@ package com.noahcharlton.wgpuj.util;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWNativeWin32;
+import org.lwjgl.system.MemoryStack;
+
+import java.nio.IntBuffer;
 
 public class GlfwHandler {
 
@@ -15,6 +18,17 @@ public class GlfwHandler {
 
         //Do not use opengl
         GLFW.glfwWindowHint(GLFW.GLFW_CLIENT_API, GLFW.GLFW_NO_API);
+    }
+
+    public static Dimension getWindowDimension(long handle){
+        try (MemoryStack stack = MemoryStack.stackPush() ) {
+            IntBuffer width = stack.mallocInt(1);
+            IntBuffer height = stack.mallocInt(1);
+
+            GLFW.glfwGetWindowSize(handle, width, height);
+
+            return new Dimension(width.get(), height.get());
+        }
     }
 
     public static void terminate(){

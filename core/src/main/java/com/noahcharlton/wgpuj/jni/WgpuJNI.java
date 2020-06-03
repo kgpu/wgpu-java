@@ -9,6 +9,7 @@ public interface WgpuJNI {
     @u_int32_t
     int wgpu_get_version();
 
+    @u_int64_t
     long wgpu_create_surface_from_windows_hwnd(Pointer hInstance, Pointer hwnd);
 
     int wgpu_set_log_level(WgpuLogLevel level);
@@ -37,4 +38,10 @@ public interface WgpuJNI {
 
     @u_int64_t
     long wgpu_device_create_render_pipeline(@u_int64_t long device, Pointer wgpuRenderPipelineDescriptor);
+
+    @u_int64_t
+    long wgpu_device_create_swap_chain(@u_int64_t long device, @u_int64_t long surfaceID,
+                                       Pointer wgpuWSwapChainDescriptor);
+
+    WgpuSwapChainOutput wgpu_swap_chain_get_next_texture(@u_int64_t long swapChain);
 }

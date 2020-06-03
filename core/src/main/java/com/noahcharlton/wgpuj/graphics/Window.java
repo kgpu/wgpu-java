@@ -18,15 +18,14 @@ import com.noahcharlton.wgpuj.jni.WgpuRasterizationStateDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuRequestAdapterOptions;
 import com.noahcharlton.wgpuj.jni.WgpuShaderModuleDescription;
 import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
+import com.noahcharlton.wgpuj.util.Dimension;
 import com.noahcharlton.wgpuj.util.GlfwHandler;
 import com.noahcharlton.wgpuj.util.Platform;
 import jnr.ffi.Pointer;
 import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWVidMode;
-import org.lwjgl.system.MemoryStack;
 
-import java.nio.IntBuffer;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static org.lwjgl.system.MemoryUtil.NULL;
@@ -35,9 +34,13 @@ public class Window {
 
     private final long handle;
     private final long device;
+    private final long surface;
 
     private long vertexModule;
     private long fragmentModule;
+
+    private Dimension currentDimension;
+    private SwapChain swapChain;
 
     public Window() {
         this.handle = GLFW.glfwCreateWindow(300, 300, "Title", NULL, NULL);
@@ -46,10 +49,12 @@ public class Window {
             throw new RuntimeException("Failed to create window!");
 
         initializeGlfwWindow();
+        surface = createSurface();
         device = createDevice();
 
         loadShaders();
         createPipeline();
+        createSwapChain();
     }
 
     private void createPipeline() {
@@ -110,27 +115,18 @@ public class Window {
                 GLFW.glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
         });
 
-        try (MemoryStack stack = MemoryStack.stackPush() ) {
-            IntBuffer pWidth = stack.mallocInt(1); // int*
-            IntBuffer pHeight = stack.mallocInt(1); // int*
+        currentDimension = GlfwHandler.getWindowDimension(handle);
+        GLFWVidMode vidmode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
 
-            // Get the window size passed to glfwCreateWindow
-            GLFW.glfwGetWindowSize(handle, pWidth, pHeight);
-
-            // Get the resolution of the primary monitor
-            GLFWVidMode vidmode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
-
-            // Center the window
-            GLFW.glfwSetWindowPos(
-                    handle,
-                    (vidmode.width() - pWidth.get(0)) / 2,
-                    (vidmode.height() - pHeight.get(0)) / 2
-            );
-        }
+        // Center the window
+        GLFW.glfwSetWindowPos(
+                handle,
+                (vidmode.width() - currentDimension.getWidth()) / 2,
+                (vidmode.height() - currentDimension.getHeight()) / 2
+        );
     }
 
     private long createDevice() {
-        var surface = createSurface();
         var options = new WgpuRequestAdapterOptions(WGPUPowerPreference.DEFAULT, surface);
         var adapter = requestAdapter(options);
         var descriptor = new WgpuDeviceDescriptor(false, 1);
@@ -171,6 +167,29 @@ public class Window {
 
     public void update(){
         GLFW.glfwPollEvents();
+        var newDimension = GlfwHandler.getWindowDimension(handle);
+
+        if(!newDimension.equals(currentDimension)){
+            currentDimension = newDimension;
+
+            onResize();
+        }
+
+        swapChain.update();
+    }
+
+    private void onResize() {
+        System.out.println("Resize: " + currentDimension);
+
+        createSwapChain();
+    }
+
+    private void createSwapChain() {
+        swapChain = SwapChain.create(currentDimension, device, surface);
+    }
+
+    public Dimension getWindowDimension() {
+        return currentDimension;
     }
 
     public boolean isCloseRequested(){
@@ -180,5 +199,9 @@ public class Window {
     public void dispose(){
         Callbacks.glfwFreeCallbacks(handle);
         GLFW.glfwDestroyWindow(handle);
+    }
+
+    long getWgpuDevice() {
+        return device;
     }
 }
