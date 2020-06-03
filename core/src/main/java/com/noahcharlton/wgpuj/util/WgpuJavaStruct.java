@@ -1,12 +1,17 @@
 package com.noahcharlton.wgpuj.util;
 
 import com.noahcharlton.wgpuj.WgpuJava;
+import jnr.ffi.Runtime;
 import jnr.ffi.Struct;
 
 public class WgpuJavaStruct extends Struct {
 
     public WgpuJavaStruct() {
         super(WgpuJava.getRuntime());
+    }
+
+    public WgpuJavaStruct(Runtime runtime) {
+        super(runtime);
     }
 
     protected void useDirectMemory(){

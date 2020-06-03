@@ -25,4 +25,10 @@ public interface WgpuJNI {
 
     @u_int64_t
     long wgpu_device_create_shader_module(@u_int64_t long device, Pointer shaderModuleDescriptor);
+
+    @u_int64_t
+    long wgpu_device_create_bind_group_layout(@u_int64_t long device, Pointer bindGroupLayoutDescriptor);
+
+    @u_int64_t
+    long wgpu_device_create_bind_group(@u_int64_t long device, Pointer wgpuBindGroupDescriptor);
 }

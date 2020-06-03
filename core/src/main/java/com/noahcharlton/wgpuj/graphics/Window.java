@@ -2,6 +2,8 @@ package com.noahcharlton.wgpuj.graphics;
 
 import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.jni.WGPUPowerPreference;
+import com.noahcharlton.wgpuj.jni.WgpuBindGroupDescriptor;
+import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuDeviceDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuRequestAdapterOptions;
 import com.noahcharlton.wgpuj.jni.WgpuShaderModuleDescription;
@@ -34,6 +36,18 @@ public class Window {
         device = createDevice();
 
         loadShaders();
+        createPipeline();
+    }
+
+    private void createPipeline() {
+        var layoutDescriptor = new WgpuBindGroupLayoutDescriptor("bind group layout");
+        var bindGroupLayout = WgpuJava.wgpuNative.wgpu_device_create_bind_group_layout(device,
+                layoutDescriptor.getPointerTo());
+        System.out.println("Bind Group Layout: " + bindGroupLayout);
+        var groupDescriptor = new WgpuBindGroupDescriptor("bind group", bindGroupLayout);
+        var bindGroup = WgpuJava.wgpuNative.wgpu_device_create_bind_group(device, groupDescriptor.getPointerTo());
+
+        System.out.println("Bind Group: " + bindGroup);
     }
 
     private void loadShaders() {
