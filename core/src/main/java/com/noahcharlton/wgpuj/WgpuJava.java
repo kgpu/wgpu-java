@@ -29,7 +29,6 @@ public class WgpuJava {
     }
 
     private static void setupLog() {
-        //Trace level
         wgpuNative.wgpu_set_log_callback(LogCallback.createDefault());
         wgpuNative.wgpu_set_log_level(WgpuLogLevel.WARN);
     }
@@ -40,7 +39,7 @@ public class WgpuJava {
         int minor = (version >> 8) & 0xFF;
         int patch = version & 0xff;
 
-        System.out.printf("wpgu-native: %d.%d.%d\n", major, minor, patch);
+        System.out.printf("Wgpu Native Version: %d.%d.%d\n", major, minor, patch);
     }
 
     public static void destroy(){
@@ -50,6 +49,14 @@ public class WgpuJava {
     public static Pointer createLongPointer(long value){
         return Pointer.wrap(runtime, value);
     }
+
+    public static Pointer createDirectLongPointer(long value){
+        var pointer = createDirectPointer(Long.BYTES);
+        pointer.putLongLong(0, value);
+
+        return pointer;
+    }
+
 
     public static Pointer createNullPointer(){
         return Pointer.wrap(runtime, 0x00);

@@ -1,6 +1,7 @@
 package com.noahcharlton.wgpuj.jni;
 
 import jnr.ffi.Pointer;
+import jnr.ffi.types.intptr_t;
 import jnr.ffi.types.u_int32_t;
 import jnr.ffi.types.u_int64_t;
 
@@ -36,6 +37,7 @@ public interface WgpuJNI {
     @u_int64_t
     long wgpu_device_create_pipeline_layout(@u_int64_t long device, Pointer wgpuPipelineLayoutDescriptor);
 
+
     @u_int64_t
     long wgpu_device_create_render_pipeline(@u_int64_t long device, Pointer wgpuRenderPipelineDescriptor);
 
@@ -44,4 +46,33 @@ public interface WgpuJNI {
                                        Pointer wgpuWSwapChainDescriptor);
 
     void wgpu_swap_chain_get_next_texture_jnr_hack(@u_int64_t long swapChain, Pointer output);
+
+    @u_int64_t
+    long wgpu_device_create_command_encoder(@u_int64_t long device_id, Pointer commandEncoderDescription);
+
+    WgpuRawPass wgpu_command_encoder_begin_render_pass(@u_int64_t long encoder, Pointer renderPassDescriptor);
+
+    void wgpu_render_pass_set_pipeline(Pointer rawPass, @u_int64_t long pipelineID);
+
+    /**
+     * @param offsets Currently Not implemented
+     */
+    void wgpu_render_pass_set_bind_group(Pointer rawPass, @u_int32_t int index, @u_int64_t long bindGroup,
+                                         Pointer offsets, @intptr_t long offsetLength);
+
+    void wgpu_render_pass_draw(Pointer rawPass, @u_int32_t int vertexCount, @u_int32_t int instanceCount,
+                               @u_int32_t int firstVertex, @u_int32_t int firstInstance);
+
+    @u_int64_t
+    long wgpu_device_get_default_queue(@u_int64_t long device);
+
+    @u_int64_t
+    long wgpu_render_pass_end_pass(Pointer rawPass);
+
+    @u_int64_t
+    long wgpu_command_encoder_finish(@u_int64_t long encoderID, Pointer commandBufferDescriptor);
+
+    void wgpu_queue_submit(@u_int64_t long queueID, Pointer commandBuffers, @u_int32_t int buffersLength);
+
+    void wgpu_swap_chain_present(@u_int64_t long swapChain);
 }

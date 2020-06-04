@@ -15,6 +15,7 @@ import com.noahcharlton.wgpuj.jni.WgpuPipelineLayoutDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
 import com.noahcharlton.wgpuj.jni.WgpuProgrammableStageDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuRasterizationStateDescriptor;
+import com.noahcharlton.wgpuj.jni.WgpuRawPass;
 import com.noahcharlton.wgpuj.jni.WgpuRequestAdapterOptions;
 import com.noahcharlton.wgpuj.jni.WgpuShaderModuleDescription;
 import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
@@ -38,12 +39,14 @@ public class Window {
 
     private long vertexModule;
     private long fragmentModule;
+    private long pipelineID;
+    private long bindGroupID;
 
     private Dimension currentDimension;
     private SwapChain swapChain;
 
     public Window() {
-        this.handle = GLFW.glfwCreateWindow(300, 300, "Title", NULL, NULL);
+        this.handle = GLFW.glfwCreateWindow(300, 300, "Wgpu-Java", NULL, NULL);
 
         if(this.handle == NULL)
             throw new RuntimeException("Failed to create window!");
@@ -62,17 +65,12 @@ public class Window {
         var bindGroupLayout = WgpuJava.wgpuNative.wgpu_device_create_bind_group_layout(device,
                 layoutDescriptor.getPointerTo());
         var groupDescriptor = new WgpuBindGroupDescriptor("bind group", bindGroupLayout);
-        var bindGroup = WgpuJava.wgpuNative.wgpu_device_create_bind_group(device, groupDescriptor.getPointerTo());
+        bindGroupID = WgpuJava.wgpuNative.wgpu_device_create_bind_group(device, groupDescriptor.getPointerTo());
         var pipelineLayoutDescriptor = new WgpuPipelineLayoutDescriptor(bindGroupLayout);
         var pipelineLayoutID = WgpuJava.wgpuNative.wgpu_device_create_pipeline_layout(device,
                 pipelineLayoutDescriptor.getPointerTo());
         var pipelineSettings = createPipelineSettings(pipelineLayoutID).build().getPointerTo();
-        var pipelineId = WgpuJava.wgpuNative.wgpu_device_create_render_pipeline(device, pipelineSettings);
-
-        System.out.println("Bind Group Layout: " + bindGroupLayout);
-        System.out.println("Bind Group: " + bindGroup);
-        System.out.println("Pipeline Layout: " + pipelineLayoutID);
-        System.out.println("Pipeline: " + pipelineId);
+        pipelineID = WgpuJava.wgpuNative.wgpu_device_create_render_pipeline(device, pipelineSettings);
     }
 
     private PipelineSettings createPipelineSettings(long pipelineLayout){
@@ -105,8 +103,6 @@ public class Window {
     private void loadShaders() {
         vertexModule = WgpuShaderModuleDescription.fromFile("triangle.vert").load(device);
         fragmentModule = WgpuShaderModuleDescription.fromFile("triangle.frag").load(device);
-
-        System.out.printf("Shaders {vertex = %d, frag = %d} \n", vertexModule, fragmentModule);
     }
 
     private void initializeGlfwWindow() {
@@ -175,7 +171,16 @@ public class Window {
             onResize();
         }
 
-        swapChain.update();
+        render();
+    }
+
+    private void render() {
+        WgpuRawPass rawPass = swapChain.beginRenderPass(device);
+        WgpuJava.wgpuNative.wgpu_render_pass_set_pipeline(rawPass.getPointerTo(), pipelineID);
+        WgpuJava.wgpuNative.wgpu_render_pass_set_bind_group(rawPass.getPointerTo(), 0, bindGroupID,
+                WgpuJava.createNullPointer(), 0);
+        WgpuJava.wgpuNative.wgpu_render_pass_draw(rawPass.getPointerTo(), 3, 1, 0, 0);
+        swapChain.endRenderPass(rawPass, device);
     }
 
     private void onResize() {

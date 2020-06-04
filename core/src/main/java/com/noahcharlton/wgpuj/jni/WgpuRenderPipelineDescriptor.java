@@ -11,7 +11,7 @@ public class WgpuRenderPipelineDescriptor extends WgpuJavaStruct {
     private final Struct.Pointer fragmentStage;
     private final Struct.Enum<WgpuPrimitiveTopology> primitiveTopology;
     private final Struct.Pointer rasterizationState;
-    private final Struct.StructRef<WgpuColorStateDescriptor> colorStates;
+    private final Struct.StructRef colorStates;
     private final Struct.UnsignedLong colorStatesLength;
     private final Struct.Pointer depthStencilState;
     private final WgpuVertexStateDescriptor vertexState;

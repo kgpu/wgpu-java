@@ -14,10 +14,10 @@ public class WgpuColorStateDescriptor extends WgpuJavaStruct {
     public static final int COLOR = 7;
     public static final int ALL = 15;
 
-    private Struct.Enum<WgpuTextureFormat> textureFormat;
-    private WgpuBlendDescriptor alphaBlend;
-    private WgpuBlendDescriptor colorBlend;
-    private Struct.Unsigned32 writeMask;
+    private Struct.Enum<WgpuTextureFormat> textureFormat = new Struct.Enum<>(WgpuTextureFormat.class);;
+    private WgpuBlendDescriptor alphaBlend = inner(new WgpuBlendDescriptor());;
+    private WgpuBlendDescriptor colorBlend = inner(new WgpuBlendDescriptor());;
+    private Struct.Unsigned32 writeMask = new Struct.Unsigned32();;
 
     public WgpuColorStateDescriptor(Runtime runtime) {
         super(runtime);
@@ -25,15 +25,6 @@ public class WgpuColorStateDescriptor extends WgpuJavaStruct {
 
     public WgpuColorStateDescriptor(WgpuTextureFormat textureFormat, BlendDescriptor alpha, BlendDescriptor color,
                                     int writeMask) {
-        var alphaBlend = new WgpuBlendDescriptor();
-        var colorBlend = new WgpuBlendDescriptor();
-
-        this.textureFormat = new Struct.Enum<>(WgpuTextureFormat.class);
-        this.alphaBlend = inner(alphaBlend);
-        this.colorBlend = inner(colorBlend);
-        this.writeMask = new Struct.Unsigned32();
-
-        useDirectMemory();
         this.textureFormat.set(textureFormat);
         this.writeMask.set(writeMask);
         alphaBlend.set(alpha);
