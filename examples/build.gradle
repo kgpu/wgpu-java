@@ -1,9 +1,11 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
 group 'com.noahcharlton.wgpuj'
 version '0.1.0'
+mainClassName  = 'com.noahcharlton.wgpuj.examples.Example'
 
 sourceCompatibility = 11
 
