@@ -70,6 +70,13 @@ public class WgpuJava {
         return runtime.getMemoryManager().allocateDirect(size);
     }
 
+    /**
+     * Used for unit testing only!
+     */
+    static void setRuntime(Runtime runtime) {
+        WgpuJava.runtime = runtime;
+    }
+
     public static Runtime getRuntime() {
         return runtime;
     }

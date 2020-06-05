@@ -1,7 +1,7 @@
 package com.noahcharlton.wgpuj.core;
 
 import com.noahcharlton.wgpuj.WgpuJava;
-import com.noahcharlton.wgpuj.core.util.SharedLibraryLoader;
+import com.noahcharlton.wgpuj.util.SharedLibraryLoader;
 
 import java.io.File;
 

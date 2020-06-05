@@ -4,7 +4,7 @@ import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.core.util.Dimension;
 import com.noahcharlton.wgpuj.core.util.GlfwHandler;
 import com.noahcharlton.wgpuj.core.util.Platform;
-import com.noahcharlton.wgpuj.jni.WGPUPowerPreference;
+import com.noahcharlton.wgpuj.jni.WgpuPowerPreference;
 import com.noahcharlton.wgpuj.jni.WgpuDeviceDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuRequestAdapterOptions;
 import jnr.ffi.Pointer;
@@ -43,7 +43,7 @@ public class Window {
     }
 
     private long createDevice() {
-        var options = new WgpuRequestAdapterOptions(WGPUPowerPreference.DEFAULT, surface);
+        var options = new WgpuRequestAdapterOptions(WgpuPowerPreference.DEFAULT, surface);
         var adapter = requestAdapter(options);
         var descriptor = new WgpuDeviceDescriptor(false, 1);
 

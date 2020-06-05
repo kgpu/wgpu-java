@@ -1,4 +1,4 @@
-package com.noahcharlton.wgpuj.core.util;
+package com.noahcharlton.wgpuj.util;
 
 import java.io.Closeable;
 import java.io.File;

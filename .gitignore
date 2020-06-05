@@ -5,6 +5,8 @@
 ## Rust
 native/wgpu-native/target/**
 native/wgpu-native/Cargo.lock
+native/wgpu-test/target/**
+native/wgpu-test/Cargo.lock
 
 ## Libraries
 **.dll

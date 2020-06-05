@@ -1,6 +1,6 @@
 package com.noahcharlton.wgpuj.jni;
 
-public enum WGPUPowerPreference{
+public enum WgpuPowerPreference {
 
     DEFAULT(0),
     LOW(1),
@@ -8,7 +8,7 @@ public enum WGPUPowerPreference{
 
     private final int value;
 
-    WGPUPowerPreference(int value) {
+    WgpuPowerPreference(int value) {
         this.value = value;
     }
 
