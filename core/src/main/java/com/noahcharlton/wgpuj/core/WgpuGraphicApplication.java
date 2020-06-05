@@ -2,6 +2,7 @@ package com.noahcharlton.wgpuj.core;
 
 import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
 import com.noahcharlton.wgpuj.core.graphics.Window;
+import com.noahcharlton.wgpuj.core.graphics.WindowSettings;
 import com.noahcharlton.wgpuj.core.util.GlfwHandler;
 
 public class WgpuGraphicApplication implements AutoCloseable{
@@ -10,13 +11,13 @@ public class WgpuGraphicApplication implements AutoCloseable{
 
     private final Window window;
 
-    public WgpuGraphicApplication(RenderPipelineSettings settings) {
+    public WgpuGraphicApplication(RenderPipelineSettings renderSettings, WindowSettings windowSettings) {
         if(applicationCreated) throw new UnsupportedOperationException("Wgpu-java only supports one application.");
         applicationCreated = true;
 
         GlfwHandler.init();
 
-        window = new Window(settings);
+        window = new Window(renderSettings, windowSettings);
     }
 
     public void render(){

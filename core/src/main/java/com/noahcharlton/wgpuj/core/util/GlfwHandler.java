@@ -3,6 +3,7 @@ package com.noahcharlton.wgpuj.core.util;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWNativeWin32;
+import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.IntBuffer;
@@ -18,6 +19,17 @@ public class GlfwHandler {
 
         //Do not use opengl
         GLFW.glfwWindowHint(GLFW.GLFW_CLIENT_API, GLFW.GLFW_NO_API);
+    }
+
+    public static void centerWindow(long handle, Dimension currentDimension) {
+        GLFWVidMode vidmode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
+
+        // Center the window
+        GLFW.glfwSetWindowPos(
+                handle,
+                (vidmode.width() - currentDimension.getWidth()) / 2,
+                (vidmode.height() - currentDimension.getHeight()) / 2
+        );
     }
 
     public static Dimension getWindowDimension(long handle){

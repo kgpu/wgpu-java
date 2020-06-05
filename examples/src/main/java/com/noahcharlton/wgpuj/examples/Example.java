@@ -7,6 +7,7 @@ import com.noahcharlton.wgpuj.core.WgpuCore;
 import com.noahcharlton.wgpuj.core.graphics.BlendDescriptor;
 import com.noahcharlton.wgpuj.core.graphics.ColorState;
 import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
+import com.noahcharlton.wgpuj.core.graphics.WindowSettings;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
 import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
 import com.noahcharlton.wgpuj.jni.WgpuColorStateDescriptor;
@@ -23,8 +24,9 @@ public class Example {
         WgpuCore.loadWgpuNative();
 
         RenderPipelineSettings settings = createPipelineSettings();
+        WindowSettings windowSettings = new WindowSettings("Wgpu-Java example", 640, 480);
 
-        try(WgpuGraphicApplication application = new WgpuGraphicApplication(settings)){
+        try(var application = new WgpuGraphicApplication(settings, windowSettings)){
             while(!application.getWindow().isCloseRequested()){
                 application.render();
             }

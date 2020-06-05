@@ -10,7 +10,6 @@ import com.noahcharlton.wgpuj.jni.WgpuRequestAdapterOptions;
 import jnr.ffi.Pointer;
 import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWVidMode;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -27,36 +26,20 @@ public class Window {
     private Dimension currentDimension;
     private SwapChain swapChain;
 
-    public Window(RenderPipelineSettings settings) {
-        this.handle = GLFW.glfwCreateWindow(300, 300, "Wgpu-Java", NULL, NULL);
+    public Window(RenderPipelineSettings renderSettings, WindowSettings windowSettings) {
+        this.handle = windowSettings.createWindow();
 
         if(this.handle == NULL)
             throw new RuntimeException("Failed to create window!");
 
-        initializeGlfwWindow();
+        currentDimension = GlfwHandler.getWindowDimension(handle);
+        GlfwHandler.centerWindow(handle, currentDimension);
 
         surface = createSurface();
         device = createDevice();
-        renderPipeline = new RenderPipeline(settings, device);
+        renderPipeline = new RenderPipeline(renderSettings, device);
 
         createNewSwapChain();
-    }
-
-    private void initializeGlfwWindow() {
-        GLFW.glfwSetKeyCallback(handle, (window, key, scancode, action, mods) -> {
-            if ( key == GLFW.GLFW_KEY_ESCAPE && action == GLFW.GLFW_RELEASE )
-                GLFW.glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
-        });
-
-        currentDimension = GlfwHandler.getWindowDimension(handle);
-        GLFWVidMode vidmode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
-
-        // Center the window
-        GLFW.glfwSetWindowPos(
-                handle,
-                (vidmode.width() - currentDimension.getWidth()) / 2,
-                (vidmode.height() - currentDimension.getHeight()) / 2
-        );
     }
 
     private long createDevice() {
@@ -112,8 +95,6 @@ public class Window {
     }
 
     private void onResize() {
-        System.out.println("Resize: " + currentDimension);
-
         createNewSwapChain();
     }
 
