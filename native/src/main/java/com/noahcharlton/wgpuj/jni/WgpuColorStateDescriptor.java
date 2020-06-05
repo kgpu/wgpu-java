@@ -1,6 +1,5 @@
 package com.noahcharlton.wgpuj.jni;
 
-import com.noahcharlton.wgpuj.graphics.BlendDescriptor;
 import com.noahcharlton.wgpuj.util.WgpuJavaStruct;
 import jnr.ffi.Runtime;
 import jnr.ffi.Struct;
@@ -15,19 +14,25 @@ public class WgpuColorStateDescriptor extends WgpuJavaStruct {
     public static final int ALL = 15;
 
     private Struct.Enum<WgpuTextureFormat> textureFormat = new Struct.Enum<>(WgpuTextureFormat.class);;
-    private WgpuBlendDescriptor alphaBlend = inner(new WgpuBlendDescriptor());;
-    private WgpuBlendDescriptor colorBlend = inner(new WgpuBlendDescriptor());;
+    private WgpuBlendDescriptor alphaBlend = inner(new WgpuBlendDescriptor());
+    private WgpuBlendDescriptor colorBlend = inner(new WgpuBlendDescriptor());
     private Struct.Unsigned32 writeMask = new Struct.Unsigned32();;
 
     public WgpuColorStateDescriptor(Runtime runtime) {
         super(runtime);
     }
 
-    public WgpuColorStateDescriptor(WgpuTextureFormat textureFormat, BlendDescriptor alpha, BlendDescriptor color,
+    public WgpuColorStateDescriptor(WgpuTextureFormat textureFormat,
+                                    WgpuBlendFactor srcAlpha,
+                                    WgpuBlendFactor destAlpha,
+                                    WgpuBlendOperation opAlpha,
+                                    WgpuBlendFactor srcColor,
+                                    WgpuBlendFactor destColor,
+                                    WgpuBlendOperation opColor,
                                     int writeMask) {
         this.textureFormat.set(textureFormat);
         this.writeMask.set(writeMask);
-        alphaBlend.set(alpha);
-        colorBlend.set(color);
+        alphaBlend.set(srcAlpha, destAlpha, opAlpha);
+        colorBlend.set(srcColor, destColor, opColor);
     }
 }

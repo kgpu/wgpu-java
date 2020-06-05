@@ -1,4 +1,4 @@
-package com.noahcharlton.wgpuj.graphics;
+package com.noahcharlton.wgpuj.core;
 
 import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.jni.WgpuCommandEncoderDescriptor;
@@ -12,8 +12,6 @@ import com.noahcharlton.wgpuj.jni.WgpuSwapChainDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuSwapChainOutput;
 import com.noahcharlton.wgpuj.jni.WgpuSwapChainStatus;
 import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
-import com.noahcharlton.wgpuj.util.Color;
-import com.noahcharlton.wgpuj.util.Dimension;
 
 public class SwapChain {
 
@@ -29,9 +27,9 @@ public class SwapChain {
         long textureID = getSwapChainTexture();
         encoderID = WgpuJava.wgpuNative.wgpu_device_create_command_encoder(device,
                 new WgpuCommandEncoderDescriptor("command_encoder").getPointerTo());
-        var rawPassDescriptor = new WgpuRawPassDescriptor(null, new WgpuRenderPassColorDescriptor(
-                textureID, WgpuLoadOp.CLEAR, WgpuStoreOp.STORE, Color.GREEN
-        ));
+        var clearColor = Color.GREEN;
+        var rawPassDescriptor = new WgpuRawPassDescriptor(null, new WgpuRenderPassColorDescriptor(textureID,
+                WgpuLoadOp.CLEAR, WgpuStoreOp.STORE, clearColor.r, clearColor.g, clearColor.b, clearColor.a));
 
         return WgpuJava.wgpuNative.wgpu_command_encoder_begin_render_pass(encoderID,
                 rawPassDescriptor.getPointerTo());
@@ -64,7 +62,8 @@ public class SwapChain {
         var descriptor = new WgpuSwapChainDescriptor(
                 WgpuSwapChainDescriptor.TEXTURE_OUTPUT_ATTACHMENT,
                 WgpuTextureFormat.Bgra8Unorm,
-                dimension,
+                dimension.getWidth(),
+                dimension.getHeight(),
                 WgpuPresentMode.FIFO);
 
         var id = WgpuJava.wgpuNative.wgpu_device_create_swap_chain(device, surface, descriptor.getPointerTo());

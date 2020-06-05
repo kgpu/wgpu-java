@@ -1,4 +1,4 @@
-package com.noahcharlton.wgpuj.graphics;
+package com.noahcharlton.wgpuj.core;
 
 import com.noahcharlton.wgpuj.jni.WgpuColorStateDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuIndexFormat;
@@ -26,7 +26,22 @@ public class PipelineSettings {
     }
 
     public WgpuRenderPipelineDescriptor build(){
-        return new WgpuRenderPipelineDescriptor(this);
+        var descriptor = new WgpuRenderPipelineDescriptor();
+
+        descriptor.getLayout().set(layout);
+        descriptor.getVertexStage().set(vertexModule, vertexEntryPoint);
+        descriptor.getFragmentStage().set(fragmentStage);
+        descriptor.getPrimitiveTopology().set(primitiveTopology.getIntValue());
+        descriptor.getRasterizationState().set(rasterizationState);
+        descriptor.getColorStates().set(colorStates);
+        descriptor.getColorStatesLength().set(colorStates.length);
+        descriptor.getDepthStencilState().set(depthStencilState);
+        descriptor.getVertexState().set(vertexIndexFormat);
+        descriptor.getSampleCount().set(sampleCount);
+        descriptor.getSampleMask().set(sampleMask);
+        descriptor.getAlphaToCoverage().set(alphaToCoverage);
+
+        return descriptor;
     }
 
     public long getLayout() {

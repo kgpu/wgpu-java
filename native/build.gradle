@@ -11,35 +11,10 @@ repositories {
     mavenCentral()
 }
 
-import org.gradle.internal.os.OperatingSystem
-
-project.ext.lwjglVersion = "3.2.3"
-
-switch (OperatingSystem.current()) {
-    case OperatingSystem.LINUX:
-        project.ext.lwjglNatives = "natives-linux"
-        break
-    case OperatingSystem.MAC_OS:
-        project.ext.lwjglNatives = "natives-macos"
-        break
-    case OperatingSystem.WINDOWS:
-        project.ext.lwjglNatives = "natives-windows"
-        break
-}
-
 dependencies {
-    implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
-
-    implementation "org.lwjgl:lwjgl"
-    implementation "org.lwjgl:lwjgl-glfw"
-    runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
-
     compile group: 'com.github.jnr', name: 'jnr-ffi', version: '2.1.15'
     compile group: 'com.github.jnr', name: 'jffi', version: '1.2.23'
 }
-
-// wgpu-native installer
 
 task createNatives(type: Copy){
     from("${projectDir}/wgpu-native/target/debug") {

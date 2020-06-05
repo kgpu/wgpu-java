@@ -1,12 +1,14 @@
 package com.noahcharlton.wgpuj.examples;
 
-import com.noahcharlton.wgpuj.WgpuJava;
-import com.noahcharlton.wgpuj.graphics.Window;
+import com.noahcharlton.wgpuj.core.GlfwHandler;
+import com.noahcharlton.wgpuj.core.SharedLibraryLoader;
+import com.noahcharlton.wgpuj.core.Window;
 
 public class Example {
 
     public static void main(String[] args){
-        WgpuJava.init();
+        SharedLibraryLoader.loadWgpuNative();
+        GlfwHandler.init();
 
         Window window = new Window();
 
@@ -15,7 +17,7 @@ public class Example {
         }
 
         window.dispose();
-        WgpuJava.destroy();
+        GlfwHandler.terminate();
     }
 
 }

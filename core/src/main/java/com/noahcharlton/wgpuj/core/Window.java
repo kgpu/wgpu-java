@@ -1,4 +1,4 @@
-package com.noahcharlton.wgpuj.graphics;
+package com.noahcharlton.wgpuj.core;
 
 import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.jni.WGPUPowerPreference;
@@ -19,9 +19,6 @@ import com.noahcharlton.wgpuj.jni.WgpuRawPass;
 import com.noahcharlton.wgpuj.jni.WgpuRequestAdapterOptions;
 import com.noahcharlton.wgpuj.jni.WgpuShaderModuleDescription;
 import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
-import com.noahcharlton.wgpuj.util.Dimension;
-import com.noahcharlton.wgpuj.util.GlfwHandler;
-import com.noahcharlton.wgpuj.util.Platform;
 import jnr.ffi.Pointer;
 import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFW;
@@ -88,11 +85,11 @@ public class Window {
                         0.0f,
                         0.0f).getPointerTo())
                 .setPrimitiveTopology(WgpuPrimitiveTopology.TriangleList)
-                .setColorStates(new WgpuColorStateDescriptor(
+                .setColorStates(new ColorState(
                         WgpuTextureFormat.Bgra8Unorm,
                         new BlendDescriptor(WgpuBlendFactor.One, WgpuBlendFactor.Zero, WgpuBlendOperation.ADD),
                         new BlendDescriptor(WgpuBlendFactor.One, WgpuBlendFactor.Zero, WgpuBlendOperation.ADD),
-                        WgpuColorStateDescriptor.ALL))
+                        WgpuColorStateDescriptor.ALL).build())
                 .setDepthStencilState(WgpuJava.createNullPointer())
                 .setVertexIndexFormat(WgpuIndexFormat.Uint16)
                 .setSampleCount(1)

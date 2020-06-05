@@ -11,7 +11,8 @@ Java bindings for [Wgpu](https://github.com/gfx-rs/wgpu) based on
 ### Structure :
 ###### wgpu-java/core
 Libraries that make wgpu easier to use in Java.
-Includes a windowing library, rendering pipelines, swap chains, etc.  
+Includes a windowing library, rendering pipelines, swap chains, etc. Uses 
+LWJGL to get Glfw bindings 
 
 ###### wgpu-java/native: 
 Actual bindings with wgpu-native. Bindings are created at 

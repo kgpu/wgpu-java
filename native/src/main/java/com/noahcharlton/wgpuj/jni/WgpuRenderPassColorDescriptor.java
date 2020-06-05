@@ -1,7 +1,6 @@
 package com.noahcharlton.wgpuj.jni;
 
 import com.noahcharlton.wgpuj.WgpuJava;
-import com.noahcharlton.wgpuj.util.Color;
 import com.noahcharlton.wgpuj.util.WgpuJavaStruct;
 import jnr.ffi.Runtime;
 import jnr.ffi.Struct;
@@ -24,13 +23,14 @@ public class WgpuRenderPassColorDescriptor extends WgpuJavaStruct {
         this.clearColor = inner(new WgpuColor());
     }
 
-    public WgpuRenderPassColorDescriptor(long attachment, WgpuLoadOp loadOp, WgpuStoreOp storeOp, Color clearColor) {
+    public WgpuRenderPassColorDescriptor(long attachment, WgpuLoadOp loadOp, WgpuStoreOp storeOp,
+                                         double clearR, double clearG, double clearB, double clearA) {
         this(WgpuJava.getRuntime());
 
         useDirectMemory();
         this.attachment.set(attachment);
         this.loadOp.set(loadOp.getIntValue());
         this.storeOp.set(storeOp.getIntValue());
-        this.clearColor.set(clearColor);
+        this.clearColor.set(clearR, clearG, clearB, clearA);
     }
 }
