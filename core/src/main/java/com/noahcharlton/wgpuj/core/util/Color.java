@@ -1,4 +1,4 @@
-package com.noahcharlton.wgpuj.core;
+package com.noahcharlton.wgpuj.core.util;
 
 import java.util.Objects;
 

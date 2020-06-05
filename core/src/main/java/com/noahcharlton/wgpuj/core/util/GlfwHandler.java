@@ -1,4 +1,4 @@
-package com.noahcharlton.wgpuj.core;
+package com.noahcharlton.wgpuj.core.util;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;

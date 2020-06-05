@@ -1,6 +1,9 @@
-package com.noahcharlton.wgpuj.core;
+package com.noahcharlton.wgpuj.core.graphics;
 
 import com.noahcharlton.wgpuj.WgpuJava;
+import com.noahcharlton.wgpuj.core.util.Dimension;
+import com.noahcharlton.wgpuj.core.util.GlfwHandler;
+import com.noahcharlton.wgpuj.core.util.Platform;
 import com.noahcharlton.wgpuj.jni.WGPUPowerPreference;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutDescriptor;

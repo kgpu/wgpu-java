@@ -1,4 +1,4 @@
-package com.noahcharlton.wgpuj.core;
+package com.noahcharlton.wgpuj.core.util;
 
 public class Platform {
 

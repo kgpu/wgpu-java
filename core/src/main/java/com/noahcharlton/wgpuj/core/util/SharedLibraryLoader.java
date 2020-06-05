@@ -1,6 +1,4 @@
-package com.noahcharlton.wgpuj.core;
-
-import com.noahcharlton.wgpuj.WgpuJava;
+package com.noahcharlton.wgpuj.core.util;
 
 import java.io.Closeable;
 import java.io.File;
@@ -16,12 +14,6 @@ public class SharedLibraryLoader {
     private static final boolean isWindows = System.getProperty("os.name").contains("Windows");
     private static final boolean isLinux = System.getProperty("os.name").contains("Linux");
     private static final boolean isMac = System.getProperty("os.name").contains("Mac");
-
-    public static void loadWgpuNative(){
-        File file = new SharedLibraryLoader().load("wgpu_native");
-
-        WgpuJava.init(file);
-    }
 
     private String crc(InputStream input) {
         if(input == null) throw new IllegalArgumentException("input cannot be null.");

@@ -1,6 +1,8 @@
-package com.noahcharlton.wgpuj.core;
+package com.noahcharlton.wgpuj.core.graphics;
 
 import com.noahcharlton.wgpuj.WgpuJava;
+import com.noahcharlton.wgpuj.core.util.Color;
+import com.noahcharlton.wgpuj.core.util.Dimension;
 import com.noahcharlton.wgpuj.jni.WgpuCommandEncoderDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuLoadOp;
 import com.noahcharlton.wgpuj.jni.WgpuPresentMode;

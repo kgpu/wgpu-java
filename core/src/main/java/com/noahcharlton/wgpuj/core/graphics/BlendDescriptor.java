@@ -1,4 +1,4 @@
-package com.noahcharlton.wgpuj.core;
+package com.noahcharlton.wgpuj.core.graphics;
 
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
 import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
