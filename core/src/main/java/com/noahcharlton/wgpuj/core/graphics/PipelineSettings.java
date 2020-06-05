@@ -1,5 +1,6 @@
 package com.noahcharlton.wgpuj.core.graphics;
 
+import com.noahcharlton.wgpuj.core.ShaderModule;
 import com.noahcharlton.wgpuj.jni.WgpuColorStateDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuIndexFormat;
 import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
@@ -9,9 +10,8 @@ import jnr.ffi.Pointer;
 public class PipelineSettings {
 
     private long layout;
-    private long vertexModule;
-    private String vertexEntryPoint;
-    private Pointer fragmentStage;
+    private ShaderModule vertexStage;
+    private ShaderModule fragmentStage;
     private WgpuPrimitiveTopology primitiveTopology;
     private Pointer rasterizationState;
     private WgpuColorStateDescriptor[] colorStates;
@@ -29,8 +29,8 @@ public class PipelineSettings {
         var descriptor = new WgpuRenderPipelineDescriptor();
 
         descriptor.getLayout().set(layout);
-        descriptor.getVertexStage().set(vertexModule, vertexEntryPoint);
-        descriptor.getFragmentStage().set(fragmentStage);
+        descriptor.getVertexStage().set(vertexStage.getId(), vertexStage.getEntryPoint());
+        descriptor.getFragmentStage().set(fragmentStage.createStageDescriptor().getPointerTo());
         descriptor.getPrimitiveTopology().set(primitiveTopology.getIntValue());
         descriptor.getRasterizationState().set(rasterizationState);
         descriptor.getColorStates().set(colorStates);
@@ -48,39 +48,27 @@ public class PipelineSettings {
         return layout;
     }
 
-    public long getVertexModule() {
-        return vertexModule;
-    }
-
-    public PipelineSettings setVertexModule(long vertexModule) {
-        this.vertexModule = vertexModule;
-
-        return this;
-    }
-
-    public String getVertexEntryPoint() {
-        return vertexEntryPoint;
-    }
-
-    public PipelineSettings setVertexEntryPoint(String vertexEntryPoint) {
-        this.vertexEntryPoint = vertexEntryPoint;
-
-        return this;
-    }
-
     public PipelineSettings setLayout(long layout) {
         this.layout = layout;
 
         return this;
     }
 
-    public Pointer getFragmentStage() {
+    public ShaderModule getVertexStage() {
+        return vertexStage;
+    }
+
+    public PipelineSettings setVertexStage(ShaderModule vertexStage) {
+        this.vertexStage = vertexStage;
+        return this;
+    }
+
+    public ShaderModule getFragmentStage() {
         return fragmentStage;
     }
 
-    public PipelineSettings setFragmentStage(Pointer fragmentStage) {
+    public PipelineSettings setFragmentStage(ShaderModule fragmentStage) {
         this.fragmentStage = fragmentStage;
-
         return this;
     }
 

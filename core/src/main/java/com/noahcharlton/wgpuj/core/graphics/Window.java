@@ -1,6 +1,7 @@
 package com.noahcharlton.wgpuj.core.graphics;
 
 import com.noahcharlton.wgpuj.WgpuJava;
+import com.noahcharlton.wgpuj.core.ShaderModule;
 import com.noahcharlton.wgpuj.core.util.Dimension;
 import com.noahcharlton.wgpuj.core.util.GlfwHandler;
 import com.noahcharlton.wgpuj.core.util.Platform;
@@ -16,11 +17,9 @@ import com.noahcharlton.wgpuj.jni.WgpuFrontFace;
 import com.noahcharlton.wgpuj.jni.WgpuIndexFormat;
 import com.noahcharlton.wgpuj.jni.WgpuPipelineLayoutDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
-import com.noahcharlton.wgpuj.jni.WgpuProgrammableStageDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuRasterizationStateDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuRawPass;
 import com.noahcharlton.wgpuj.jni.WgpuRequestAdapterOptions;
-import com.noahcharlton.wgpuj.jni.WgpuShaderModuleDescription;
 import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
 import jnr.ffi.Pointer;
 import org.lwjgl.glfw.Callbacks;
@@ -37,8 +36,8 @@ public class Window {
     private final long device;
     private final long surface;
 
-    private long vertexModule;
-    private long fragmentModule;
+    private final ShaderModule vertexModule;
+    private final ShaderModule fragmentModule;
     private long pipelineID;
     private long bindGroupID;
 
@@ -54,8 +53,9 @@ public class Window {
         initializeGlfwWindow();
         surface = createSurface();
         device = createDevice();
+        vertexModule = ShaderModule.fromClasspathFile("/triangle.vert.spv", "main", device);
+        fragmentModule = ShaderModule.fromClasspathFile("/triangle.frag.spv", "main", device);
 
-        loadShaders();
         createPipeline();
         createSwapChain();
     }
@@ -74,13 +74,11 @@ public class Window {
     }
 
     private PipelineSettings createPipelineSettings(long pipelineLayout){
-        var fragment = new WgpuProgrammableStageDescriptor(fragmentModule, "main").getPointerTo();
 
         return new PipelineSettings()
                 .setLayout(pipelineLayout)
-                .setVertexModule(vertexModule)
-                .setVertexEntryPoint("main")
-                .setFragmentStage(fragment)
+                .setVertexStage(vertexModule)
+                .setFragmentStage(fragmentModule)
                 .setRasterizationState(new WgpuRasterizationStateDescriptor(
                         WgpuFrontFace.COUNTER_CLOCKWISE,
                         WgpuCullMode.NONE,
@@ -98,11 +96,6 @@ public class Window {
                 .setSampleCount(1)
                 .setSampleMask(0)
                 .setAlphaToCoverage(false);
-    }
-
-    private void loadShaders() {
-        vertexModule = WgpuShaderModuleDescription.fromFile("triangle.vert").load(device);
-        fragmentModule = WgpuShaderModuleDescription.fromFile("triangle.frag").load(device);
     }
 
     private void initializeGlfwWindow() {
@@ -204,9 +197,5 @@ public class Window {
     public void dispose(){
         Callbacks.glfwFreeCallbacks(handle);
         GLFW.glfwDestroyWindow(handle);
-    }
-
-    long getWgpuDevice() {
-        return device;
     }
 }

@@ -35,6 +35,7 @@ public class WgpuApplication implements AutoCloseable{
 
     @Override
     public void close() {
+        window.dispose();
         GlfwHandler.terminate();
     }
 
