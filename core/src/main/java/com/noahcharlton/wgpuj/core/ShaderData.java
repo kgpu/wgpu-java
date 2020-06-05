@@ -5,21 +5,31 @@ import com.noahcharlton.wgpuj.jni.WgpuShaderModuleDescription;
 
 import java.io.IOException;
 
-public class ShaderModule {
+/**
+ * A container for a shader before it is loaded into
+ * Wgpu.
+ */
+public class ShaderData {
 
-    private final long id;
     private final String entryPoint;
+    private final byte[] data;
 
-    public ShaderModule(byte[] data, String entryPoint, long device) {
-        this.id = new WgpuShaderModuleDescription(data).load(device);
+    public ShaderData(String entryPoint, byte[] data) {
         this.entryPoint = entryPoint;
+        this.data = data;
     }
 
-    public WgpuProgrammableStageDescriptor createStageDescriptor(){
-        return new WgpuProgrammableStageDescriptor(id, entryPoint);
+    public WgpuProgrammableStageDescriptor build(long device){
+        long shaderModule = createModule(device);
+
+        return new WgpuProgrammableStageDescriptor(shaderModule, entryPoint);
     }
 
-    public static ShaderModule fromClasspathFile(String path, String entryPoint, long device){
+    public long createModule(long device) {
+        return new WgpuShaderModuleDescription(data).load(device);
+    }
+
+    public static ShaderData fromClasspathFile(String path, String entryPoint){
         var inputStream = WgpuShaderModuleDescription.class.getResourceAsStream(path);
 
         if(inputStream == null){
@@ -29,14 +39,14 @@ public class ShaderModule {
         try {
             byte[] bytes =  inputStream.readAllBytes();
 
-            return new ShaderModule(bytes, entryPoint, device);
+            return new ShaderData(entryPoint, bytes);
         } catch(IOException e) {
             throw new RuntimeException("Failed to read shader file " + path, e);
         }
     }
 
-    public long getId() {
-        return id;
+    public byte[] getData() {
+        return data;
     }
 
     public String getEntryPoint() {

@@ -1,26 +1,12 @@
 package com.noahcharlton.wgpuj.core.graphics;
 
 import com.noahcharlton.wgpuj.WgpuJava;
-import com.noahcharlton.wgpuj.core.ShaderModule;
 import com.noahcharlton.wgpuj.core.util.Dimension;
 import com.noahcharlton.wgpuj.core.util.GlfwHandler;
 import com.noahcharlton.wgpuj.core.util.Platform;
 import com.noahcharlton.wgpuj.jni.WGPUPowerPreference;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
-import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
-import com.noahcharlton.wgpuj.jni.WgpuColorStateDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuCullMode;
 import com.noahcharlton.wgpuj.jni.WgpuDeviceDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuFrontFace;
-import com.noahcharlton.wgpuj.jni.WgpuIndexFormat;
-import com.noahcharlton.wgpuj.jni.WgpuPipelineLayoutDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
-import com.noahcharlton.wgpuj.jni.WgpuRasterizationStateDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuRawPass;
 import com.noahcharlton.wgpuj.jni.WgpuRequestAdapterOptions;
-import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
 import jnr.ffi.Pointer;
 import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFW;
@@ -36,66 +22,24 @@ public class Window {
     private final long device;
     private final long surface;
 
-    private final ShaderModule vertexModule;
-    private final ShaderModule fragmentModule;
-    private long pipelineID;
-    private long bindGroupID;
+    private final RenderPipeline renderPipeline;
 
     private Dimension currentDimension;
     private SwapChain swapChain;
 
-    public Window() {
+    public Window(RenderPipelineSettings settings) {
         this.handle = GLFW.glfwCreateWindow(300, 300, "Wgpu-Java", NULL, NULL);
 
         if(this.handle == NULL)
             throw new RuntimeException("Failed to create window!");
 
         initializeGlfwWindow();
+
         surface = createSurface();
         device = createDevice();
-        vertexModule = ShaderModule.fromClasspathFile("/triangle.vert.spv", "main", device);
-        fragmentModule = ShaderModule.fromClasspathFile("/triangle.frag.spv", "main", device);
+        renderPipeline = new RenderPipeline(settings, device);
 
-        createPipeline();
-        createSwapChain();
-    }
-
-    private void createPipeline() {
-        var layoutDescriptor = new WgpuBindGroupLayoutDescriptor("bind group layout");
-        var bindGroupLayout = WgpuJava.wgpuNative.wgpu_device_create_bind_group_layout(device,
-                layoutDescriptor.getPointerTo());
-        var groupDescriptor = new WgpuBindGroupDescriptor("bind group", bindGroupLayout);
-        bindGroupID = WgpuJava.wgpuNative.wgpu_device_create_bind_group(device, groupDescriptor.getPointerTo());
-        var pipelineLayoutDescriptor = new WgpuPipelineLayoutDescriptor(bindGroupLayout);
-        var pipelineLayoutID = WgpuJava.wgpuNative.wgpu_device_create_pipeline_layout(device,
-                pipelineLayoutDescriptor.getPointerTo());
-        var pipelineSettings = createPipelineSettings(pipelineLayoutID).build().getPointerTo();
-        pipelineID = WgpuJava.wgpuNative.wgpu_device_create_render_pipeline(device, pipelineSettings);
-    }
-
-    private PipelineSettings createPipelineSettings(long pipelineLayout){
-
-        return new PipelineSettings()
-                .setLayout(pipelineLayout)
-                .setVertexStage(vertexModule)
-                .setFragmentStage(fragmentModule)
-                .setRasterizationState(new WgpuRasterizationStateDescriptor(
-                        WgpuFrontFace.COUNTER_CLOCKWISE,
-                        WgpuCullMode.NONE,
-                        0,
-                        0.0f,
-                        0.0f).getPointerTo())
-                .setPrimitiveTopology(WgpuPrimitiveTopology.TriangleList)
-                .setColorStates(new ColorState(
-                        WgpuTextureFormat.Bgra8Unorm,
-                        new BlendDescriptor(WgpuBlendFactor.One, WgpuBlendFactor.Zero, WgpuBlendOperation.ADD),
-                        new BlendDescriptor(WgpuBlendFactor.One, WgpuBlendFactor.Zero, WgpuBlendOperation.ADD),
-                        WgpuColorStateDescriptor.ALL).build())
-                .setDepthStencilState(WgpuJava.createNullPointer())
-                .setVertexIndexFormat(WgpuIndexFormat.Uint16)
-                .setSampleCount(1)
-                .setSampleMask(0)
-                .setAlphaToCoverage(false);
+        createNewSwapChain();
     }
 
     private void initializeGlfwWindow() {
@@ -154,7 +98,7 @@ public class Window {
         throw new UnsupportedOperationException();
     }
 
-    public void update(){
+    public void render(){
         GLFW.glfwPollEvents();
         var newDimension = GlfwHandler.getWindowDimension(handle);
 
@@ -164,25 +108,16 @@ public class Window {
             onResize();
         }
 
-        render();
-    }
-
-    private void render() {
-        WgpuRawPass rawPass = swapChain.beginRenderPass(device);
-        WgpuJava.wgpuNative.wgpu_render_pass_set_pipeline(rawPass.getPointerTo(), pipelineID);
-        WgpuJava.wgpuNative.wgpu_render_pass_set_bind_group(rawPass.getPointerTo(), 0, bindGroupID,
-                WgpuJava.createNullPointer(), 0);
-        WgpuJava.wgpuNative.wgpu_render_pass_draw(rawPass.getPointerTo(), 3, 1, 0, 0);
-        swapChain.endRenderPass(rawPass, device);
+        swapChain.render(renderPipeline, device);
     }
 
     private void onResize() {
         System.out.println("Resize: " + currentDimension);
 
-        createSwapChain();
+        createNewSwapChain();
     }
 
-    private void createSwapChain() {
+    private void createNewSwapChain() {
         swapChain = SwapChain.create(currentDimension, device, surface);
     }
 

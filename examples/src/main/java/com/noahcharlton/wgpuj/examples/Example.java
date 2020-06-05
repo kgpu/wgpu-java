@@ -1,15 +1,60 @@
 package com.noahcharlton.wgpuj.examples;
 
-import com.noahcharlton.wgpuj.core.WgpuApplication;
+import com.noahcharlton.wgpuj.WgpuJava;
+import com.noahcharlton.wgpuj.core.ShaderData;
+import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
+import com.noahcharlton.wgpuj.core.WgpuCore;
+import com.noahcharlton.wgpuj.core.graphics.BlendDescriptor;
+import com.noahcharlton.wgpuj.core.graphics.ColorState;
+import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
+import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
+import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
+import com.noahcharlton.wgpuj.jni.WgpuColorStateDescriptor;
+import com.noahcharlton.wgpuj.jni.WgpuCullMode;
+import com.noahcharlton.wgpuj.jni.WgpuFrontFace;
+import com.noahcharlton.wgpuj.jni.WgpuIndexFormat;
+import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
+import com.noahcharlton.wgpuj.jni.WgpuRasterizationStateDescriptor;
+import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
 
 public class Example {
 
     public static void main(String[] args){
-        try(WgpuApplication application = new WgpuApplication()){
+        WgpuCore.loadWgpuNative();
+
+        RenderPipelineSettings settings = createPipelineSettings();
+
+        try(WgpuGraphicApplication application = new WgpuGraphicApplication(settings)){
             while(!application.getWindow().isCloseRequested()){
-                application.update();
+                application.render();
             }
         }
+    }
+
+    private static RenderPipelineSettings createPipelineSettings(){
+        ShaderData vertex = ShaderData.fromClasspathFile("/triangle.vert.spv", "main");
+        ShaderData fragment = ShaderData.fromClasspathFile("/triangle.frag.spv", "main");
+
+        return new RenderPipelineSettings()
+                .setVertexStage(vertex)
+                .setFragmentStage(fragment)
+                .setRasterizationState(new WgpuRasterizationStateDescriptor(
+                        WgpuFrontFace.COUNTER_CLOCKWISE,
+                        WgpuCullMode.NONE,
+                        0,
+                        0.0f,
+                        0.0f).getPointerTo())
+                .setPrimitiveTopology(WgpuPrimitiveTopology.TriangleList)
+                .setColorStates(new ColorState(
+                        WgpuTextureFormat.Bgra8Unorm,
+                        new BlendDescriptor(WgpuBlendFactor.One, WgpuBlendFactor.Zero, WgpuBlendOperation.ADD),
+                        new BlendDescriptor(WgpuBlendFactor.One, WgpuBlendFactor.Zero, WgpuBlendOperation.ADD),
+                        WgpuColorStateDescriptor.ALL).build())
+                .setDepthStencilState(WgpuJava.createNullPointer())
+                .setVertexIndexFormat(WgpuIndexFormat.Uint16)
+                .setSampleCount(1)
+                .setSampleMask(0)
+                .setAlphaToCoverage(false);
     }
 
 }
