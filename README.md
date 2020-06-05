@@ -9,17 +9,25 @@ Java bindings for [Wgpu](https://github.com/gfx-rs/wgpu) based on
 ![Alternate image text](images/triangle_example.png)
 
 ### Structure :
-###### wgpu-java/core: 
+###### wgpu-java/core
+Libraries that make wgpu easier to use in Java.
+Includes a windowing library, rendering pipelines, swap chains, etc.  
+
+###### wgpu-java/native: 
 Actual bindings with wgpu-native. Bindings are created at 
 runtime using [jnr-ffi](https://github.com/jnr/jnr-ffi)
 
+Use this 
+
 ###### wgpu-java/examples
-Examples based on the wgpu-native examples
+Examples based on the wgpu-native examples on how to use wgpu-java/core
 
 ### How to run:
+Gradle will automatically build the required dll/.so/.dylib when wgpu-java/natives 
+is compiled, so you only need to run the following command:
 ```
 git clone https://github.com/DevOrc/wgpu-java
-gradlew createNatives run
+gradlew examples:run
 ```
 
 ### Supported Platforms
