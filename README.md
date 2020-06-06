@@ -18,7 +18,13 @@ LWJGL to get Glfw bindings
 Actual bindings with wgpu-native. Bindings are created at 
 runtime using [jnr-ffi](https://github.com/jnr/jnr-ffi)
 
-Use this 
+###### wgpu-java/native/wgpu-native
+The [fork](https://github.com/DevOrc/wgpu-native/tree/jnr-compatible) of wgpu-native that this library uses.
+A fork is needed to add some functionsto get around some problems with jnr-ffi 
+(the library that produces the bindings from java to rust)
+
+###### wgpu-java/native/wgpu-test
+A cargo crate that has functions used for unit testing the FFI code.
 
 ###### wgpu-java/examples
 Examples based on the wgpu-native examples on how to use wgpu-java/core

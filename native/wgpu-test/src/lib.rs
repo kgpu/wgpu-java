@@ -3,6 +3,7 @@ use std::os::raw::c_char;
 
 #[macro_use]
 mod fail;
+mod wgpu_enum;
 
 #[no_mangle]
 pub unsafe extern fn rust_fails_test(){
@@ -32,12 +33,12 @@ pub unsafe extern fn java_gives_foobar_string(input: *mut c_char){
 }
 
 #[no_mangle]
-pub unsafe fn color_to_string(color: wgt::Color) -> *const c_char {
+pub extern fn color_to_string(color: wgt::Color) -> *const c_char {
     CString::new(format!("{:?}", color)).unwrap().into_raw()
 }
 
 #[no_mangle]
-pub unsafe fn bind_group_layout_descriptor_test(
+pub extern fn bind_group_layout_descriptor_test(
     desc: &wgc::binding_model::BindGroupLayoutDescriptor) {
 
     let label = unsafe {CStr::from_ptr(desc.label).to_str().unwrap() };

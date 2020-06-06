@@ -29,8 +29,8 @@ public class WgpuRenderPassColorDescriptor extends WgpuJavaStruct {
 
         useDirectMemory();
         this.attachment.set(attachment);
-        this.loadOp.set(loadOp.getIntValue());
-        this.storeOp.set(storeOp.getIntValue());
+        this.loadOp.set(loadOp);
+        this.storeOp.set(storeOp);
         this.clearColor.set(clearR, clearG, clearB, clearA);
     }
 }

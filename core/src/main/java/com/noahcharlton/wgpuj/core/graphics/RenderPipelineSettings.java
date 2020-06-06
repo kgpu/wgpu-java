@@ -32,7 +32,7 @@ public class RenderPipelineSettings {
         descriptor.getLayout().set(layout);
         descriptor.getVertexStage().set(vertexModule, vertexStage.getEntryPoint());
         descriptor.getFragmentStage().set(fragment);
-        descriptor.getPrimitiveTopology().set(primitiveTopology.getIntValue());
+        descriptor.getPrimitiveTopology().set(primitiveTopology);
         descriptor.getRasterizationState().set(rasterizationState);
         descriptor.getColorStates().set(colorStates);
         descriptor.getColorStatesLength().set(colorStates.length);

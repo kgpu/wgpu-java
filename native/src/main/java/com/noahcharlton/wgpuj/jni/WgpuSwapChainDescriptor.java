@@ -25,6 +25,6 @@ public class WgpuSwapChainDescriptor extends WgpuJavaStruct {
         this.textureFormat.set(format.getIntValue());
         this.width.set(windowWidth);
         this.height.set(windowHeight);
-        this.presentMode.set(mode.getIntValue());
+        this.presentMode.set(mode);
     }
 }

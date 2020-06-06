@@ -46,7 +46,7 @@ public class Example {
                         0,
                         0.0f,
                         0.0f).getPointerTo())
-                .setPrimitiveTopology(WgpuPrimitiveTopology.TriangleList)
+                .setPrimitiveTopology(WgpuPrimitiveTopology.TRIANGLE_LIST)
                 .setColorStates(new ColorState(
                         WgpuTextureFormat.Bgra8Unorm,
                         new BlendDescriptor(WgpuBlendFactor.One, WgpuBlendFactor.Zero, WgpuBlendOperation.ADD),
