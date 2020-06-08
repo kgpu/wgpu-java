@@ -14,7 +14,7 @@ public class WgpuJavaStruct extends Struct {
         super(runtime);
     }
 
-    protected void useDirectMemory(){
+    public void useDirectMemory(){
         int size = Struct.size(this);
 
         jnr.ffi.Pointer pointer = WgpuJava.getRuntime().getMemoryManager().allocateDirect(size);

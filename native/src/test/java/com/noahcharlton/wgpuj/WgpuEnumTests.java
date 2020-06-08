@@ -56,6 +56,14 @@ public class WgpuEnumTests extends WgpuNativeTest{
         standardEnumTest(op, output);
     }
 
+//    @Test
+//    @EnumSource(WgpuBlendFactor.class)
+//    void wgpuBlendFactorTest(WgpuBlendFactor factor) {
+//        Pointer output = wgpuTest.get_store_op_name(factor);
+//
+//        standardEnumTest(op, output);
+//    }
+
     private <E extends Enum> void standardEnumTest(E e, Pointer output){
         String actual = RustCString.fromPointer(output);
         String expected = toRustEnumName(e);

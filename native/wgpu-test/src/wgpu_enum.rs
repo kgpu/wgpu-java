@@ -26,3 +26,4 @@ enum_name_test!(get_primitive_topology_name, wgt::PrimitiveTopology);
 enum_name_test!(get_present_mode_name, wgt::PresentMode);
 enum_name_test!(get_store_op_name, wgt::StoreOp);
 enum_name_test!(get_load_op_name, wgt::LoadOp);
+//enum_name_test!(get_load_op_name, wgt::LoadOp);

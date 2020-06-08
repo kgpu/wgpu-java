@@ -1,7 +1,6 @@
 package com.noahcharlton.wgpuj;
 
 import com.noahcharlton.wgpuj.fail.RustFailCallback;
-import com.noahcharlton.wgpuj.jni.WgpuColor;
 import com.noahcharlton.wgpuj.jni.WgpuLoadOp;
 import com.noahcharlton.wgpuj.jni.WgpuPowerPreference;
 import com.noahcharlton.wgpuj.jni.WgpuPresentMode;
@@ -23,7 +22,7 @@ public interface WgpuTest {
 
     void set_fail_callback(RustFailCallback callback);
 
-    Pointer color_to_string(WgpuColor color);
+    Pointer color_to_string(Pointer color);
 
     void bind_group_layout_descriptor_test(Pointer bindGroupLayoutDescriptor);
 
