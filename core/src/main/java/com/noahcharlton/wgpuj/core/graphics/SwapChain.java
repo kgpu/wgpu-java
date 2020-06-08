@@ -74,7 +74,7 @@ public class SwapChain {
     public static SwapChain create(Dimension dimension, long device, long surface){
         var descriptor = new WgpuSwapChainDescriptor(
                 WgpuSwapChainDescriptor.TEXTURE_OUTPUT_ATTACHMENT,
-                WgpuTextureFormat.Bgra8Unorm,
+                WgpuTextureFormat.BGRA8_UNORM,
                 dimension.getWidth(),
                 dimension.getHeight(),
                 WgpuPresentMode.FIFO);

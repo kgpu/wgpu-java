@@ -48,9 +48,9 @@ public class Example {
                         0.0f).getPointerTo())
                 .setPrimitiveTopology(WgpuPrimitiveTopology.TRIANGLE_LIST)
                 .setColorStates(new ColorState(
-                        WgpuTextureFormat.Bgra8Unorm,
-                        new BlendDescriptor(WgpuBlendFactor.One, WgpuBlendFactor.Zero, WgpuBlendOperation.ADD),
-                        new BlendDescriptor(WgpuBlendFactor.One, WgpuBlendFactor.Zero, WgpuBlendOperation.ADD),
+                        WgpuTextureFormat.BGRA8_UNORM,
+                        new BlendDescriptor(WgpuBlendFactor.ONE, WgpuBlendFactor.ZERO, WgpuBlendOperation.ADD),
+                        new BlendDescriptor(WgpuBlendFactor.ONE, WgpuBlendFactor.ZERO, WgpuBlendOperation.ADD),
                         WgpuColorStateDescriptor.ALL).build())
                 .setDepthStencilState(WgpuJava.createNullPointer())
                 .setVertexIndexFormat(WgpuIndexFormat.Uint16)

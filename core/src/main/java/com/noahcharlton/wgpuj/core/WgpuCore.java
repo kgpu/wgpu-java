@@ -7,9 +7,13 @@ import java.io.File;
 
 public class WgpuCore {
 
-    public static void loadWgpuNative(){
-        File file = new SharedLibraryLoader().load("wgpu_native");
+    private static final File file = new SharedLibraryLoader().load("wgpu_native");
 
+    public static void loadWgpuNative(){
         WgpuJava.init(file);
+    }
+
+    static File getLibraryFile() {
+        return file;
     }
 }

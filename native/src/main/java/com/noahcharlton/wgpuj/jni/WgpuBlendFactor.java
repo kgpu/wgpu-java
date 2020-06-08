@@ -2,19 +2,19 @@ package com.noahcharlton.wgpuj.jni;
 
 public enum WgpuBlendFactor {
 
-    Zero(0),
-    One(1),
-    SrcColor(2),
-    OneMinusSrcColor(3),
-    SrcAlpha(4),
-    OneMinusSrcAlpha(5),
-    DstColor(6),
-    OneMinusDstColor(7),
-    DstAlpha(8),
-    OneMinusDstAlpha(9),
-    SrcAlphaSaturated(10),
-    BlendColor(11),
-    OneMinusBlendColor(12);
+    ZERO(0),
+    ONE(1),
+    SRC_COLOR(2),
+    ONE_MINUS_SRC_COLOR(3),
+    SRC_ALPHA(4),
+    ONE_MINUS_SRC_ALPHA(5),
+    DST_COLOR(6),
+    ONE_MINUS_DST_COLOR(7),
+    DST_ALPHA(8),
+    ONE_MINUS_DST_ALPHA(9),
+    SRC_ALPHA_SATURATED(10),
+    BLEND_COLOR(11),
+    ONE_MINUS_BLEND_COLOR(12);
     
     private final int value;
 

@@ -35,4 +35,22 @@ dependencies {
     implementation "org.lwjgl:lwjgl-glfw"
     runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
+
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.4.2")
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+}
+
+test {
+    useJUnitPlatform()
+
+    testLogging {
+        showStandardStreams = true
+        events "skipped", "failed"
+
+        showExceptions true
+        exceptionFormat "full"
+        showCauses true
+        showStackTraces true
+    }
 }
