@@ -1,4 +1,6 @@
 # Wgpu-Java
+![CI](https://github.com/DevOrc/wgpu-java/workflows/CI/badge.svg)
+
 Java bindings for [Wgpu](https://github.com/gfx-rs/wgpu) based on
 [Wgpu-native](https://github.com/gfx-rs/wgpu-native). 
 

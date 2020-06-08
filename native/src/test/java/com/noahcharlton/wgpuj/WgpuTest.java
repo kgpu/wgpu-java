@@ -25,8 +25,6 @@ public interface WgpuTest {
 
     Pointer color_to_string(WgpuColor color);
 
-    void device_descriptor_test(Pointer deviceDescriptor);
-
     void bind_group_layout_descriptor_test(Pointer bindGroupLayoutDescriptor);
 
     Pointer get_power_preference_name(WgpuPowerPreference preference);

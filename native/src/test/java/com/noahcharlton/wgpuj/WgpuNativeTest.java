@@ -10,11 +10,19 @@ public class WgpuNativeTest {
     protected static WgpuTest wgpuTest;
 
     static {
-        var file = new SharedLibraryLoader().load("wgpu_test");
+        try{
+            var file = new SharedLibraryLoader().load("wgpu_test");
 
-        wgpuTest = LibraryLoader.create(WgpuTest.class).load(file.getAbsolutePath());
-        WgpuJava.setRuntime(Runtime.getRuntime(wgpuTest));
+            wgpuTest = LibraryLoader.create(WgpuTest.class).load(file.getAbsolutePath());
+            WgpuJava.setRuntime(Runtime.getRuntime(wgpuTest));
 
-        wgpuTest.set_fail_callback(new RustFailCallback.RustFailCallbackImpl());
+            wgpuTest.set_fail_callback(new RustFailCallback.RustFailCallbackImpl());
+        }catch(Exception e){
+            System.err.println("Failed to initialize wgpu test library!");
+
+            e.printStackTrace();
+
+            throw new RuntimeException(e);
+        }
     }
 }

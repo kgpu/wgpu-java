@@ -22,13 +22,23 @@ dependencies {
 
 test {
     useJUnitPlatform()
+
+    testLogging {
+        showStandardStreams = true
+        events "skipped", "failed"
+
+        showExceptions true
+        exceptionFormat "full"
+        showCauses true
+        showStackTraces true
+    }
 }
 
 task createNatives(type: Copy){
     from("${projectDir}/wgpu-native/target/debug") {
         include 'wgpu_native.dll'
-        include 'wgpu_native.so'
-        include 'wgpu_native.dylib'
+        include 'libwgpu_native.so'
+        include 'libwgpu_native.dylib'
     }
     into "${projectDir}/src/main/resources"
 }
@@ -41,8 +51,8 @@ task cargoBuild(type:Exec) {
 task createTestNatives(type: Copy){
     from("${projectDir}/wgpu-test/target/debug") {
         include 'wgpu_test.dll'
-        include 'wgpu_test.so'
-        include 'wgpu_test.dylib'
+        include 'libwgpu_test.so'
+        include 'libwgpu_test.dylib'
     }
     into "${projectDir}/src/test/resources"
 }
@@ -52,6 +62,7 @@ task cargoTestBuild(type:Exec) {
     commandLine 'cargo', 'build'
 }
 
+test.dependsOn cleanTest
 compileJava.dependsOn createNatives
 compileTestJava.dependsOn createTestNatives
 createNatives.dependsOn cargoBuild

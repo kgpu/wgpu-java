@@ -43,8 +43,12 @@ public class SharedLibraryLoader {
     public File load(String libraryName) {
         String platformName = mapLibraryName(libraryName);
 
+
         try {
-            return loadFile(platformName);
+            var file = loadFile(platformName);
+            System.out.println("Loaded library: " + file.getAbsolutePath());
+
+            return file;
         } catch(Throwable ex) {
             throw new RuntimeException("Couldn't load shared library '" + platformName + "' for target: "
                     + System.getProperty("os.name"), ex);
