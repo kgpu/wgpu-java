@@ -4,8 +4,8 @@ import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.core.util.Dimension;
 import com.noahcharlton.wgpuj.core.util.GlfwHandler;
 import com.noahcharlton.wgpuj.core.util.Platform;
+import com.noahcharlton.wgpuj.jni.WgpuLimits;
 import com.noahcharlton.wgpuj.jni.WgpuPowerPreference;
-import com.noahcharlton.wgpuj.jni.WgpuDeviceDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuRequestAdapterOptions;
 import jnr.ffi.Pointer;
 import org.lwjgl.glfw.Callbacks;
@@ -45,13 +45,9 @@ public class Window {
     private long createDevice() {
         var options = new WgpuRequestAdapterOptions(WgpuPowerPreference.DEFAULT, surface);
         var adapter = requestAdapter(options);
-        var descriptor = new WgpuDeviceDescriptor(false, 1);
+        var limits = new WgpuLimits(1).getPointerTo();
 
-        return requestDevice(adapter, descriptor);
-    }
-
-    private long requestDevice(long adapter, WgpuDeviceDescriptor desc) {
-        return WgpuJava.wgpuNative.wgpu_adapter_request_device(adapter, desc.getPointerTo(), null);
+        return WgpuJava.wgpuNative.wgpu_adapter_request_device(adapter, 0, limits, null);
     }
 
     private long requestAdapter(WgpuRequestAdapterOptions options) {
@@ -60,6 +56,7 @@ public class Window {
         WgpuJava.wgpuNative.wgpu_request_adapter_async(
                 options.getPointerTo(),
                 2 | 4 | 8, //Backends for Vulkan, Metal, Dx12
+                false,
                 (received, userData) -> {
                     adapter.set(received);
                 },

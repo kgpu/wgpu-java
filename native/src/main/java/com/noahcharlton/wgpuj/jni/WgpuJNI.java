@@ -19,11 +19,15 @@ public interface WgpuJNI {
 
     void wgpu_request_adapter_async(Pointer options,
                                     @u_int32_t int backendMask,
+                                    boolean allowUnsafe,
                                     RequestAdapterCallback callback,
                                     Pointer userdata);
 
     @u_int64_t
-    long wgpu_adapter_request_device(@u_int64_t long buffer, Pointer description, String tracePath);
+    long wgpu_adapter_request_device(@u_int64_t long buffer,
+                                     @u_int64_t long extensions,
+                                     Pointer limits,
+                                     String tracePath);
 
     @u_int64_t
     long wgpu_device_create_shader_module(@u_int64_t long device, Pointer shaderModuleDescriptor);

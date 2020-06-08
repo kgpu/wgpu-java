@@ -45,11 +45,3 @@ pub extern fn bind_group_layout_descriptor_test(
 
     assert_ffi!(label, "foobar9876");
 }
-
-// Currently disabled - see WgpuTypeTests.java for more detail
-//
-//#[no_mangle]
-//pub fn device_descriptor_test(device: &wgt::DeviceDescriptor) {
-//    assert_ffi!(device.extensions.anisotropic_filtering, true);
-//    assert_ffi!(device.limits.max_bind_groups, 54321);
-//}
