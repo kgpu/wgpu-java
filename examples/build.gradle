@@ -1,12 +1,9 @@
 plugins {
     id 'java'
-    id 'application'
 }
 
 group 'com.noahcharlton.wgpuj'
 version '0.1.0'
-mainClassName  = 'com.noahcharlton.wgpuj.examples.Example'
-
 sourceCompatibility = 11
 
 repositories {
@@ -15,4 +12,14 @@ repositories {
 
 dependencies {
     compile project(':core')
+}
+
+task(triangleExample, dependsOn: 'classes', type: JavaExec) {
+    main = 'com.noahcharlton.wgpuj.examples.TriangleExample'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task(computeExample, dependsOn: 'classes', type: JavaExec) {
+    main = 'com.noahcharlton.wgpuj.examples.ComputeExample'
+    classpath = sourceSets.main.runtimeClasspath
 }

@@ -29,7 +29,11 @@ public class WgpuJava {
         wgpuNative.wgpu_set_log_level(WgpuLogLevel.WARN);
     }
 
-    private static String getWgpuNativeVersion(){
+    public static void setWgpuLogLevel(WgpuLogLevel level){
+        wgpuNative.wgpu_set_log_level(level);
+    }
+
+    public static String getWgpuNativeVersion(){
         int version = wgpuNative.wgpu_get_version();
         int major = (version >> 16) & 0xFF;
         int minor = (version >> 8) & 0xFF;

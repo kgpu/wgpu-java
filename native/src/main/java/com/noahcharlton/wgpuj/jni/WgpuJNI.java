@@ -24,7 +24,7 @@ public interface WgpuJNI {
                                     Pointer userdata);
 
     @u_int64_t
-    long wgpu_adapter_request_device(@u_int64_t long buffer,
+    long wgpu_adapter_request_device(@u_int64_t long adapter,
                                      @u_int64_t long extensions,
                                      Pointer limits,
                                      String tracePath);
@@ -79,4 +79,35 @@ public interface WgpuJNI {
     void wgpu_queue_submit(@u_int64_t long queueID, Pointer commandBuffers, @u_int32_t int buffersLength);
 
     void wgpu_swap_chain_present(@u_int64_t long swapChain);
+
+    @u_int64_t
+    long wgpu_device_create_buffer(@u_int64_t long device, Pointer bufferDescriptor);
+
+    Pointer wgpu_buffer_get_mapped_range(@u_int64_t long buffer, @u_int64_t long start, @u_int64_t long size);
+
+    void wgpu_buffer_unmap(@u_int64_t long buffer);
+
+    @u_int64_t
+    long wgpu_device_create_compute_pipeline(@u_int64_t long device, Pointer computePipelineDescriptor);
+
+    WgpuRawPass wgpu_command_encoder_begin_compute_pass(@u_int64_t long encoderId, Pointer computePassDescriptor);
+
+    void wgpu_compute_pass_set_pipeline(Pointer rawPass, @u_int64_t long pipelineId);
+
+    void wgpu_compute_pass_set_bind_group(Pointer rawPass, @u_int32_t int index, @u_int64_t long bindGroup,
+                                          Pointer offsets, @intptr_t long offsetLength);
+
+    void wgpu_compute_pass_dispatch(Pointer rawPass, @u_int32_t int groupsX, @u_int32_t int groupsY,
+                                    @u_int32_t int groupsZ);
+
+    void wgpu_compute_pass_end_pass(Pointer rawPass);
+
+    void wgpu_command_encoder_copy_buffer_to_buffer(@u_int64_t long commandEncoderId, @u_int64_t long srcBuffer,
+                                                    @u_int64_t long srcOffset, @u_int64_t long dstBuffer,
+                                                    @u_int64_t long dstOffset, @u_int64_t long size);
+
+    void wgpu_buffer_map_read_async(@u_int64_t long buffer, @u_int64_t long start, @u_int64_t long size,
+                                    BufferMapCallback callback, Pointer userData);
+
+    void wgpu_device_poll(@u_int64_t long device, boolean forceWait);
 }

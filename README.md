@@ -5,7 +5,7 @@ Java bindings for [Wgpu](https://github.com/gfx-rs/wgpu) based on
 [Wgpu-native](https://github.com/gfx-rs/wgpu-native). 
 
 ##### Requirements:
-- Rust Nightly 
+- Rust 
 - Java JDK 11+
 
 ![Alternate image text](images/triangle_example.png)
@@ -36,7 +36,8 @@ Gradle will automatically build the required dll/.so/.dylib when wgpu-java/nativ
 is compiled, so you only need to run the following command:
 ```
 git clone https://github.com/DevOrc/wgpu-java
-gradlew examples:run
+gradlew triangleExample
+gradlew computeExample
 ```
 
 ### Supported Platforms

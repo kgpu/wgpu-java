@@ -18,7 +18,7 @@ import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
 import com.noahcharlton.wgpuj.jni.WgpuRasterizationStateDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
 
-public class Example {
+public class TriangleExample {
 
     public static void main(String[] args){
         WgpuCore.loadWgpuNative();

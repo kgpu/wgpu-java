@@ -7,7 +7,6 @@ import jnr.ffi.Struct;
 public class WgpuBindGroupDescriptor extends WgpuJavaStruct {
 
     private final Struct.Pointer label = new Struct.Pointer();
-    //TODO: Make layout an UnsignedLong - currently if it is an UnsignedLong wgpu-core will crash
     private final Struct.Unsigned64 layout = new Struct.Unsigned64();
     private final Struct.StructRef<WgpuBindGroupEntry> entries = new StructRef<>(WgpuBindGroupEntry.class);
     private final Struct.UnsignedLong entriesLength = new Struct.UnsignedLong();
