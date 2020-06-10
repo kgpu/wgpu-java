@@ -38,4 +38,8 @@ public class Buffer {
     public long getId() {
         return id;
     }
+
+    public long getSize() {
+        return size;
+    }
 }

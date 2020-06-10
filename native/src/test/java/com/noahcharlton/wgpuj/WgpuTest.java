@@ -8,6 +8,7 @@ import com.noahcharlton.wgpuj.jni.WgpuBufferMapAsyncStatus;
 import com.noahcharlton.wgpuj.jni.WgpuCullMode;
 import com.noahcharlton.wgpuj.jni.WgpuFrontFace;
 import com.noahcharlton.wgpuj.jni.WgpuIndexFormat;
+import com.noahcharlton.wgpuj.jni.WgpuInputStepMode;
 import com.noahcharlton.wgpuj.jni.WgpuLoadOp;
 import com.noahcharlton.wgpuj.jni.WgpuLogLevel;
 import com.noahcharlton.wgpuj.jni.WgpuPowerPreference;
@@ -18,6 +19,7 @@ import com.noahcharlton.wgpuj.jni.WgpuSwapChainStatus;
 import com.noahcharlton.wgpuj.jni.WgpuTextureComponentType;
 import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
 import com.noahcharlton.wgpuj.jni.WgpuTextureViewDimension;
+import com.noahcharlton.wgpuj.jni.WgpuVertexFormat;
 import jnr.ffi.Pointer;
 
 public interface WgpuTest {
@@ -75,4 +77,8 @@ public interface WgpuTest {
     Pointer get_wgpu_texture_view_dimension_name(WgpuTextureViewDimension dimension);
 
     Pointer get_wgpu_texture_component_type_name(WgpuTextureComponentType type);
+
+    Pointer get_wgpu_input_step_mode_name(WgpuInputStepMode mode);
+
+    Pointer get_wgpu_vertex_format_name(WgpuVertexFormat format);
 }

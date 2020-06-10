@@ -5,6 +5,7 @@ import com.noahcharlton.wgpuj.jni.WgpuColorStateDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuIndexFormat;
 import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
 import com.noahcharlton.wgpuj.jni.WgpuRenderPipelineDescriptor;
+import com.noahcharlton.wgpuj.jni.WgpuVertexBufferLayoutDescriptor;
 import jnr.ffi.Pointer;
 
 public class RenderPipelineSettings {
@@ -16,6 +17,7 @@ public class RenderPipelineSettings {
     private WgpuColorStateDescriptor[] colorStates;
     private Pointer depthStencilState;
     private WgpuIndexFormat vertexIndexFormat;
+    private WgpuVertexBufferLayoutDescriptor[] bufferLayouts;
     private int sampleCount;
     private int sampleMask;
     private boolean alphaToCoverage;
@@ -37,7 +39,7 @@ public class RenderPipelineSettings {
         descriptor.getColorStates().set(colorStates);
         descriptor.getColorStatesLength().set(colorStates.length);
         descriptor.getDepthStencilState().set(depthStencilState);
-        descriptor.getVertexState().set(vertexIndexFormat);
+        descriptor.getVertexState().set(vertexIndexFormat, bufferLayouts);
         descriptor.getSampleCount().set(sampleCount);
         descriptor.getSampleMask().set(sampleMask);
         descriptor.getAlphaToCoverage().set(alphaToCoverage);
@@ -71,6 +73,16 @@ public class RenderPipelineSettings {
         this.primitiveTopology = primitiveTopology;
 
         return this;
+    }
+
+    public RenderPipelineSettings setBufferLayouts(WgpuVertexBufferLayoutDescriptor... bufferLayouts) {
+        this.bufferLayouts = bufferLayouts;
+
+        return this;
+    }
+
+    public WgpuVertexBufferLayoutDescriptor[] getBufferLayouts() {
+        return bufferLayouts;
     }
 
     public Pointer getRasterizationState() {

@@ -1,6 +1,7 @@
 package com.noahcharlton.wgpuj.core.graphics;
 
 import com.noahcharlton.wgpuj.WgpuJava;
+import com.noahcharlton.wgpuj.core.util.Buffer;
 import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.core.util.Dimension;
 import com.noahcharlton.wgpuj.jni.WgpuCommandEncoderDescriptor;
@@ -21,19 +22,17 @@ public class SwapChain {
 
     private long encoderID;
 
+    private WgpuRawPass rawPass;
+
     public SwapChain(long chainID) {
         this.chainID = chainID;
     }
 
-    public void render(RenderPipeline pipeline, long device){
-        WgpuRawPass rawPass = beginRenderPass(device);
-
+    public void renderStart(RenderPipeline pipeline, long device){
+        rawPass = beginRenderPass(device);
         WgpuJava.wgpuNative.wgpu_render_pass_set_pipeline(rawPass.getPointerTo(), pipeline.getPipelineID());
         WgpuJava.wgpuNative.wgpu_render_pass_set_bind_group(rawPass.getPointerTo(), 0, pipeline.getBindGroupID(),
                 WgpuJava.createNullPointer(), 0);
-        WgpuJava.wgpuNative.wgpu_render_pass_draw(rawPass.getPointerTo(), 3, 1, 0, 0);
-
-        endRenderPass(rawPass, device);
     }
 
     private WgpuRawPass beginRenderPass(long device){
@@ -46,6 +45,25 @@ public class SwapChain {
 
         return WgpuJava.wgpuNative.wgpu_command_encoder_begin_render_pass(encoderID,
                 rawPassDescriptor.getPointerTo());
+    }
+
+    public void setIndexBuffer(Buffer buffer){
+        WgpuJava.wgpuNative.wgpu_render_pass_set_index_buffer(rawPass.getPointerTo(), buffer.getId(), 0,
+                buffer.getSize());
+    }
+
+    public void setVertexBuffer(Buffer buffer, int slot){
+        WgpuJava.wgpuNative.wgpu_render_pass_set_vertex_buffer(rawPass.getPointerTo(), slot, buffer.getId(),
+                0, buffer.getSize());
+    }
+
+    public void drawIndexed(int indexCount, int instances, int indexOffset){
+        WgpuJava.wgpuNative.wgpu_render_pass_draw_indexed(rawPass.getPointerTo(),
+                indexCount, instances, indexOffset, 0, 0);
+    }
+
+    public void draw(int vertices, int instances){
+        WgpuJava.wgpuNative.wgpu_render_pass_draw(rawPass.getPointerTo(), vertices, instances, 0, 0);
     }
 
     private long getSwapChainTexture() {
@@ -62,13 +80,15 @@ public class SwapChain {
         return output.getTextureViewID();
     }
 
-    private void endRenderPass(WgpuRawPass rawPass, long device){
+    public void renderEnd(long device){
         long queue = WgpuJava.wgpuNative.wgpu_device_get_default_queue(device);
         WgpuJava.wgpuNative.wgpu_render_pass_end_pass(rawPass.getPointerTo());
 
         long cmdBuffer = WgpuJava.wgpuNative.wgpu_command_encoder_finish(encoderID, WgpuJava.createNullPointer());
         WgpuJava.wgpuNative.wgpu_queue_submit(queue, WgpuJava.createDirectLongPointer(cmdBuffer), 1);
         WgpuJava.wgpuNative.wgpu_swap_chain_present(chainID);
+
+        rawPass = null;
     }
 
     public static SwapChain create(Dimension dimension, long device, long surface){

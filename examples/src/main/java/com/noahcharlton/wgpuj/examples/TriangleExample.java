@@ -28,7 +28,9 @@ public class TriangleExample {
 
         try(var application = new WgpuGraphicApplication(settings, windowSettings)){
             while(!application.getWindow().isCloseRequested()){
-                application.render();
+                var swapChain = application.renderStart();
+                swapChain.draw(3, 1);
+                application.renderEnd();
             }
         }
     }
@@ -54,6 +56,7 @@ public class TriangleExample {
                         WgpuColorStateDescriptor.ALL).build())
                 .setDepthStencilState(WgpuJava.createNullPointer())
                 .setVertexIndexFormat(WgpuIndexFormat.Uint16)
+                .setBufferLayouts()
                 .setSampleCount(1)
                 .setSampleMask(0)
                 .setAlphaToCoverage(false);
