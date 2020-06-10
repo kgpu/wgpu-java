@@ -38,3 +38,5 @@ enum_name_test!(get_wgpu_binding_type_name, wgc::binding_model::BindingType);
 enum_name_test!(get_wgpu_buffer_map_async_status_name, wgc::resource::BufferMapAsyncStatus);
 enum_name_test!(get_wgpu_texture_view_dimension_name, wgt::TextureViewDimension);
 enum_name_test!(get_wgpu_texture_component_type_name, wgt::TextureComponentType);
+enum_name_test!(get_wgpu_input_step_mode_name, wgt::InputStepMode);
+enum_name_test!(get_wgpu_vertex_format_name, wgt::VertexFormat);

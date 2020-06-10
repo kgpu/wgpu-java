@@ -7,6 +7,7 @@ import com.noahcharlton.wgpuj.jni.WgpuBufferMapAsyncStatus;
 import com.noahcharlton.wgpuj.jni.WgpuCullMode;
 import com.noahcharlton.wgpuj.jni.WgpuFrontFace;
 import com.noahcharlton.wgpuj.jni.WgpuIndexFormat;
+import com.noahcharlton.wgpuj.jni.WgpuInputStepMode;
 import com.noahcharlton.wgpuj.jni.WgpuLoadOp;
 import com.noahcharlton.wgpuj.jni.WgpuLogLevel;
 import com.noahcharlton.wgpuj.jni.WgpuPowerPreference;
@@ -17,6 +18,7 @@ import com.noahcharlton.wgpuj.jni.WgpuSwapChainStatus;
 import com.noahcharlton.wgpuj.jni.WgpuTextureComponentType;
 import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
 import com.noahcharlton.wgpuj.jni.WgpuTextureViewDimension;
+import com.noahcharlton.wgpuj.jni.WgpuVertexFormat;
 import com.noahcharlton.wgpuj.util.RustCString;
 import jnr.ffi.Pointer;
 import org.junit.jupiter.api.Assertions;
@@ -167,6 +169,22 @@ public class WgpuEnumTests extends WgpuNativeTest {
         Pointer output = wgpuTest.get_wgpu_texture_component_type_name(type);
 
         standardEnumTest(type, output);
+    }
+
+    @ParameterizedTest
+    @EnumSource(WgpuInputStepMode.class)
+    void wgpuInputStepModeTest(WgpuInputStepMode mode) {
+        Pointer output = wgpuTest.get_wgpu_input_step_mode_name(mode);
+
+        standardEnumTest(mode, output);
+    }
+
+    @ParameterizedTest
+    @EnumSource(WgpuVertexFormat.class)
+    void wgpuVertexFormatTest(WgpuVertexFormat format) {
+        Pointer output = wgpuTest.get_wgpu_vertex_format_name(format);
+
+        standardEnumTest(format, output);
     }
 
     private <E extends Enum> void standardEnumTest(E e, Pointer output) {

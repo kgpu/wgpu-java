@@ -110,4 +110,14 @@ public interface WgpuJNI {
                                     BufferMapCallback callback, Pointer userData);
 
     void wgpu_device_poll(@u_int64_t long device, boolean forceWait);
+
+    void wgpu_render_pass_set_vertex_buffer(Pointer rawPass, @u_int32_t int slot, @u_int64_t long buffer,
+                                            @u_int64_t long offset, @u_int64_t long size);
+
+    void wgpu_render_pass_set_index_buffer(Pointer rawPass, @u_int64_t long buffer, @u_int64_t long offset,
+                                           @u_int64_t long size);
+
+    void wgpu_render_pass_draw_indexed(Pointer rawPass, @u_int32_t int indexCount, @u_int32_t int instanceCount,
+                                       @u_int32_t int firstIndex, @u_int32_t int baseVertex,
+                                       @u_int32_t int firstInstance);
 }

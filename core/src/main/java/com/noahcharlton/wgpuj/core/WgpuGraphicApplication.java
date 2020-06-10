@@ -1,6 +1,7 @@
 package com.noahcharlton.wgpuj.core;
 
 import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
+import com.noahcharlton.wgpuj.core.graphics.SwapChain;
 import com.noahcharlton.wgpuj.core.graphics.Window;
 import com.noahcharlton.wgpuj.core.graphics.WindowSettings;
 import com.noahcharlton.wgpuj.core.util.GlfwHandler;
@@ -20,8 +21,12 @@ public class WgpuGraphicApplication implements AutoCloseable{
         window = new Window(renderSettings, windowSettings);
     }
 
-    public void render(){
-        window.render();
+    public SwapChain renderStart(){
+        return window.renderStart();
+    }
+
+    public void renderEnd(){
+        window.renderEnd();
     }
 
     @Override
@@ -32,5 +37,9 @@ public class WgpuGraphicApplication implements AutoCloseable{
 
     public Window getWindow() {
         return window;
+    }
+
+    public long getDevice(){
+        return window.getDevice();
     }
 }

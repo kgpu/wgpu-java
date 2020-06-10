@@ -80,7 +80,7 @@ public class Window {
                 "https://github.com/DevOrc/wgpu-java/issues/4");
     }
 
-    public void render(){
+    public SwapChain renderStart(){
         GLFW.glfwPollEvents();
         var newDimension = GlfwHandler.getWindowDimension(handle);
 
@@ -90,7 +90,13 @@ public class Window {
             onResize();
         }
 
-        swapChain.render(renderPipeline, device);
+        swapChain.renderStart(renderPipeline, device);
+
+        return swapChain;
+    }
+
+    public void renderEnd(){
+        swapChain.renderEnd(device);
     }
 
     private void onResize() {
@@ -112,5 +118,9 @@ public class Window {
     public void dispose(){
         Callbacks.glfwFreeCallbacks(handle);
         GLFW.glfwDestroyWindow(handle);
+    }
+
+    public long getDevice() {
+        return device;
     }
 }

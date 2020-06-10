@@ -9,6 +9,8 @@ Java bindings for [Wgpu](https://github.com/gfx-rs/wgpu) based on
 - Java JDK 11+
 
 ![Alternate image text](images/triangle_example.png)
+![Alternate image text](images/vertex_example.png)
+
 
 ### Structure :
 ###### wgpu-java/core

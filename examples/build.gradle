@@ -23,3 +23,8 @@ task(computeExample, dependsOn: 'classes', type: JavaExec) {
     main = 'com.noahcharlton.wgpuj.examples.ComputeExample'
     classpath = sourceSets.main.runtimeClasspath
 }
+
+task(vertexExample, dependsOn: 'classes', type: JavaExec) {
+    main = 'com.noahcharlton.wgpuj.examples.VertexExample'
+    classpath = sourceSets.main.runtimeClasspath
+}
