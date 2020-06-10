@@ -5,6 +5,11 @@
 ## Rust
 native/wgpu-test/target/**
 
+## Wgpu artifacts
+data1.bin
+data2.spv
+trace.ron
+
 ## Libraries
 **.dll
 **.so
