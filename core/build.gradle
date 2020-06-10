@@ -53,4 +53,14 @@ test {
         showCauses true
         showStackTraces true
     }
+
+    afterSuite { desc, result ->
+        if (!desc.parent) { // will match the outermost suite
+            println "Found an ran ${result.testCount} tests"
+            print "Results: ${result.resultType} "
+            print "${result.successfulTestCount} successes, "
+            print "${result.failedTestCount} failures, "
+            println "${result.skippedTestCount} skipped)"
+        }
+    }
 }
