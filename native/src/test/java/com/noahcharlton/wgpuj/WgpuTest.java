@@ -1,8 +1,10 @@
 package com.noahcharlton.wgpuj;
 
 import com.noahcharlton.wgpuj.fail.RustFailCallback;
+import com.noahcharlton.wgpuj.jni.WgpuBindingType;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
 import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
+import com.noahcharlton.wgpuj.jni.WgpuBufferMapAsyncStatus;
 import com.noahcharlton.wgpuj.jni.WgpuCullMode;
 import com.noahcharlton.wgpuj.jni.WgpuFrontFace;
 import com.noahcharlton.wgpuj.jni.WgpuIndexFormat;
@@ -13,7 +15,9 @@ import com.noahcharlton.wgpuj.jni.WgpuPresentMode;
 import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
 import com.noahcharlton.wgpuj.jni.WgpuStoreOp;
 import com.noahcharlton.wgpuj.jni.WgpuSwapChainStatus;
+import com.noahcharlton.wgpuj.jni.WgpuTextureComponentType;
 import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
+import com.noahcharlton.wgpuj.jni.WgpuTextureViewDimension;
 import jnr.ffi.Pointer;
 
 public interface WgpuTest {
@@ -33,6 +37,10 @@ public interface WgpuTest {
     Pointer color_to_string(Pointer color);
 
     void bind_group_layout_descriptor_test(Pointer bindGroupLayoutDescriptor);
+
+    void bind_group_entry_test_binding(Pointer bindGroupEntry);
+
+    Pointer bind_group_entry_resource_to_string(Pointer bindGroupEntry);
 
     Pointer get_power_preference_name(WgpuPowerPreference preference);
 
@@ -59,4 +67,12 @@ public interface WgpuTest {
     Pointer get_swap_chain_status_name(WgpuSwapChainStatus status);
 
     Pointer get_texture_format_name(WgpuTextureFormat name);
+
+    Pointer get_wgpu_binding_type_name(WgpuBindingType type);
+
+    Pointer get_wgpu_buffer_map_async_status_name(WgpuBufferMapAsyncStatus status);
+
+    Pointer get_wgpu_texture_view_dimension_name(WgpuTextureViewDimension dimension);
+
+    Pointer get_wgpu_texture_component_type_name(WgpuTextureComponentType type);
 }

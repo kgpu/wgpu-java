@@ -45,3 +45,18 @@ pub extern fn bind_group_layout_descriptor_test(
 
     assert_ffi!(label, "foobar9876");
 }
+
+#[no_mangle]
+pub extern fn bind_group_entry_test_binding(
+    desc: &wgc::binding_model::BindGroupEntry) {
+
+    assert_ffi!(desc.binding, 654321);
+}
+
+#[no_mangle]
+pub extern fn bind_group_entry_resource_to_string(
+    desc: &wgc::binding_model::BindGroupEntry) -> *const c_char {
+
+    CString::new(format!("{:?}", desc.resource)).unwrap().into_raw()
+}
+

@@ -1,11 +1,20 @@
 package com.noahcharlton.wgpuj;
 
+import com.noahcharlton.wgpuj.jni.WgpuBindGroupEntry;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutDescriptor;
+import com.noahcharlton.wgpuj.jni.WgpuBindingResourceData;
+import com.noahcharlton.wgpuj.jni.WgpuBindingResourceTag;
 import com.noahcharlton.wgpuj.jni.WgpuColor;
 import com.noahcharlton.wgpuj.util.RustCString;
 import jnr.ffi.Pointer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 public class WgpuTypeTests extends WgpuNativeTest{
 
@@ -28,4 +37,46 @@ public class WgpuTypeTests extends WgpuNativeTest{
 
         wgpuTest.bind_group_layout_descriptor_test(descriptor.getPointerTo());
     }
+
+    @Test
+    void bindGroupEntryBindingTest() {
+        var entry = new WgpuBindGroupEntry();
+        entry.setBinding(654321);
+
+        wgpuTest.bind_group_entry_test_binding(entry.getPointerTo());
+    }
+
+    @Test
+    void bindGroupEntryResourceTest() {
+        var entry = new WgpuBindGroupEntry();
+        entry.setBinding(654321);
+
+        wgpuTest.bind_group_entry_test_binding(entry.getPointerTo());
+    }
+
+    @ParameterizedTest
+    @MethodSource("getBindGroupEntryStringInputs")
+    void bindGroupEntryDataStringTest(Consumer<WgpuBindingResourceData> data, WgpuBindingResourceTag tag,
+                                      String expected) {
+        var entry = new WgpuBindGroupEntry();
+        entry.getResource().setTag(tag);
+        data.accept(entry.getResource().getData());
+
+        Pointer output = wgpuTest.bind_group_entry_resource_to_string(entry.getPointerTo());
+        String actual = RustCString.fromPointer(output);
+
+        Assertions.assertEquals(expected, actual);
+    }
+    private static Stream<Arguments> getBindGroupEntryStringInputs() {
+        return Stream.of(
+                Arguments.of((Consumer<WgpuBindingResourceData>) data -> data.setSamplerId(745),
+                        WgpuBindingResourceTag.SAMPLER, "Sampler((745, 0, Empty))"),
+                Arguments.of((Consumer<WgpuBindingResourceData>) data -> data.setTextureViewId(66),
+                        WgpuBindingResourceTag.TEXTURE_VIEW, "TextureView((66, 0, Empty))"),
+                Arguments.of((Consumer<WgpuBindingResourceData>) data -> data.getBinding().set(31, 45, 26),
+                        WgpuBindingResourceTag.BUFFER,
+                        "Buffer(BufferBinding { buffer: (31, 0, Empty), offset: 45, size: BufferSize(26) })")
+        );
+    }
+
 }

@@ -34,3 +34,7 @@ enum_name_test!(get_front_face_name, wgt::FrontFace);
 enum_name_test!(get_log_level_name, wgn::LogLevel);
 enum_name_test!(get_swap_chain_status_name, wgt::SwapChainStatus);
 enum_name_test!(get_texture_format_name, wgt::TextureFormat);
+enum_name_test!(get_wgpu_binding_type_name, wgc::binding_model::BindingType);
+enum_name_test!(get_wgpu_buffer_map_async_status_name, wgc::resource::BufferMapAsyncStatus);
+enum_name_test!(get_wgpu_texture_view_dimension_name, wgt::TextureViewDimension);
+enum_name_test!(get_wgpu_texture_component_type_name, wgt::TextureComponentType);

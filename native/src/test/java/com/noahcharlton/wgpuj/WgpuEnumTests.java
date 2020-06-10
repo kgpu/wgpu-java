@@ -1,7 +1,9 @@
 package com.noahcharlton.wgpuj;
 
+import com.noahcharlton.wgpuj.jni.WgpuBindingType;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
 import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
+import com.noahcharlton.wgpuj.jni.WgpuBufferMapAsyncStatus;
 import com.noahcharlton.wgpuj.jni.WgpuCullMode;
 import com.noahcharlton.wgpuj.jni.WgpuFrontFace;
 import com.noahcharlton.wgpuj.jni.WgpuIndexFormat;
@@ -12,7 +14,9 @@ import com.noahcharlton.wgpuj.jni.WgpuPresentMode;
 import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
 import com.noahcharlton.wgpuj.jni.WgpuStoreOp;
 import com.noahcharlton.wgpuj.jni.WgpuSwapChainStatus;
+import com.noahcharlton.wgpuj.jni.WgpuTextureComponentType;
 import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
+import com.noahcharlton.wgpuj.jni.WgpuTextureViewDimension;
 import com.noahcharlton.wgpuj.util.RustCString;
 import jnr.ffi.Pointer;
 import org.junit.jupiter.api.Assertions;
@@ -131,6 +135,38 @@ public class WgpuEnumTests extends WgpuNativeTest {
         Pointer output = wgpuTest.get_texture_format_name(format);
 
         standardEnumTest(format, output);
+    }
+
+    @ParameterizedTest
+    @EnumSource(WgpuBindingType.class)
+    void wgpuBindingTypeTest(WgpuBindingType type) {
+        Pointer output = wgpuTest.get_wgpu_binding_type_name(type);
+
+        standardEnumTest(type, output);
+    }
+
+    @ParameterizedTest
+    @EnumSource(WgpuBufferMapAsyncStatus.class)
+    void wgpuBufferMapAsyncStatusTest(WgpuBufferMapAsyncStatus status) {
+        Pointer output = wgpuTest.get_wgpu_buffer_map_async_status_name(status);
+
+        standardEnumTest(status, output);
+    }
+
+    @ParameterizedTest
+    @EnumSource(WgpuTextureViewDimension.class)
+    void wgpuTextureViewDimensionNameTest(WgpuTextureViewDimension dimension) {
+        Pointer output = wgpuTest.get_wgpu_texture_view_dimension_name(dimension);
+
+        standardEnumTest(dimension, output);
+    }
+
+    @ParameterizedTest
+    @EnumSource(WgpuTextureComponentType.class)
+    void wgpuTextureComponentTypeTest(WgpuTextureComponentType type) {
+        Pointer output = wgpuTest.get_wgpu_texture_component_type_name(type);
+
+        standardEnumTest(type, output);
     }
 
     private <E extends Enum> void standardEnumTest(E e, Pointer output) {
