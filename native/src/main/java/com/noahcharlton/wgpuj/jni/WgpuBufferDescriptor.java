@@ -29,4 +29,8 @@ public class WgpuBufferDescriptor extends WgpuJavaStruct {
         this.usage.set(usage);
         this.mappedAtCreation.set(mappedAtCreation);
     }
+
+    public Unsigned32 getUsage() {
+        return usage;
+    }
 }

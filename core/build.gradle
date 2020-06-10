@@ -28,7 +28,7 @@ switch (OperatingSystem.current()) {
 }
 
 dependencies {
-    compile project(':native')
+    api project(':native')
 
     implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
     implementation "org.lwjgl:lwjgl"

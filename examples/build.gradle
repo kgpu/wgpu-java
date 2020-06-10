@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    compile project(':core')
+    implementation project(':core')
 }
 
 task(triangleExample, dependsOn: 'classes', type: JavaExec) {

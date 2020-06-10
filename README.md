@@ -22,7 +22,7 @@ runtime using [jnr-ffi](https://github.com/jnr/jnr-ffi)
 
 ###### wgpu-java/native/wgpu-native
 The [fork](https://github.com/DevOrc/wgpu-native/tree/jnr-compatible) of wgpu-native that this library uses.
-A fork is needed to add some functionsto get around some problems with jnr-ffi 
+A fork is needed to add some functions to get around some problems with jnr-ffi 
 (the library that produces the bindings from java to rust)
 
 ###### wgpu-java/native/wgpu-test
@@ -51,11 +51,11 @@ gradlew computeExample
   
 :white_check_mark: = Supported
 
-:large_orange_diamond: = Supported by Wgpu but *__not__* by Wgpu-java (yet)
+:large_orange_diamond: = Intermediate Support: See [Issue #4](https://github.com/DevOrc/wgpu-java/issues/4)
 
 :construction: = Wgpu support being worked on
 
 ### Contributing
 I only have a windows machine, so the best way to contribute is to write
-and test the platform specific code (i.e. window handling). For more details, file a github issue about your 
-platform.
+and test the platform specific code (i.e. window handling for rendering pipelines). For more details, file a github 
+issue about your platform.

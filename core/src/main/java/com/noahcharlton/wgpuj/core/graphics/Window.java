@@ -1,6 +1,7 @@
 package com.noahcharlton.wgpuj.core.graphics;
 
 import com.noahcharlton.wgpuj.WgpuJava;
+import com.noahcharlton.wgpuj.core.util.Backend;
 import com.noahcharlton.wgpuj.core.util.Dimension;
 import com.noahcharlton.wgpuj.core.util.GlfwHandler;
 import com.noahcharlton.wgpuj.core.util.Platform;
@@ -55,7 +56,7 @@ public class Window {
 
         WgpuJava.wgpuNative.wgpu_request_adapter_async(
                 options.getPointerTo(),
-                2 | 4 | 8, //Backends for Vulkan, Metal, Dx12
+                Backend.of(Backend.VULKAN, Backend.METAL, Backend.DX12),
                 false,
                 (received, userData) -> {
                     adapter.set(received);
@@ -75,7 +76,8 @@ public class Window {
             return WgpuJava.wgpuNative.wgpu_create_surface_from_windows_hwnd(WgpuJava.createNullPointer(), hwnd);
         }
 
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Platform not supported. See " +
+                "https://github.com/DevOrc/wgpu-java/issues/4");
     }
 
     public void render(){

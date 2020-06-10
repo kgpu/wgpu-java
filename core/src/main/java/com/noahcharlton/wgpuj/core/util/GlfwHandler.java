@@ -56,7 +56,8 @@ public class GlfwHandler {
         if(Platform.isWindows){
             return GLFWNativeWin32.glfwGetWin32Window(handle);
         }else{
-            throw new UnsupportedOperationException("Platform not supported");
+            throw new UnsupportedOperationException("Platform not supported. See " +
+                    "https://github.com/DevOrc/wgpu-java/issues/4");
         }
     }
 
