@@ -40,6 +40,8 @@ is compiled, so you only need to run the following command:
 git clone https://github.com/DevOrc/wgpu-java
 gradlew triangleExample
 gradlew computeExample
+gradlew vertexExample
+gradlew textureExample
 ```
 
 ### Supported Platforms

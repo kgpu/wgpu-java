@@ -16,7 +16,9 @@ import com.noahcharlton.wgpuj.jni.WgpuPresentMode;
 import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
 import com.noahcharlton.wgpuj.jni.WgpuStoreOp;
 import com.noahcharlton.wgpuj.jni.WgpuSwapChainStatus;
+import com.noahcharlton.wgpuj.jni.WgpuTextureAspect;
 import com.noahcharlton.wgpuj.jni.WgpuTextureComponentType;
+import com.noahcharlton.wgpuj.jni.WgpuTextureDimension;
 import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
 import com.noahcharlton.wgpuj.jni.WgpuTextureViewDimension;
 import com.noahcharlton.wgpuj.jni.WgpuVertexFormat;
@@ -41,6 +43,10 @@ public interface WgpuTest {
     void bind_group_layout_descriptor_test(Pointer bindGroupLayoutDescriptor);
 
     void bind_group_entry_test_binding(Pointer bindGroupEntry);
+
+    void wgpu_origin_3d_test(Pointer origin3d);
+
+    void wgpu_extent_3d_test(Pointer extent3d);
 
     Pointer bind_group_entry_resource_to_string(Pointer bindGroupEntry);
 
@@ -81,4 +87,8 @@ public interface WgpuTest {
     Pointer get_wgpu_input_step_mode_name(WgpuInputStepMode mode);
 
     Pointer get_wgpu_vertex_format_name(WgpuVertexFormat format);
+
+    Pointer get_wgpu_texture_dimension_name(WgpuTextureDimension dimension);
+
+    Pointer get_wgpu_texture_aspect_name(WgpuTextureAspect aspect);
 }

@@ -60,3 +60,20 @@ pub extern fn bind_group_entry_resource_to_string(
     CString::new(format!("{:?}", desc.resource)).unwrap().into_raw()
 }
 
+#[no_mangle]
+pub extern fn wgpu_origin_3d_test(
+    origin: &wgt::Origin3d) {
+
+    assert_ffi!(123, origin.x);
+    assert_ffi!(456, origin.y);
+    assert_ffi!(789, origin.z);
+}
+
+#[no_mangle]
+pub extern fn wgpu_extent_3d_test(
+    origin: &wgt::Extent3d) {
+
+    assert_ffi!(147, origin.width);
+    assert_ffi!(258, origin.height);
+    assert_ffi!(369, origin.depth);
+}

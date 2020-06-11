@@ -22,12 +22,11 @@ public class Window {
     private final long device;
     private final long surface;
 
-    private final RenderPipeline renderPipeline;
-
+    private RenderPipeline renderPipeline;
     private Dimension currentDimension;
     private SwapChain swapChain;
 
-    public Window(RenderPipelineSettings renderSettings, WindowSettings windowSettings) {
+    public Window(WindowSettings windowSettings) {
         this.handle = windowSettings.createWindow();
 
         if(this.handle == NULL)
@@ -38,9 +37,6 @@ public class Window {
 
         surface = createSurface();
         device = createDevice();
-        renderPipeline = new RenderPipeline(renderSettings, device);
-
-        createNewSwapChain();
     }
 
     private long createDevice() {
@@ -80,6 +76,12 @@ public class Window {
                 "https://github.com/DevOrc/wgpu-java/issues/4");
     }
 
+    public void initRenderPipeline(RenderPipelineSettings settings){
+        renderPipeline = new RenderPipeline(settings, device);
+
+        createNewSwapChain();
+    }
+
     public SwapChain renderStart(){
         GLFW.glfwPollEvents();
         var newDimension = GlfwHandler.getWindowDimension(handle);
@@ -93,10 +95,6 @@ public class Window {
         swapChain.renderStart(renderPipeline, device);
 
         return swapChain;
-    }
-
-    public void renderEnd(){
-        swapChain.renderEnd(device);
     }
 
     private void onResize() {

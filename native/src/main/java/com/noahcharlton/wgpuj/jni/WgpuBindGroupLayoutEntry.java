@@ -30,9 +30,20 @@ public class WgpuBindGroupLayoutEntry extends WgpuJavaStruct {
         useDirectMemory();
     }
 
-    public void setPartial(int binding, int visibility, WgpuBindingType bindingType){
+    public WgpuBindGroupLayoutEntry setPartial(int binding, int visibility, WgpuBindingType bindingType){
         this.binding.set(binding);
         this.visibility.set(visibility);
         this.bindingType.set(bindingType);
+
+        return this;
+    }
+
+    public WgpuBindGroupLayoutEntry setSampledTextureData(boolean multiSampled, WgpuTextureViewDimension viewDimension,
+                                                          WgpuTextureComponentType textureComponentType){
+        this.multiSampled.set(multiSampled);
+        this.viewDimension.set(viewDimension);
+        this.textureComponentType.set(textureComponentType);
+
+        return this;
     }
 }

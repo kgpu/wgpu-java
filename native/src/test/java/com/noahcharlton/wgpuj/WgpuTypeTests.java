@@ -5,6 +5,8 @@ import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuBindingResourceData;
 import com.noahcharlton.wgpuj.jni.WgpuBindingResourceTag;
 import com.noahcharlton.wgpuj.jni.WgpuColor;
+import com.noahcharlton.wgpuj.jni.WgpuExtent3d;
+import com.noahcharlton.wgpuj.jni.WgpuOrigin3D;
 import com.noahcharlton.wgpuj.util.RustCString;
 import jnr.ffi.Pointer;
 import org.junit.jupiter.api.Assertions;
@@ -54,6 +56,20 @@ public class WgpuTypeTests extends WgpuNativeTest{
         wgpuTest.bind_group_entry_test_binding(entry.getPointerTo());
     }
 
+    @Test
+    void origin3dTest() {
+        var origin = new WgpuOrigin3D(123, 456, 789);
+
+        wgpuTest.wgpu_origin_3d_test(origin.getPointerTo());
+    }
+
+    @Test
+    void extent3dTest() {
+        var extent = new WgpuExtent3d(147, 258, 369);
+
+        wgpuTest.wgpu_extent_3d_test(extent.getPointerTo());
+    }
+
     @ParameterizedTest
     @MethodSource("getBindGroupEntryStringInputs")
     void bindGroupEntryDataStringTest(Consumer<WgpuBindingResourceData> data, WgpuBindingResourceTag tag,
@@ -67,6 +83,7 @@ public class WgpuTypeTests extends WgpuNativeTest{
 
         Assertions.assertEquals(expected, actual);
     }
+
     private static Stream<Arguments> getBindGroupEntryStringInputs() {
         return Stream.of(
                 Arguments.of((Consumer<WgpuBindingResourceData>) data -> data.setSamplerId(745),

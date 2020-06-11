@@ -18,6 +18,22 @@ public class WgpuBindGroupEntry extends WgpuJavaStruct {
         useDirectMemory();
     }
 
+    public WgpuBindGroupEntry setTextureView(int binding, long textureViewId){
+        this.binding.set(binding);
+        this.resource.setTag(WgpuBindingResourceTag.TEXTURE_VIEW);
+        this.resource.getData().setTextureViewId(textureViewId);
+
+        return this;
+    }
+
+    public WgpuBindGroupEntry setSampler(int binding, long samplerId) {
+        this.binding.set(binding);
+        this.resource.setTag(WgpuBindingResourceTag.SAMPLER);
+        this.resource.getData().setSamplerId(samplerId);
+
+        return this;
+    }
+
     public void setBinding(int binding){
         this.binding.set(binding);
     }

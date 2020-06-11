@@ -12,21 +12,21 @@ public class WgpuGraphicApplication implements AutoCloseable{
 
     private final Window window;
 
-    public WgpuGraphicApplication(RenderPipelineSettings renderSettings, WindowSettings windowSettings) {
+    public WgpuGraphicApplication(WindowSettings windowSettings) {
         if(applicationCreated) throw new UnsupportedOperationException("Wgpu-java only supports one application.");
         applicationCreated = true;
 
         GlfwHandler.init();
 
-        window = new Window(renderSettings, windowSettings);
+        window = new Window(windowSettings);
+    }
+
+    public void init(RenderPipelineSettings settings){
+        window.initRenderPipeline(settings);
     }
 
     public SwapChain renderStart(){
         return window.renderStart();
-    }
-
-    public void renderEnd(){
-        window.renderEnd();
     }
 
     @Override

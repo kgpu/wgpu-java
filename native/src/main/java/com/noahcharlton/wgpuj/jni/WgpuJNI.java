@@ -120,4 +120,16 @@ public interface WgpuJNI {
     void wgpu_render_pass_draw_indexed(Pointer rawPass, @u_int32_t int indexCount, @u_int32_t int instanceCount,
                                        @u_int32_t int firstIndex, @u_int32_t int baseVertex,
                                        @u_int32_t int firstInstance);
+
+    @u_int64_t
+    long wgpu_device_create_texture(@u_int64_t long device, Pointer textureDescriptor);
+
+    void wgpu_command_encoder_copy_buffer_to_texture(@u_int64_t long encoder, Pointer bufferCopyView,
+                                                     Pointer textureCopyView, Pointer copySize);
+
+    @u_int64_t
+    long wgpu_texture_create_view(@u_int64_t long textureId, Pointer textureViewDescriptor);
+
+    @u_int64_t
+    long wgpu_device_create_sampler(@u_int64_t long device, Pointer samplerDesc);
 }

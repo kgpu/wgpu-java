@@ -23,14 +23,17 @@ public class TriangleExample {
     public static void main(String[] args){
         WgpuCore.loadWgpuNative();
 
-        RenderPipelineSettings settings = createPipelineSettings();
+        RenderPipelineSettings renderPipelineSettings = createPipelineSettings();
         WindowSettings windowSettings = new WindowSettings("Wgpu-Java example", 640, 480);
 
-        try(var application = new WgpuGraphicApplication(settings, windowSettings)){
+        try(var application = new WgpuGraphicApplication(windowSettings)){
+            application.init(renderPipelineSettings);
+
             while(!application.getWindow().isCloseRequested()){
                 var swapChain = application.renderStart();
                 swapChain.draw(3, 1);
-                application.renderEnd();
+
+                swapChain.renderEnd();
             }
         }
     }
@@ -59,7 +62,8 @@ public class TriangleExample {
                 .setBufferLayouts()
                 .setSampleCount(1)
                 .setSampleMask(0)
-                .setAlphaToCoverage(false);
+                .setAlphaToCoverage(false)
+                .setBindGroupLayouts();
     }
 
 }

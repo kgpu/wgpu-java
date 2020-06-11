@@ -56,10 +56,10 @@ public class VertexExample {
         WgpuCore.loadWgpuNative();
         WgpuJava.setWgpuLogLevel(WgpuLogLevel.INFO);
 
-        RenderPipelineSettings settings = createPipelineSettings();
+        RenderPipelineSettings renderPipelineSettings = createPipelineSettings();
         WindowSettings windowSettings = new WindowSettings("Wgpu-Java vertex example", 302, 302);
 
-        try(var application = new WgpuGraphicApplication(settings, windowSettings)){
+        try(var application = new WgpuGraphicApplication(windowSettings)){
             var vertexBuffer = new BufferSettings()
                     .setLabel("Vertex buffer")
                     .setSize(FLOATS_PER_VERTEX * Float.BYTES * VERTICES.length)
@@ -78,6 +78,8 @@ public class VertexExample {
             indexBuffer.getMappedData().put(0, INDICES, 0, INDICES.length);
             indexBuffer.unmap();
 
+            application.init(renderPipelineSettings);
+
             while(!application.getWindow().isCloseRequested()){
                 var swapChain = application.renderStart();
                 swapChain.setIndexBuffer(indexBuffer);
@@ -85,7 +87,7 @@ public class VertexExample {
 
                 swapChain.drawIndexed(VERTICES.length, 1, 0);
 
-                application.renderEnd();
+                swapChain.renderEnd();
             }
         }
     }
@@ -117,6 +119,7 @@ public class VertexExample {
                         new WgpuVertexBufferAttributeDescriptor(0, WgpuVertexFormat.FLOAT3, 0)))
                 .setSampleCount(1)
                 .setSampleMask(0)
-                .setAlphaToCoverage(false);
+                .setAlphaToCoverage(false)
+                .setBindGroupLayouts();
     }
 }

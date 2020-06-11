@@ -15,7 +15,9 @@ import com.noahcharlton.wgpuj.jni.WgpuPresentMode;
 import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
 import com.noahcharlton.wgpuj.jni.WgpuStoreOp;
 import com.noahcharlton.wgpuj.jni.WgpuSwapChainStatus;
+import com.noahcharlton.wgpuj.jni.WgpuTextureAspect;
 import com.noahcharlton.wgpuj.jni.WgpuTextureComponentType;
+import com.noahcharlton.wgpuj.jni.WgpuTextureDimension;
 import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
 import com.noahcharlton.wgpuj.jni.WgpuTextureViewDimension;
 import com.noahcharlton.wgpuj.jni.WgpuVertexFormat;
@@ -185,6 +187,22 @@ public class WgpuEnumTests extends WgpuNativeTest {
         Pointer output = wgpuTest.get_wgpu_vertex_format_name(format);
 
         standardEnumTest(format, output);
+    }
+
+    @ParameterizedTest
+    @EnumSource(WgpuTextureDimension.class)
+    void wgpuTextureDimensionTest(WgpuTextureDimension dimension) {
+        Pointer output = wgpuTest.get_wgpu_texture_dimension_name(dimension);
+
+        standardEnumTest(dimension, output);
+    }
+
+    @ParameterizedTest
+    @EnumSource(WgpuTextureAspect.class)
+    void wgpuTextureAspectTest(WgpuTextureAspect aspect) {
+        Pointer output = wgpuTest.get_wgpu_texture_aspect_name(aspect);
+
+        standardEnumTest(aspect, output);
     }
 
     private <E extends Enum> void standardEnumTest(E e, Pointer output) {

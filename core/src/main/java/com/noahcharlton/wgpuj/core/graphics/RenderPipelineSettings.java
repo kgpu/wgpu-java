@@ -21,6 +21,7 @@ public class RenderPipelineSettings {
     private int sampleCount;
     private int sampleMask;
     private boolean alphaToCoverage;
+    private long[] bindGroupLayouts;
 
     public RenderPipelineSettings() {
 
@@ -153,5 +154,15 @@ public class RenderPipelineSettings {
         this.alphaToCoverage = alphaToCoverage;
 
         return this;
+    }
+
+    public RenderPipelineSettings setBindGroupLayouts(long... bindGroupLayouts) {
+        this.bindGroupLayouts = bindGroupLayouts;
+
+        return this;
+    }
+
+    public long[] getBindGroupLayouts() {
+        return bindGroupLayouts;
     }
 }
