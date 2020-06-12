@@ -8,8 +8,8 @@ Java bindings for [Wgpu](https://github.com/gfx-rs/wgpu) based on
 - Rust 
 - Java JDK 11+
 
-![Alternate image text](images/triangle_example.png)
-![Alternate image text](images/vertex_example.png)
+![Cube Example](images/cube_example.png)
+![Vertex Example](images/vertex_example.png)
 
 
 ### Structure :
@@ -42,6 +42,7 @@ gradlew triangleExample
 gradlew computeExample
 gradlew vertexExample
 gradlew textureExample
+gradlew cubeExample
 ```
 
 ### Supported Platforms

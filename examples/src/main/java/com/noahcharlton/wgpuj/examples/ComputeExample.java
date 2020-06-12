@@ -11,7 +11,6 @@ import com.noahcharlton.wgpuj.jni.WgpuBindGroupDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupEntry;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutEntry;
-import com.noahcharlton.wgpuj.jni.WgpuBindingResourceTag;
 import com.noahcharlton.wgpuj.jni.WgpuBindingType;
 import com.noahcharlton.wgpuj.jni.WgpuCommandEncoderDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuComputePipelineDescriptor;
@@ -103,10 +102,7 @@ public class ComputeExample {
     }
 
     private static long createBindGroup(long device, long layout, long storageBuffer, long bufferSize) {
-        var entry = new WgpuBindGroupEntry();
-        entry.setBinding(0);
-        entry.getResource().setTag(WgpuBindingResourceTag.BUFFER);
-        entry.getResource().getData().getBinding().set(storageBuffer, 0, bufferSize);
+        var entry = new WgpuBindGroupEntry().setBuffer(0, storageBuffer, bufferSize);
 
         var desc  = new WgpuBindGroupDescriptor("bind group", layout, entry);
 

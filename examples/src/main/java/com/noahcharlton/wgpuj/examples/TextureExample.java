@@ -61,6 +61,9 @@ public class TextureExample {
     public static void main(String[] args) {
         WgpuCore.loadWgpuNative();
 
+        if(true)
+            throw new UnsupportedOperationException("This example is currently disabled due to an issue in wgpu-native");
+
         ImageData texture = loadTexture();
         RenderPipelineSettings renderPipelineSettings = createPipelineSettings();
         WindowSettings windowSettings = new WindowSettings("Wgpu-Java Texture Example", 640, 400);
@@ -175,7 +178,7 @@ public class TextureExample {
                         new WgpuVertexBufferAttributeDescriptor(
                                 0, WgpuVertexFormat.FLOAT3, 0),
                         new WgpuVertexBufferAttributeDescriptor(
-                                3, WgpuVertexFormat.FLOAT2, 1)
+                                3 * Float.BYTES, WgpuVertexFormat.FLOAT2, 1)
                 ))
                 .setSampleCount(1)
                 .setSampleMask(0)

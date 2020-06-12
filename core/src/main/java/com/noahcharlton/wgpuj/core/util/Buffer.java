@@ -14,6 +14,50 @@ public class Buffer {
         this.size = size;
     }
 
+    public static Buffer createVertexBuffer(String name, float[] data, long device){
+        return createFloatBuffer(name, data, device, BufferUsage.VERTEX);
+    }
+
+    public static Buffer createFloatBuffer(String name, float[] data, long device, BufferUsage... usages){
+        var buffer = new BufferSettings()
+                .setLabel(name)
+                .setSize(data.length * Float.BYTES)
+                .setMapped(true)
+                .setUsages(usages)
+                .createBuffer(device);
+        var ptr = buffer.getMappedData();
+
+        for(int i = 0; i < data.length; i++){
+            ptr.put(0, data, 0, data.length);
+        }
+
+        buffer.unmap();
+
+        return buffer;
+    }
+
+    public static Buffer createIndexBuffer(String name, short[] data, long device){
+        return createShortBuffer(name, data, device, BufferUsage.INDEX);
+    }
+
+    public static Buffer createShortBuffer(String name, short[] data, long device, BufferUsage... usages){
+        var buffer = new BufferSettings()
+                .setLabel(name)
+                .setSize(data.length * Short.BYTES)
+                .setMapped(true)
+                .setUsages(usages)
+                .createBuffer(device);
+        var ptr = buffer.getMappedData();
+
+        for(int i = 0; i < data.length; i++){
+            ptr.put(0, data, 0, data.length);
+        }
+
+        buffer.unmap();
+
+        return buffer;
+    }
+
     public void readAsync(){
         readAsync((status, userdata) -> {}, WgpuJava.createNullPointer());
     }

@@ -132,4 +132,7 @@ public interface WgpuJNI {
 
     @u_int64_t
     long wgpu_device_create_sampler(@u_int64_t long device, Pointer samplerDesc);
+
+    void wgpu_queue_write_buffer(@u_int64_t long queue, @u_int64_t long buffer, @u_int64_t long offset,
+                                 Pointer data, @intptr_t int dataLength);
 }

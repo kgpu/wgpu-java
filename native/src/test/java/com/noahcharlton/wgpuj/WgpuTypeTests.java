@@ -43,17 +43,42 @@ public class WgpuTypeTests extends WgpuNativeTest{
     @Test
     void bindGroupEntryBindingTest() {
         var entry = new WgpuBindGroupEntry();
-        entry.setBinding(654321);
+        entry.getBinding().set(654321);
 
         wgpuTest.bind_group_entry_test_binding(entry.getPointerTo());
     }
 
     @Test
-    void bindGroupEntryResourceTest() {
+    void bindGroupEntrySamplerResourceTest() {
         var entry = new WgpuBindGroupEntry();
-        entry.setBinding(654321);
+        entry.setSampler(0, 4343);
 
-        wgpuTest.bind_group_entry_test_binding(entry.getPointerTo());
+        Pointer actual = wgpuTest.bind_group_entry_resource_to_string(entry.getPointerTo());
+
+        String expected = "Sampler((4343, 0, Empty))";
+        Assertions.assertEquals(expected, RustCString.fromPointer(actual));
+    }
+
+    @Test
+    void bindGroupEntryBufferResourceTest() {
+        var entry = new WgpuBindGroupEntry();
+        entry.setBuffer(0, 123, 456);
+
+        Pointer actual = wgpuTest.bind_group_entry_resource_to_string(entry.getPointerTo());
+
+        String expected = "Buffer(BufferBinding { buffer: (123, 0, Empty), offset: 0, size: BufferSize(456) })";
+        Assertions.assertEquals(expected, RustCString.fromPointer(actual));
+    }
+
+    @Test
+    void bindGroupEntryTextureResourceTest() {
+        var entry = new WgpuBindGroupEntry();
+        entry.setTextureView(0, 9874);
+
+        Pointer actual = wgpuTest.bind_group_entry_resource_to_string(entry.getPointerTo());
+
+        String expected = "TextureView((9874, 0, Empty))";
+        Assertions.assertEquals(expected, RustCString.fromPointer(actual));
     }
 
     @Test

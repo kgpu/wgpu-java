@@ -33,3 +33,8 @@ task(textureExample, dependsOn: 'classes', type: JavaExec) {
     main = 'com.noahcharlton.wgpuj.examples.TextureExample'
     classpath = sourceSets.main.runtimeClasspath
 }
+
+task(cubeExample, dependsOn: 'classes', type: JavaExec) {
+    main = 'com.noahcharlton.wgpuj.examples.CubeExample'
+    classpath = sourceSets.main.runtimeClasspath
+}

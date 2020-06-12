@@ -34,8 +34,16 @@ public class WgpuBindGroupEntry extends WgpuJavaStruct {
         return this;
     }
 
-    public void setBinding(int binding){
+    public WgpuBindGroupEntry setBuffer(int binding, long buffer, long size){
         this.binding.set(binding);
+        this.resource.setTag(WgpuBindingResourceTag.BUFFER);
+        this.resource.getData().getBinding().set(buffer, 0, size);
+
+        return this;
+    }
+
+    public Unsigned32 getBinding() {
+        return binding;
     }
 
     public WgpuBindingResource getResource() {

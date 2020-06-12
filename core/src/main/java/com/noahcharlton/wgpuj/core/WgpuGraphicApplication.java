@@ -1,5 +1,6 @@
 package com.noahcharlton.wgpuj.core;
 
+import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
 import com.noahcharlton.wgpuj.core.graphics.SwapChain;
 import com.noahcharlton.wgpuj.core.graphics.Window;
@@ -11,6 +12,7 @@ public class WgpuGraphicApplication implements AutoCloseable{
     private volatile boolean applicationCreated;
 
     private final Window window;
+    private long queue;
 
     public WgpuGraphicApplication(WindowSettings windowSettings) {
         if(applicationCreated) throw new UnsupportedOperationException("Wgpu-java only supports one application.");
@@ -19,6 +21,7 @@ public class WgpuGraphicApplication implements AutoCloseable{
         GlfwHandler.init();
 
         window = new Window(windowSettings);
+        queue = WgpuJava.wgpuNative.wgpu_device_get_default_queue(window.getDevice());
     }
 
     public void init(RenderPipelineSettings settings){
@@ -41,5 +44,9 @@ public class WgpuGraphicApplication implements AutoCloseable{
 
     public long getDevice(){
         return window.getDevice();
+    }
+
+    public long getQueue() {
+        return queue;
     }
 }
