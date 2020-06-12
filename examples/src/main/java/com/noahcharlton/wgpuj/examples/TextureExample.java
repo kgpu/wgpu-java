@@ -149,8 +149,8 @@ public class TextureExample {
     }
 
     private static RenderPipelineSettings createPipelineSettings(){
-        ShaderData vertex = ShaderData.fromClasspathFile("/texture.vert.spv", "main");
-        ShaderData fragment = ShaderData.fromClasspathFile("/texture.frag.spv", "main");
+        ShaderData vertex = ShaderData.fromRawClasspathFile("/texture.vert", "main");
+        ShaderData fragment = ShaderData.fromCompiledClasspathFile("/texture.frag", "main");
 
         return new RenderPipelineSettings()
                 .setVertexStage(vertex)

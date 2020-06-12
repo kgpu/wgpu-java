@@ -1,9 +1,11 @@
 package com.noahcharlton.wgpuj.core;
 
+import com.noahcharlton.wgpuj.core.util.ClasspathUtil;
+import com.noahcharlton.wgpuj.core.util.ShaderCompiler;
 import com.noahcharlton.wgpuj.jni.WgpuProgrammableStageDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuShaderModuleDescription;
 
-import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * A container for a shader before it is loaded into
@@ -29,20 +31,31 @@ public class ShaderData {
         return new WgpuShaderModuleDescription(data).load(device);
     }
 
-    public static ShaderData fromClasspathFile(String path, String entryPoint){
-        var inputStream = WgpuShaderModuleDescription.class.getResourceAsStream(path);
+    public static ShaderData fromCompiledClasspathFile(String path, String entryPoint){
+        return new ShaderData(entryPoint, ClasspathUtil.readBytes(path));
+    }
 
-        if(inputStream == null){
-            throw new RuntimeException("Failed to find shader file: " + path);
+    public static ShaderData fromRawClasspathFile(String path, String entryPoint){
+        int type;
+
+        if(path.endsWith(".vert")){
+            type = ShaderCompiler.VERTEX;
+        }else if(path.endsWith(".frag")){
+            type = ShaderCompiler.FRAGMENT;
+        }else if(path.endsWith(".comp")){
+            type = ShaderCompiler.COMPUTE;
+        }else{
+            throw new IllegalArgumentException("Path must have extension .frag, .vert, or .comp. You may also use " +
+                    "ShaderData.fromRawClasspathFile(String path, String entryPoint, int type)");
         }
 
-        try {
-            byte[] bytes =  inputStream.readAllBytes();
+        return fromRawClasspathFile(path, entryPoint, type);
+    }
 
-            return new ShaderData(entryPoint, bytes);
-        } catch(IOException e) {
-            throw new RuntimeException("Failed to read shader file " + path, e);
-        }
+    public static ShaderData fromRawClasspathFile(String path, String entryPoint, int type){
+        String text = ClasspathUtil.readText(path, StandardCharsets.UTF_8);
+
+        return new ShaderData(entryPoint, ShaderCompiler.compile(text, type));
     }
 
     public byte[] getData() {

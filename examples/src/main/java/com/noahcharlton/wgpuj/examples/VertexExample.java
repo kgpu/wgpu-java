@@ -93,8 +93,8 @@ public class VertexExample {
     }
 
     private static RenderPipelineSettings createPipelineSettings(){
-        ShaderData vertex = ShaderData.fromClasspathFile("/vertex.vert.spv", "main");
-        ShaderData fragment = ShaderData.fromClasspathFile("/vertex.frag.spv", "main");
+        ShaderData vertex = ShaderData.fromRawClasspathFile("/vertex.vert", "main");
+        ShaderData fragment = ShaderData.fromRawClasspathFile("/vertex.frag", "main");
 
         return new RenderPipelineSettings()
                 .setVertexStage(vertex)

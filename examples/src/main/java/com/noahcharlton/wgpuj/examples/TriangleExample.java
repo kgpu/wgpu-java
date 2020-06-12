@@ -2,8 +2,8 @@ package com.noahcharlton.wgpuj.examples;
 
 import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.core.ShaderData;
-import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
 import com.noahcharlton.wgpuj.core.WgpuCore;
+import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
 import com.noahcharlton.wgpuj.core.graphics.BlendDescriptor;
 import com.noahcharlton.wgpuj.core.graphics.ColorState;
 import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
@@ -39,8 +39,8 @@ public class TriangleExample {
     }
 
     private static RenderPipelineSettings createPipelineSettings(){
-        ShaderData vertex = ShaderData.fromClasspathFile("/triangle.vert.spv", "main");
-        ShaderData fragment = ShaderData.fromClasspathFile("/triangle.frag.spv", "main");
+        ShaderData vertex = ShaderData.fromRawClasspathFile("/triangle.vert", "main");
+        ShaderData fragment = ShaderData.fromRawClasspathFile("/triangle.frag", "main");
 
         return new RenderPipelineSettings()
                 .setVertexStage(vertex)
