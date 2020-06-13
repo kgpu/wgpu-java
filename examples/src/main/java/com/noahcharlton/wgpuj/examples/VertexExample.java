@@ -10,6 +10,7 @@ import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
 import com.noahcharlton.wgpuj.core.graphics.WindowSettings;
 import com.noahcharlton.wgpuj.core.util.BufferSettings;
 import com.noahcharlton.wgpuj.core.util.BufferUsage;
+import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
 import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
 import com.noahcharlton.wgpuj.jni.WgpuColorStateDescriptor;
@@ -120,6 +121,7 @@ public class VertexExample {
                 .setSampleCount(1)
                 .setSampleMask(0)
                 .setAlphaToCoverage(false)
-                .setBindGroupLayouts();
+                .setBindGroupLayouts()
+                .setClearColor(Color.BLACK);
     }
 }

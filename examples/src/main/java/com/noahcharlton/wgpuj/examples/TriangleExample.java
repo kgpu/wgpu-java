@@ -8,6 +8,7 @@ import com.noahcharlton.wgpuj.core.graphics.BlendDescriptor;
 import com.noahcharlton.wgpuj.core.graphics.ColorState;
 import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
 import com.noahcharlton.wgpuj.core.graphics.WindowSettings;
+import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
 import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
 import com.noahcharlton.wgpuj.jni.WgpuColorStateDescriptor;
@@ -63,7 +64,8 @@ public class TriangleExample {
                 .setSampleCount(1)
                 .setSampleMask(0)
                 .setAlphaToCoverage(false)
-                .setBindGroupLayouts();
+                .setBindGroupLayouts()
+                .setClearColor(Color.BLACK);
     }
 
 }

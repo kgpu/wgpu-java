@@ -33,16 +33,15 @@ public class SwapChain {
     public void renderStart(RenderPipeline pipeline, long device){
         this.device = device;
         this.queue = WgpuJava.wgpuNative.wgpu_device_get_default_queue(device);
-        this.rawPass = beginRenderPass();
+        this.rawPass = beginRenderPass(pipeline.getClearColor());
 
         WgpuJava.wgpuNative.wgpu_render_pass_set_pipeline(rawPass.getPointerTo(), pipeline.getPipelineID());
     }
 
-    private WgpuRawPass beginRenderPass() {
+    private WgpuRawPass beginRenderPass(Color clearColor) {
         long textureID = getSwapChainTexture();
         encoderID = WgpuJava.wgpuNative.wgpu_device_create_command_encoder(device,
                 new WgpuCommandEncoderDescriptor("command_encoder").getPointerTo());
-        var clearColor = Color.GREEN;
         var rawPassDescriptor = new WgpuRawPassDescriptor(null, new WgpuRenderPassColorDescriptor(textureID,
                 WgpuLoadOp.CLEAR, WgpuStoreOp.STORE, clearColor.r, clearColor.g, clearColor.b, clearColor.a));
 

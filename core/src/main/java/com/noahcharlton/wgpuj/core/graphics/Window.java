@@ -1,6 +1,7 @@
 package com.noahcharlton.wgpuj.core.graphics;
 
 import com.noahcharlton.wgpuj.WgpuJava;
+import com.noahcharlton.wgpuj.core.input.GlfwKeyHandler;
 import com.noahcharlton.wgpuj.core.util.Backend;
 import com.noahcharlton.wgpuj.core.util.Dimension;
 import com.noahcharlton.wgpuj.core.util.GlfwHandler;
@@ -25,6 +26,7 @@ public class Window {
     private RenderPipeline renderPipeline;
     private Dimension currentDimension;
     private SwapChain swapChain;
+    private WindowEventHandler eventHandler;
 
     public Window(WindowSettings windowSettings) {
         this.handle = windowSettings.createWindow();
@@ -34,9 +36,11 @@ public class Window {
 
         currentDimension = GlfwHandler.getWindowDimension(handle);
         GlfwHandler.centerWindow(handle, currentDimension);
+        GLFW.glfwSetKeyCallback(handle, new GlfwKeyHandler(this));
 
         surface = createSurface();
         device = createDevice();
+        eventHandler = new WindowEventHandler.EmptyWindowHandler();
     }
 
     private long createDevice() {
@@ -99,6 +103,8 @@ public class Window {
 
     private void onResize() {
         createNewSwapChain();
+
+        eventHandler.onResize();
     }
 
     private void createNewSwapChain() {
@@ -113,6 +119,10 @@ public class Window {
         return GLFW.glfwWindowShouldClose(handle);
     }
 
+    public void setEventHandler(WindowEventHandler eventHandler) {
+        this.eventHandler = eventHandler;
+    }
+
     public void dispose(){
         Callbacks.glfwFreeCallbacks(handle);
         GLFW.glfwDestroyWindow(handle);
@@ -120,5 +130,9 @@ public class Window {
 
     public long getDevice() {
         return device;
+    }
+
+    public WindowEventHandler getEventHandler() {
+        return eventHandler;
     }
 }

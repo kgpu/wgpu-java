@@ -13,6 +13,7 @@ import com.noahcharlton.wgpuj.core.math.MathUtils;
 import com.noahcharlton.wgpuj.core.math.MatrixUtils;
 import com.noahcharlton.wgpuj.core.util.Buffer;
 import com.noahcharlton.wgpuj.core.util.BufferUsage;
+import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.core.util.Dimension;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupEntry;
@@ -39,23 +40,6 @@ import org.joml.Vector3f;
 public class CubeExample {
 
     private static final float[] VERTICES = new float[]{
-//            //Bottom Rectangle
-//            -.5f, -.5f, -.5f, 1f, 0f, 0f,
-//            -.5f, .5f, -.5f, 1f, 0f, 0f,
-//            .5f, .5f, -.5f, 1f, 0f, 0f,
-//            .5f, -.5f, -.5f, 1f, 0f, 0f,
-//
-//            //Top Rectangle
-//            -.5f, -.5f, .5f, 0f, 0f, 1f,
-//            -.5f, .5f, .5f, 0f, 0f, 1f,
-//            .5f, .5f, .5f, 0f, 0f, 1f,
-//            .5f, -.5f, .5f, 0f, 0f, 1f,
-//
-//            -.5f, .5f, -.5f, .25f, 0f, .75f,
-//            -.5f, .5f, .5f, .25f, 0f, .75f,
-//            -.5f, -.5f, -.5f, .25f, 0f, .75f,
-//            -.5f, -.5f, .5f, .25f, 0f, .75f,
-
             -1, -1, 1, 1f, 0f, 0f,
             1, -1, 1, 1f, 0f, 0f,
             1, 1, 1, 1f, 0f, 0f,
@@ -90,15 +74,6 @@ public class CubeExample {
     private static final int FLOATS_PER_VERTEX = 6;
 
     private static final short[] INDICES = new short[]{
-//            0, 1, 2,
-//            0, 2, 3,
-//
-//            4, 5, 6,
-//            4, 6, 7,
-//
-//            8, 10, 9,
-//            9, 10, 11
-
             0, 1, 2, 2, 3, 0,
             4, 5, 6, 6, 7, 4,
             8, 9, 10, 10, 11, 8,
@@ -206,6 +181,7 @@ public class CubeExample {
                 .setSampleCount(1)
                 .setSampleMask(0)
                 .setAlphaToCoverage(false)
-                .setBindGroupLayouts();
+                .setBindGroupLayouts()
+                .setClearColor(Color.BLACK);
     }
 }

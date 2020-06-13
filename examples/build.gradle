@@ -38,3 +38,8 @@ task(cubeExample, dependsOn: 'classes', type: JavaExec) {
     main = 'com.noahcharlton.wgpuj.examples.CubeExample'
     classpath = sourceSets.main.runtimeClasspath
 }
+
+task(windowEventExample, dependsOn: 'classes', type: JavaExec) {
+    main = 'com.noahcharlton.wgpuj.examples.WindowEventExample'
+    classpath = sourceSets.main.runtimeClasspath
+}

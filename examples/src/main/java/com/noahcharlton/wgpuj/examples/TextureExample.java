@@ -10,6 +10,7 @@ import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
 import com.noahcharlton.wgpuj.core.graphics.WindowSettings;
 import com.noahcharlton.wgpuj.core.util.BufferSettings;
 import com.noahcharlton.wgpuj.core.util.BufferUsage;
+import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.core.util.ImageData;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupEntry;
@@ -183,6 +184,7 @@ public class TextureExample {
                 .setSampleCount(1)
                 .setSampleMask(0)
                 .setAlphaToCoverage(false)
-                .setBindGroupLayouts();
+                .setBindGroupLayouts()
+                .setClearColor(Color.BLACK);
     }
 }
