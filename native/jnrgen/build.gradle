@@ -11,8 +11,14 @@ repositories {
     mavenCentral()
 }
 
-task(run, dependsOn: 'classes', type: JavaExec) {
+task(generateBindings, dependsOn: 'classes', type: JavaExec) {
     main = 'com.noahcharlton.wgpuj.jnrgen.JNRGenerator'
     classpath = sourceSets.main.runtimeClasspath
     args "${buildDir}"
+
+    standardOutput = System.out
+    errorOutput = System.err
 }
+
+//Remove old bindings
+tasks.generateBindings.doFirst {clean}

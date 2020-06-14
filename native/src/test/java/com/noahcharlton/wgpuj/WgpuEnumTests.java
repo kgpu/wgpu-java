@@ -108,13 +108,8 @@ public class WgpuEnumTests extends WgpuNativeTest {
     @EnumSource(WgpuFrontFace.class)
     void wgpuFrontFaceTest(WgpuFrontFace face) {
         Pointer output = wgpuTest.get_front_face_name(face);
-        String actual = RustCString.fromPointer(output);
 
-        if(face == WgpuFrontFace.CLOCKWISE) {
-            Assertions.assertEquals("Cw", actual);
-        } else {
-            Assertions.assertEquals("Ccw", actual);
-        }
+        standardEnumTest(face, output);
     }
 
     @ParameterizedTest

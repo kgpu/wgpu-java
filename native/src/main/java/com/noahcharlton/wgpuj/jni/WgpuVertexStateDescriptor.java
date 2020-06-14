@@ -15,7 +15,7 @@ public class WgpuVertexStateDescriptor extends WgpuJavaStruct {
     }
 
     public void set(WgpuIndexFormat indexFormat, WgpuVertexBufferLayoutDescriptor... vertexBuffers){
-        this.indexFormat.set(indexFormat.getIntValue());
+        this.indexFormat.set(indexFormat);
         this.vertexBuffers.set(vertexBuffers);
         this.vertexBufferLength.set(vertexBuffers.length);
     }

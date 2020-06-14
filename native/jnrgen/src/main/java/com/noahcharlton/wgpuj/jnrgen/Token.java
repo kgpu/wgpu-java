@@ -1,5 +1,7 @@
 package com.noahcharlton.wgpuj.jnrgen;
 
+import java.util.Objects;
+
 public class Token {
 
     public enum TokenType {
@@ -32,6 +34,24 @@ public class Token {
         this(type, "");
     }
 
+    public static Token identifier(String text){
+        return new Token(TokenType.IDENTIFIER, text);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(this == o) return true;
+        if(!(o instanceof Token)) return false;
+        Token token = (Token) o;
+        return getType() == token.getType() &&
+                Objects.equals(getText(), token.getText());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getType(), getText());
+    }
+
     @Override
     public String toString() {
         String text = this.text;
@@ -40,5 +60,13 @@ public class Token {
             text = text.substring(0, 50) + "...";
 
         return String.format("%s(%s)", type, text);
+    }
+
+    public TokenType getType() {
+        return type;
+    }
+
+    public String getText() {
+        return text;
     }
 }

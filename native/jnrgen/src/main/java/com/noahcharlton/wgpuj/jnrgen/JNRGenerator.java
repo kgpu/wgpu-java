@@ -14,9 +14,19 @@ public class JNRGenerator {
         }
 
         File outputDirectory = createOutputDirectory(args[0]);
+        Config config = new Config(outputDirectory);
         String header = readHeaderFile();
 
         List<Token> tokens = new Scanner(header).getTokens();
+        List<Item> items = new Parser(tokens).getItems();
+
+        for(Item item: items){
+            try{
+                item.save(config);
+            }catch(IOException e){
+                throw new RuntimeException("Failed to save item: " + item, e);
+            }
+        }
     }
 
     private static String readHeaderFile() {

@@ -22,7 +22,6 @@ public class Scanner {
 
             if(token != null){
                 tokens.add(token);
-                System.out.println(token);
             }
         }
 
@@ -72,7 +71,7 @@ public class Scanner {
                 if(isIdentifierCharacter(c)){
                     String text = readIdentifier(c);
 
-                    return new Token(Token.TokenType.IDENTIFIER, text);
+                    return Token.identifier(text);
                 }else{
                     System.out.println("Unknown character: " + c);
 

@@ -101,7 +101,7 @@ public class VertexExample {
                 .setVertexStage(vertex)
                 .setFragmentStage(fragment)
                 .setRasterizationState(new WgpuRasterizationStateDescriptor(
-                        WgpuFrontFace.COUNTER_CLOCKWISE,
+                        WgpuFrontFace.CCW,
                         WgpuCullMode.NONE,
                         0,
                         0.0f,
@@ -113,7 +113,7 @@ public class VertexExample {
                         new BlendDescriptor(WgpuBlendFactor.ONE, WgpuBlendFactor.ZERO, WgpuBlendOperation.ADD),
                         WgpuColorStateDescriptor.ALL).build())
                 .setDepthStencilState(WgpuJava.createNullPointer())
-                .setVertexIndexFormat(WgpuIndexFormat.Uint16)
+                .setVertexIndexFormat(WgpuIndexFormat.UINT16)
                 .setBufferLayouts(new WgpuVertexBufferLayoutDescriptor(
                         Float.BYTES * FLOATS_PER_VERTEX,
                         WgpuInputStepMode.VERTEX,
