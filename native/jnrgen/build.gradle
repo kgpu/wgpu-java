@@ -1,0 +1,18 @@
+plugins {
+    id 'java'
+}
+
+group 'com.noahcharlton.wgpuj'
+version '0.1.0'
+
+sourceCompatibility = 11
+
+repositories {
+    mavenCentral()
+}
+
+task(run, dependsOn: 'classes', type: JavaExec) {
+    main = 'com.noahcharlton.wgpuj.jnrgen.JNRGenerator'
+    classpath = sourceSets.main.runtimeClasspath
+    args "${buildDir}"
+}
