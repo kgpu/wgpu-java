@@ -47,7 +47,7 @@ public class TriangleExample {
                 .setVertexStage(vertex)
                 .setFragmentStage(fragment)
                 .setRasterizationState(new WgpuRasterizationStateDescriptor(
-                        WgpuFrontFace.COUNTER_CLOCKWISE,
+                        WgpuFrontFace.CCW,
                         WgpuCullMode.NONE,
                         0,
                         0.0f,
@@ -59,7 +59,7 @@ public class TriangleExample {
                         new BlendDescriptor(WgpuBlendFactor.ONE, WgpuBlendFactor.ZERO, WgpuBlendOperation.ADD),
                         WgpuColorStateDescriptor.ALL).build())
                 .setDepthStencilState(WgpuJava.createNullPointer())
-                .setVertexIndexFormat(WgpuIndexFormat.Uint16)
+                .setVertexIndexFormat(WgpuIndexFormat.UINT16)
                 .setBufferLayouts()
                 .setSampleCount(1)
                 .setSampleMask(0)

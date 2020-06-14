@@ -30,6 +30,10 @@ A fork is needed to add some functions to get around some problems with jnr-ffi
 ###### wgpu-java/native/wgpu-test
 A cargo crate that has functions used for unit testing the FFI code.
 
+###### wgpu-java/native/jnr-gen
+A tool to make java files out of the wgpu.h header file.
+[Click Here for more info](https://github.com/DevOrc/wgpu-java/blob/master/native/jnrgen/README.md)
+
 ###### wgpu-java/examples
 Examples based on the wgpu-native examples on how to use wgpu-java/core
 
