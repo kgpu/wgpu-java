@@ -1,6 +1,7 @@
 package com.noahcharlton.wgpuj.core.util;
 
 import com.noahcharlton.wgpuj.WgpuJava;
+import com.noahcharlton.wgpuj.core.Device;
 import com.noahcharlton.wgpuj.jni.WgpuBufferDescriptor;
 
 public class BufferSettings {
@@ -10,9 +11,9 @@ public class BufferSettings {
     private BufferUsage[] usages = new BufferUsage[0];
     private boolean mapped = false;
 
-    public Buffer createBuffer(long device){
+    public Buffer createBuffer(Device device){
         var descriptor = toDescriptor().getPointerTo();
-        var id = WgpuJava.wgpuNative.wgpu_device_create_buffer(device, descriptor);
+        var id = WgpuJava.wgpuNative.wgpu_device_create_buffer(device.getId(), descriptor);
 
         return new Buffer(id, size);
     }

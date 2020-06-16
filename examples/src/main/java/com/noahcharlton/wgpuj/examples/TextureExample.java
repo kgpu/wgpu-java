@@ -1,27 +1,24 @@
 package com.noahcharlton.wgpuj.examples;
 
 import com.noahcharlton.wgpuj.WgpuJava;
+import com.noahcharlton.wgpuj.core.Device;
 import com.noahcharlton.wgpuj.core.ShaderData;
 import com.noahcharlton.wgpuj.core.WgpuCore;
 import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
 import com.noahcharlton.wgpuj.core.graphics.BlendDescriptor;
 import com.noahcharlton.wgpuj.core.graphics.ColorState;
+import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
 import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
-import com.noahcharlton.wgpuj.core.graphics.WindowSettings;
-import com.noahcharlton.wgpuj.core.util.BufferSettings;
 import com.noahcharlton.wgpuj.core.util.BufferUsage;
 import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.core.util.ImageData;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupEntry;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutEntry;
 import com.noahcharlton.wgpuj.jni.WgpuBindingType;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
 import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
 import com.noahcharlton.wgpuj.jni.WgpuBufferCopyView;
 import com.noahcharlton.wgpuj.jni.WgpuColorStateDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuCommandEncoderDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuCullMode;
 import com.noahcharlton.wgpuj.jni.WgpuExtent3d;
 import com.noahcharlton.wgpuj.jni.WgpuFrontFace;
@@ -52,7 +49,7 @@ public class TextureExample {
      */
     private static final float[] VERTICES = new float[]{
             -.5f, -.5f, 0f, 0, 0
-            -.5f, .5f, 0f, 0, 1,
+            - .5f, .5f, 0f, 0, 1,
             .5f, .5f, 0f, 1, 1,
             .5f, -.5f, 0f, 1, 0
     };
@@ -67,36 +64,22 @@ public class TextureExample {
 
         ImageData texture = loadTexture();
         RenderPipelineSettings renderPipelineSettings = createPipelineSettings();
-        WindowSettings windowSettings = new WindowSettings("Wgpu-Java Texture Example", 640, 400);
+        GraphicApplicationSettings appSettings = new GraphicApplicationSettings("Wgpu-Java Texture Example", 640, 400);
 
-        try(var application = new WgpuGraphicApplication(windowSettings)){
-            var vertexBuffer = new BufferSettings()
-                    .setLabel("Vertex buffer")
-                    .setSize(VERTICES.length * FLOATS_PER_VERTEX * Float.BYTES)
-                    .setUsages(BufferUsage.VERTEX)
-                    .setMapped(true)
-                    .createBuffer(application.getDevice());
-            vertexBuffer.getMappedData().put(0, VERTICES, 0, VERTICES.length);
-            vertexBuffer.unmap();
+        try(var application = WgpuGraphicApplication.create(appSettings)) {
+            Device device = application.getDevice();
 
-            var textureDesc= new WgpuTextureDescriptor();
+            var vertexBuffer = device.createVertexBuffer("Vertex Buffer", VERTICES);
+            var textureDesc = new WgpuTextureDescriptor();
             textureDesc.set("texture", texture.getWidth(), texture.getHeight(), 1, 1, 1, WgpuTextureDimension.D2,
                     WgpuTextureFormat.RGBA8_UINT, WgpuTextureDescriptor.COPY_DST | WgpuTextureDescriptor.SAMPLED);
+            long textureId = device.createTexture(textureDesc);
 
-            long textureId = WgpuJava.wgpuNative.wgpu_device_create_texture(application.getDevice(),
-                    textureDesc.getPointerTo());
-
-            var textureBuffer = new BufferSettings()
-                    .setLabel("Texture buffer")
-                    .setSize(texture.getPixels().length * Integer.BYTES)
-                    .setUsages(BufferUsage.COPY_SRC)
-                    .setMapped(true)
-                    .createBuffer(application.getDevice());
+            var textureBuffer = device.createIntBuffer("texture buffer", texture.getPixels(), BufferUsage.COPY_SRC);
             textureBuffer.getMappedData().put(0, texture.getPixels(), 0, texture.getPixels().length);
             textureBuffer.unmap();
 
-            long encoder = WgpuJava.wgpuNative.wgpu_device_create_command_encoder(application.getDevice(),
-                    new WgpuCommandEncoderDescriptor("").getPointerTo());
+            long encoder = device.createCommandEncoder("Command Encoder");
             WgpuJava.wgpuNative.wgpu_command_encoder_copy_buffer_to_texture(encoder,
                     new WgpuBufferCopyView(textureBuffer.getId(), 0, Integer.BYTES * texture.getWidth(),
                             texture.getHeight()).getPointerTo(),
@@ -106,53 +89,46 @@ public class TextureExample {
 
             long textureView = WgpuJava.wgpuNative.wgpu_texture_create_view(textureId, WgpuJava.createNullPointer());
             //See WgpuSamplerDescriptor, blocked by https://github.com/gfx-rs/wgpu-native/pull/34
-            long sampler = WgpuJava.wgpuNative.wgpu_device_create_sampler(application.getDevice(),
+            long sampler = WgpuJava.wgpuNative.wgpu_device_create_sampler(application.getDevice().getId(),
                     WgpuJava.createNullPointer());
 
-            var textureBindGroupLayout = WgpuJava.wgpuNative.
-                    wgpu_device_create_bind_group_layout(application.getDevice(), new WgpuBindGroupLayoutDescriptor(
-                            "texture bind group layout",
-                            new WgpuBindGroupLayoutEntry()
-                                    .setPartial(0, WgpuBindGroupLayoutEntry.SHADER_STAGE_FRAGMENT,
-                                            WgpuBindingType.SAMPLED_TEXTURE)
-                                    .setSampledTextureData(false, WgpuTextureViewDimension.D2,
-                                            WgpuTextureComponentType.UINT),
-                            new WgpuBindGroupLayoutEntry()
-                                    .setPartial(1, WgpuBindGroupLayoutEntry.SHADER_STAGE_FRAGMENT,
-                                            WgpuBindingType.SAMPLER)
-                    ).getPointerTo());
+            var textureBindGroupLayout = device.createBindGroupLayout("texture bind group layout",
+                    new WgpuBindGroupLayoutEntry()
+                            .setPartial(0, WgpuBindGroupLayoutEntry.SHADER_STAGE_FRAGMENT,
+                                    WgpuBindingType.SAMPLED_TEXTURE)
+                            .setSampledTextureData(false, WgpuTextureViewDimension.D2,
+                                    WgpuTextureComponentType.UINT),
+                    new WgpuBindGroupLayoutEntry()
+                            .setPartial(1, WgpuBindGroupLayoutEntry.SHADER_STAGE_FRAGMENT,
+                                    WgpuBindingType.SAMPLER));
 
-            var textureBindGroup = WgpuJava.wgpuNative.wgpu_device_create_bind_group(application.getDevice(),
-                    new WgpuBindGroupDescriptor(
-                            "texture bind group",
-                            textureBindGroupLayout,
-                            new WgpuBindGroupEntry().setTextureView(0, textureView),
-                            new WgpuBindGroupEntry().setSampler(1, sampler)
-                    ).getPointerTo());
+            var textureBindGroup = device.createBindGroup("texture bind group", textureBindGroupLayout,
+                    new WgpuBindGroupEntry().setTextureView(0, textureView),
+                    new WgpuBindGroupEntry().setSampler(1, sampler));
 
             renderPipelineSettings.setBindGroupLayouts(textureBindGroup);
             application.init(renderPipelineSettings);
 
-            while(!application.getWindow().isCloseRequested()){
-                var swapChain = application.renderStart();
-                swapChain.setBindGroup(0, textureBindGroup);
-                swapChain.setVertexBuffer(vertexBuffer, 0);
-                swapChain.draw(VERTICES.length, 1);
+            while(!application.getWindow().isCloseRequested()) {
+                var renderPass = application.renderStart();
+                renderPass.setBindGroup(0, textureBindGroup);
+                renderPass.setVertexBuffer(vertexBuffer, 0);
+                renderPass.draw(VERTICES.length, 1);
 
-                swapChain.renderEnd();
+                application.renderEnd();
             }
         }
     }
 
     static ImageData loadTexture() {
-        try{
+        try {
             return ImageData.fromFile("/texture.png");
-        }catch(IOException | RuntimeException e){
+        } catch(IOException | RuntimeException e) {
             throw new RuntimeException("Failed to load example texture", e);
         }
     }
 
-    private static RenderPipelineSettings createPipelineSettings(){
+    private static RenderPipelineSettings createPipelineSettings() {
         ShaderData vertex = ShaderData.fromRawClasspathFile("/texture.vert", "main");
         ShaderData fragment = ShaderData.fromCompiledClasspathFile("/texture.frag", "main");
 

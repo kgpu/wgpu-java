@@ -1,23 +1,21 @@
 package com.noahcharlton.wgpuj.examples;
 
 import com.noahcharlton.wgpuj.WgpuJava;
+import com.noahcharlton.wgpuj.core.Device;
 import com.noahcharlton.wgpuj.core.ShaderData;
 import com.noahcharlton.wgpuj.core.WgpuCore;
 import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
 import com.noahcharlton.wgpuj.core.graphics.BlendDescriptor;
 import com.noahcharlton.wgpuj.core.graphics.ColorState;
+import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
 import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
 import com.noahcharlton.wgpuj.core.graphics.Window;
-import com.noahcharlton.wgpuj.core.graphics.WindowSettings;
 import com.noahcharlton.wgpuj.core.math.MathUtils;
 import com.noahcharlton.wgpuj.core.math.MatrixUtils;
-import com.noahcharlton.wgpuj.core.util.Buffer;
 import com.noahcharlton.wgpuj.core.util.BufferUsage;
 import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.core.util.Dimension;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupEntry;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutEntry;
 import com.noahcharlton.wgpuj.jni.WgpuBindingType;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
@@ -86,7 +84,7 @@ public class CubeExample {
         WgpuCore.loadWgpuNative();
 
         RenderPipelineSettings renderPipelineSettings = createPipelineSettings();
-        WindowSettings windowSettings = new WindowSettings("Wgpu-Java cube example", 302, 332);
+        GraphicApplicationSettings appSettings = new GraphicApplicationSettings("Wgpu-Java cube example", 302, 332);
 
         Matrix4f viewMatrix = new Matrix4f().lookAt(
                 new Vector3f(1.5f, -5f, 3.0f),
@@ -94,41 +92,34 @@ public class CubeExample {
                 MathUtils.UNIT_Z
         );
 
-        try(var application = new WgpuGraphicApplication(windowSettings)) {
+        try(var application = WgpuGraphicApplication.create(appSettings)) {
+            Device device = application.getDevice();
             Matrix4f matrix = updateMatrix(application.getWindow(), viewMatrix);
 
-            var vertices = Buffer.createVertexBuffer("Vertices", VERTICES, application.getDevice());
-            var indices = Buffer.createIndexBuffer("Indices", INDICES, application.getDevice());
-            var matrixBuffer = Buffer.createFloatBuffer("Matrix", matrix.get(new float[16]),
-                    application.getDevice(), BufferUsage.UNIFORM, BufferUsage.COPY_DST);
+            var vertices = device.createVertexBuffer("Vertices", VERTICES);
+            var indices = device.createIndexBuffer("Indices", INDICES);
+            var matrixBuffer = device.createFloatBuffer("Matrix", matrix.get(new float[16]),
+                    BufferUsage.UNIFORM, BufferUsage.COPY_DST);
 
-            var bindGroupLayout = WgpuJava.wgpuNative.
-                    wgpu_device_create_bind_group_layout(application.getDevice(), new WgpuBindGroupLayoutDescriptor(
-                            "matrix group layout",
-                            new WgpuBindGroupLayoutEntry()
-                                    .setPartial(0, WgpuBindGroupLayoutEntry.SHADER_STAGE_VERTEX,
-                                            WgpuBindingType.UNIFORM_BUFFER)
-                    ).getPointerTo());
+            var bindGroupLayout = device.createBindGroupLayout("matrix group layout",
+                    new WgpuBindGroupLayoutEntry().setPartial(0, WgpuBindGroupLayoutEntry.SHADER_STAGE_VERTEX,
+                            WgpuBindingType.UNIFORM_BUFFER));
 
-            var bindGroup = WgpuJava.wgpuNative.wgpu_device_create_bind_group(application.getDevice(),
-                    new WgpuBindGroupDescriptor(
-                            "matrix bind group",
-                            bindGroupLayout,
-                            new WgpuBindGroupEntry().setBuffer(0, matrixBuffer.getId(), matrixBuffer.getSize())
-                    ).getPointerTo());
+            var bindGroup = device.createBindGroup("matrix bind group", bindGroupLayout,
+                            new WgpuBindGroupEntry().setBuffer(0, matrixBuffer.getId(), matrixBuffer.getSize()));
 
             renderPipelineSettings.setBindGroupLayouts(bindGroupLayout);
             application.init(renderPipelineSettings);
 
             while(!application.getWindow().isCloseRequested()) {
-                var swapChain = application.renderStart();
-                swapChain.setBindGroup(0, bindGroup);
-                swapChain.setVertexBuffer(vertices, 0);
-                swapChain.setIndexBuffer(indices);
+                var renderPass = application.renderStart();
+                renderPass.setBindGroup(0, bindGroup);
+                renderPass.setVertexBuffer(vertices, 0);
+                renderPass.setIndexBuffer(indices);
 
-                swapChain.drawIndexed(INDICES.length, 1, 0);
+                renderPass.drawIndexed(INDICES.length, 1, 0);
 
-                swapChain.renderEnd();
+                application.renderEnd();
 
                 var newMatrix = updateMatrix(application.getWindow(), viewMatrix);
                 float[] matrixData = newMatrix.get(new float[16]);

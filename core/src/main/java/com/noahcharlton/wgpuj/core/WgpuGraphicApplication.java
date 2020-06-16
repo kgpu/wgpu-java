@@ -1,35 +1,38 @@
 package com.noahcharlton.wgpuj.core;
 
-import com.noahcharlton.wgpuj.WgpuJava;
+import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
+import com.noahcharlton.wgpuj.core.graphics.RenderPass;
 import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
-import com.noahcharlton.wgpuj.core.graphics.SwapChain;
 import com.noahcharlton.wgpuj.core.graphics.Window;
-import com.noahcharlton.wgpuj.core.graphics.WindowSettings;
 import com.noahcharlton.wgpuj.core.util.GlfwHandler;
 
-public class WgpuGraphicApplication implements AutoCloseable{
-
-    private volatile boolean applicationCreated;
+public class WgpuGraphicApplication extends WgpuApplication implements AutoCloseable{
 
     private final Window window;
-    private long queue;
 
-    public WgpuGraphicApplication(WindowSettings windowSettings) {
-        if(applicationCreated) throw new UnsupportedOperationException("Wgpu-java only supports one application.");
-        applicationCreated = true;
+    private WgpuGraphicApplication(GraphicApplicationSettings settings, Window window) {
+        super(Device.create(settings, window.getSurface()));
 
+        this.window = window;
+    }
+
+    public static WgpuGraphicApplication create(GraphicApplicationSettings settings){
         GlfwHandler.init();
+        Window window = new Window(settings);
 
-        window = new Window(windowSettings);
-        queue = WgpuJava.wgpuNative.wgpu_device_get_default_queue(window.getDevice());
+        return new WgpuGraphicApplication(settings, window);
     }
 
     public void init(RenderPipelineSettings settings){
-        window.initRenderPipeline(settings);
+        window.initRenderPipeline(settings, device);
     }
 
-    public SwapChain renderStart(){
-        return window.renderStart();
+    public RenderPass renderStart(){
+        return window.renderStart(device);
+    }
+
+    public void renderEnd(){
+        window.renderEnd();
     }
 
     @Override
@@ -40,13 +43,5 @@ public class WgpuGraphicApplication implements AutoCloseable{
 
     public Window getWindow() {
         return window;
-    }
-
-    public long getDevice(){
-        return window.getDevice();
-    }
-
-    public long getQueue() {
-        return queue;
     }
 }

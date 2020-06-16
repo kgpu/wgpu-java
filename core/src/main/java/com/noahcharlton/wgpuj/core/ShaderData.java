@@ -21,14 +21,14 @@ public class ShaderData {
         this.data = data;
     }
 
-    public WgpuProgrammableStageDescriptor build(long device){
+    public WgpuProgrammableStageDescriptor build(Device device){
         long shaderModule = createModule(device);
 
         return new WgpuProgrammableStageDescriptor(shaderModule, entryPoint);
     }
 
-    public long createModule(long device) {
-        return new WgpuShaderModuleDescription(data).load(device);
+    public long createModule(Device device) {
+        return new WgpuShaderModuleDescription(data).load(device.getId());
     }
 
     public static ShaderData fromCompiledClasspathFile(String path, String entryPoint){

@@ -1,15 +1,14 @@
 package com.noahcharlton.wgpuj.examples;
 
 import com.noahcharlton.wgpuj.WgpuJava;
+import com.noahcharlton.wgpuj.core.Device;
 import com.noahcharlton.wgpuj.core.ShaderData;
 import com.noahcharlton.wgpuj.core.WgpuCore;
 import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
 import com.noahcharlton.wgpuj.core.graphics.BlendDescriptor;
 import com.noahcharlton.wgpuj.core.graphics.ColorState;
+import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
 import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
-import com.noahcharlton.wgpuj.core.graphics.WindowSettings;
-import com.noahcharlton.wgpuj.core.util.BufferSettings;
-import com.noahcharlton.wgpuj.core.util.BufferUsage;
 import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
 import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
@@ -58,37 +57,24 @@ public class VertexExample {
         WgpuJava.setWgpuLogLevel(WgpuLogLevel.INFO);
 
         RenderPipelineSettings renderPipelineSettings = createPipelineSettings();
-        WindowSettings windowSettings = new WindowSettings("Wgpu-Java vertex example", 302, 302);
+        GraphicApplicationSettings appSettings = new GraphicApplicationSettings("Wgpu-Java vertex example", 302, 302);
 
-        try(var application = new WgpuGraphicApplication(windowSettings)){
-            var vertexBuffer = new BufferSettings()
-                    .setLabel("Vertex buffer")
-                    .setSize(FLOATS_PER_VERTEX * Float.BYTES * VERTICES.length)
-                    .setUsages(BufferUsage.VERTEX)
-                    .setMapped(true)
-                    .createBuffer(application.getDevice());
-            vertexBuffer.getMappedData().put(0, VERTICES, 0, VERTICES.length);
-            vertexBuffer.unmap();
+        try(var application = WgpuGraphicApplication.create(appSettings)) {
+            Device device = application.getDevice();
 
-            var indexBuffer = new BufferSettings()
-                    .setLabel("Index buffer")
-                    .setSize(Float.BYTES * INDICES.length)
-                    .setUsages(BufferUsage.INDEX)
-                    .setMapped(true)
-                    .createBuffer(application.getDevice());
-            indexBuffer.getMappedData().put(0, INDICES, 0, INDICES.length);
-            indexBuffer.unmap();
+            var vertexBuffer = device.createVertexBuffer("Vertex Buffer", VERTICES);
+            var indexBuffer = device.createIndexBuffer("Index Buffer", INDICES);
 
             application.init(renderPipelineSettings);
 
             while(!application.getWindow().isCloseRequested()){
-                var swapChain = application.renderStart();
-                swapChain.setIndexBuffer(indexBuffer);
-                swapChain.setVertexBuffer(vertexBuffer, 0);
+                var renderPass = application.renderStart();
+                renderPass.setIndexBuffer(indexBuffer);
+                renderPass.setVertexBuffer(vertexBuffer, 0);
 
-                swapChain.drawIndexed(VERTICES.length, 1, 0);
+                renderPass.drawIndexed(INDICES.length, 1, 0);
 
-                swapChain.renderEnd();
+                application.renderEnd();
             }
         }
     }
