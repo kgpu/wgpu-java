@@ -1,8 +1,8 @@
 package com.noahcharlton.wgpuj.core.graphics;
 
 import com.noahcharlton.wgpuj.WgpuJava;
+import com.noahcharlton.wgpuj.core.Device;
 import com.noahcharlton.wgpuj.core.input.GlfwKeyHandler;
-import com.noahcharlton.wgpuj.core.util.Backend;
 import com.noahcharlton.wgpuj.core.util.Dimension;
 import com.noahcharlton.wgpuj.core.util.GlfwHandler;
 import com.noahcharlton.wgpuj.core.util.Platform;
@@ -20,7 +20,6 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 public class Window {
 
     private final long handle;
-    private final long device;
     private final long surface;
 
     private RenderPipeline renderPipeline;
@@ -28,8 +27,8 @@ public class Window {
     private SwapChain swapChain;
     private WindowEventHandler eventHandler;
 
-    public Window(WindowSettings windowSettings) {
-        this.handle = windowSettings.createWindow();
+    public Window(GraphicApplicationSettings settings) {
+        this.handle = settings.createWindow();
 
         if(this.handle == NULL)
             throw new RuntimeException("Failed to create window!");
@@ -39,32 +38,7 @@ public class Window {
         GLFW.glfwSetKeyCallback(handle, new GlfwKeyHandler(this));
 
         surface = createSurface();
-        device = createDevice();
         eventHandler = new WindowEventHandler.EmptyWindowHandler();
-    }
-
-    private long createDevice() {
-        var options = new WgpuRequestAdapterOptions(WgpuPowerPreference.DEFAULT, surface);
-        var adapter = requestAdapter(options);
-        var limits = new WgpuLimits(1).getPointerTo();
-
-        return WgpuJava.wgpuNative.wgpu_adapter_request_device(adapter, 0, limits, null);
-    }
-
-    private long requestAdapter(WgpuRequestAdapterOptions options) {
-        AtomicLong adapter = new AtomicLong(0);
-
-        WgpuJava.wgpuNative.wgpu_request_adapter_async(
-                options.getPointerTo(),
-                Backend.of(Backend.VULKAN, Backend.METAL, Backend.DX12),
-                false,
-                (received, userData) -> {
-                    adapter.set(received);
-                },
-                WgpuJava.createNullPointer()
-        );
-
-        return adapter.get();
     }
 
     private long createSurface() {
@@ -80,34 +54,28 @@ public class Window {
                 "https://github.com/DevOrc/wgpu-java/issues/4");
     }
 
-    public void initRenderPipeline(RenderPipelineSettings settings){
+    public void initRenderPipeline(RenderPipelineSettings settings, Device device){
         renderPipeline = new RenderPipeline(settings, device);
 
-        createNewSwapChain();
+        createNewSwapChain(device);
     }
 
-    public SwapChain renderStart(){
+    public SwapChain renderStart(Device device){
         GLFW.glfwPollEvents();
         var newDimension = GlfwHandler.getWindowDimension(handle);
 
         if(!newDimension.equals(currentDimension)){
             currentDimension = newDimension;
-
-            onResize();
+            createNewSwapChain(device);
+            eventHandler.onResize();
         }
 
-        swapChain.renderStart(renderPipeline, device);
+        swapChain.renderStart(renderPipeline);
 
         return swapChain;
     }
 
-    private void onResize() {
-        createNewSwapChain();
-
-        eventHandler.onResize();
-    }
-
-    private void createNewSwapChain() {
+    private void createNewSwapChain(Device device) {
         swapChain = SwapChain.create(currentDimension, device, surface);
     }
 
@@ -128,8 +96,8 @@ public class Window {
         GLFW.glfwDestroyWindow(handle);
     }
 
-    public long getDevice() {
-        return device;
+    public long getSurface() {
+        return surface;
     }
 
     public WindowEventHandler getEventHandler() {

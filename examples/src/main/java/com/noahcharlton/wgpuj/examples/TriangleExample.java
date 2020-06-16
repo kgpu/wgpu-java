@@ -7,7 +7,7 @@ import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
 import com.noahcharlton.wgpuj.core.graphics.BlendDescriptor;
 import com.noahcharlton.wgpuj.core.graphics.ColorState;
 import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
-import com.noahcharlton.wgpuj.core.graphics.WindowSettings;
+import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
 import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
 import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
@@ -25,9 +25,9 @@ public class TriangleExample {
         WgpuCore.loadWgpuNative();
 
         RenderPipelineSettings renderPipelineSettings = createPipelineSettings();
-        WindowSettings windowSettings = new WindowSettings("Wgpu-Java example", 640, 480);
+        GraphicApplicationSettings appSettings = new GraphicApplicationSettings("Wgpu-Java example", 640, 480);
 
-        try(var application = new WgpuGraphicApplication(windowSettings)){
+        try(var application = WgpuGraphicApplication.create(appSettings)) {
             application.init(renderPipelineSettings);
 
             while(!application.getWindow().isCloseRequested()){

@@ -1,5 +1,6 @@
 package com.noahcharlton.wgpuj.core.graphics;
 
+import com.noahcharlton.wgpuj.core.Device;
 import com.noahcharlton.wgpuj.core.ShaderData;
 import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.jni.WgpuColorStateDescriptor;
@@ -29,7 +30,7 @@ public class RenderPipelineSettings {
 
     }
 
-    public WgpuRenderPipelineDescriptor build(long device, long layout){
+    public WgpuRenderPipelineDescriptor build(Device device, long layout){
         WgpuRenderPipelineDescriptor descriptor = new WgpuRenderPipelineDescriptor();
         Pointer fragment = fragmentStage.build(device).getPointerTo();
         long vertexModule = vertexStage.createModule(device);

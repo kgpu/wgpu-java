@@ -1,27 +1,22 @@
 package com.noahcharlton.wgpuj.examples;
 
 import com.noahcharlton.wgpuj.WgpuJava;
+import com.noahcharlton.wgpuj.core.Device;
+import com.noahcharlton.wgpuj.core.DeviceSettings;
 import com.noahcharlton.wgpuj.core.ShaderData;
 import com.noahcharlton.wgpuj.core.WgpuCore;
-import com.noahcharlton.wgpuj.core.util.Backend;
 import com.noahcharlton.wgpuj.core.util.Buffer;
 import com.noahcharlton.wgpuj.core.util.BufferSettings;
 import com.noahcharlton.wgpuj.core.util.BufferUsage;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupEntry;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutEntry;
 import com.noahcharlton.wgpuj.jni.WgpuBindingType;
-import com.noahcharlton.wgpuj.jni.WgpuCommandEncoderDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuComputePipelineDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuLimits;
 import com.noahcharlton.wgpuj.jni.WgpuLogLevel;
-import com.noahcharlton.wgpuj.jni.WgpuPipelineLayoutDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuRawPass;
 import jnr.ffi.Pointer;
 
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class ComputeExample {
 
@@ -34,9 +29,7 @@ public class ComputeExample {
         System.out.println("Calculating Collatz for: " + Arrays.toString(numbers));
         int bufferSize = numbers.length * Integer.BYTES;
 
-        long adapter = getAdapterAsync();
-        long device = WgpuJava.wgpuNative.wgpu_adapter_request_device(adapter, 0,
-                new WgpuLimits(1).getPointerTo(), "");
+        Device device = Device.create(new DeviceSettings(), 0);
 
         Buffer stagingBuffer = new BufferSettings()
                 .setLabel("Staging Buffer")
@@ -45,31 +38,22 @@ public class ComputeExample {
                 .setMapped(false)
                 .createBuffer(device);
 
-        Buffer storageBuffer = new BufferSettings()
-                .setLabel("Storage Buffer")
-                .setSize(bufferSize)
-                .setUsages(BufferUsage.STORAGE, BufferUsage.COPY_DST, BufferUsage.COPY_SRC, BufferUsage.UNIFORM)
-                .setMapped(true)
-                .createBuffer(device);
+        Buffer storageBuffer = device.createIntBuffer("storage buffer", numbers, BufferUsage.STORAGE,
+                BufferUsage.COPY_DST, BufferUsage.COPY_SRC, BufferUsage.UNIFORM);
 
-        Pointer storageData = storageBuffer.getMappedData();
-        for(int i = 0; i < numbers.length; i++){
-            storageData.putInt(i * Integer.BYTES, numbers[i]);
-        }
-        storageBuffer.unmap();
+        long bindGroupLayout = device.createBindGroupLayout("bind group layout",
+                new WgpuBindGroupLayoutEntry().setPartial(0, WgpuBindGroupLayoutEntry.SHADER_STAGE_COMPUTE,
+                        WgpuBindingType.STORAGE_BUFFER));
+        long bindGroup = device.createBindGroup("bind group", bindGroupLayout,
+                new WgpuBindGroupEntry().setBuffer(0, storageBuffer.getId(), bufferSize));
 
-        long bindGroupLayout = createBindGroupLayout(device);
-        long bindGroup = createBindGroup(device, bindGroupLayout, storageBuffer.getId(), bufferSize);
-
-        Pointer pipelineLayoutDesc = new WgpuPipelineLayoutDescriptor(bindGroupLayout).getPointerTo();
-        long pipelineLayout = WgpuJava.wgpuNative.wgpu_device_create_pipeline_layout(device, pipelineLayoutDesc);
+        long pipelineLayout = device.createPipelineLayout(bindGroupLayout);
         long shader = ShaderData.fromRawClasspathFile("/collatz.comp", "main").createModule(device);
 
         Pointer pipelineDesc = new WgpuComputePipelineDescriptor(pipelineLayout, shader, "main").getPointerTo();
-        long pipelineId = WgpuJava.wgpuNative.wgpu_device_create_compute_pipeline(device, pipelineDesc);
+        long pipelineId = WgpuJava.wgpuNative.wgpu_device_create_compute_pipeline(device.getId(), pipelineDesc);
 
-        long encoder = WgpuJava.wgpuNative.wgpu_device_create_command_encoder(device,
-                new WgpuCommandEncoderDescriptor("command encoder").getPointerTo());
+        long encoder = device.createCommandEncoder("command encoder");
 
         WgpuRawPass rawPass = WgpuJava.wgpuNative.wgpu_command_encoder_begin_compute_pass(encoder,
                 WgpuJava.createNullPointer());
@@ -79,8 +63,9 @@ public class ComputeExample {
                 WgpuJava.createNullPointer(), 0);
         WgpuJava.wgpuNative.wgpu_compute_pass_dispatch(rawPass.getPointerTo(), numbers.length, 1, 1);
         WgpuJava.wgpuNative.wgpu_compute_pass_end_pass(rawPass.getPointerTo());
+        System.out.println("t4");
 
-        long queue = WgpuJava.wgpuNative.wgpu_device_get_default_queue(device);
+        long queue = device.getDefaultQueue();
         long commandBuffer = WgpuJava.wgpuNative.wgpu_command_encoder_finish(encoder, WgpuJava.createNullPointer());
 
         storageBuffer.copyTo(stagingBuffer, encoder);
@@ -89,7 +74,7 @@ public class ComputeExample {
 
         stagingBuffer.readAsync();
 
-        WgpuJava.wgpuNative.wgpu_device_poll(device, true);
+        device.poll(true);
         Pointer data = stagingBuffer.getMappedData();
 
         System.out.println("Times:");
@@ -99,38 +84,5 @@ public class ComputeExample {
         }
 
         stagingBuffer.unmap();
-    }
-
-    private static long createBindGroup(long device, long layout, long storageBuffer, long bufferSize) {
-        var entry = new WgpuBindGroupEntry().setBuffer(0, storageBuffer, bufferSize);
-
-        var desc  = new WgpuBindGroupDescriptor("bind group", layout, entry);
-
-        return WgpuJava.wgpuNative.wgpu_device_create_bind_group(device, desc.getPointerTo());
-    }
-
-    private static long createBindGroupLayout(long device){
-        var entry = new WgpuBindGroupLayoutEntry();
-        entry.setPartial(0, WgpuBindGroupLayoutEntry.SHADER_STAGE_COMPUTE, WgpuBindingType.STORAGE_BUFFER);
-
-        var descriptor = new WgpuBindGroupLayoutDescriptor("bind group layout", entry);
-
-        return WgpuJava.wgpuNative.wgpu_device_create_bind_group_layout(device, descriptor.getPointerTo());
-    }
-
-    private static long getAdapterAsync() {
-        AtomicLong adapter = new AtomicLong();
-
-        WgpuJava.wgpuNative.wgpu_request_adapter_async(
-                WgpuJava.createNullPointer(),
-                Backend.of(Backend.VULKAN, Backend.METAL, Backend.DX12),
-                false,
-                (received, userData) -> {
-                    adapter.set(received);
-                },
-                WgpuJava.createNullPointer()
-        );
-
-        return adapter.get();
     }
 }
