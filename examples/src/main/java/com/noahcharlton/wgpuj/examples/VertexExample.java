@@ -7,9 +7,8 @@ import com.noahcharlton.wgpuj.core.WgpuCore;
 import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
 import com.noahcharlton.wgpuj.core.graphics.BlendDescriptor;
 import com.noahcharlton.wgpuj.core.graphics.ColorState;
-import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
 import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
-import com.noahcharlton.wgpuj.core.util.Buffer;
+import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
 import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
 import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
@@ -69,13 +68,13 @@ public class VertexExample {
             application.init(renderPipelineSettings);
 
             while(!application.getWindow().isCloseRequested()){
-                var swapChain = application.renderStart();
-                swapChain.setIndexBuffer(indexBuffer);
-                swapChain.setVertexBuffer(vertexBuffer, 0);
+                var renderPass = application.renderStart();
+                renderPass.setIndexBuffer(indexBuffer);
+                renderPass.setVertexBuffer(vertexBuffer, 0);
 
-                swapChain.drawIndexed(INDICES.length, 1, 0);
+                renderPass.drawIndexed(INDICES.length, 1, 0);
 
-                swapChain.renderEnd();
+                application.renderEnd();
             }
         }
     }

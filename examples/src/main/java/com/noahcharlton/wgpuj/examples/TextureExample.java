@@ -110,12 +110,12 @@ public class TextureExample {
             application.init(renderPipelineSettings);
 
             while(!application.getWindow().isCloseRequested()) {
-                var swapChain = application.renderStart();
-                swapChain.setBindGroup(0, textureBindGroup);
-                swapChain.setVertexBuffer(vertexBuffer, 0);
-                swapChain.draw(VERTICES.length, 1);
+                var renderPass = application.renderStart();
+                renderPass.setBindGroup(0, textureBindGroup);
+                renderPass.setVertexBuffer(vertexBuffer, 0);
+                renderPass.draw(VERTICES.length, 1);
 
-                swapChain.renderEnd();
+                application.renderEnd();
             }
         }
     }

@@ -129,14 +129,14 @@ public class WindowEventExample {
         while(!application.getWindow().isCloseRequested()) {
             updateInput();
 
-            var swapChain = application.renderStart();
-            swapChain.setBindGroup(0, bindGroup);
-            swapChain.setIndexBuffer(indexBuffer);
-            swapChain.setVertexBuffer(vertexBuffer, 0);
+            var renderPass = application.renderStart();
+            renderPass.setBindGroup(0, bindGroup);
+            renderPass.setIndexBuffer(indexBuffer);
+            renderPass.setVertexBuffer(vertexBuffer, 0);
 
-            swapChain.drawIndexed(INDICES.length, 1, 0);
+            renderPass.drawIndexed(INDICES.length, 1, 0);
 
-            swapChain.renderEnd();
+            application.renderEnd();
         }
     }
 

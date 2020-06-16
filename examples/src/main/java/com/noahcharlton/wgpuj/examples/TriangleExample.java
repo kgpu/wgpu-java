@@ -31,10 +31,10 @@ public class TriangleExample {
             application.init(renderPipelineSettings);
 
             while(!application.getWindow().isCloseRequested()){
-                var swapChain = application.renderStart();
-                swapChain.draw(3, 1);
+                var renderPass = application.renderStart();
+                renderPass.draw(3, 1);
 
-                swapChain.renderEnd();
+                application.renderEnd();
             }
         }
     }

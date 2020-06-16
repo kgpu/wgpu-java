@@ -5,6 +5,7 @@ import com.noahcharlton.wgpuj.core.Device;
 import com.noahcharlton.wgpuj.core.DeviceSettings;
 import com.noahcharlton.wgpuj.core.ShaderData;
 import com.noahcharlton.wgpuj.core.WgpuCore;
+import com.noahcharlton.wgpuj.core.compute.ComputePass;
 import com.noahcharlton.wgpuj.core.util.Buffer;
 import com.noahcharlton.wgpuj.core.util.BufferSettings;
 import com.noahcharlton.wgpuj.core.util.BufferUsage;
@@ -13,7 +14,6 @@ import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutEntry;
 import com.noahcharlton.wgpuj.jni.WgpuBindingType;
 import com.noahcharlton.wgpuj.jni.WgpuComputePipelineDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuLogLevel;
-import com.noahcharlton.wgpuj.jni.WgpuRawPass;
 import jnr.ffi.Pointer;
 
 import java.util.Arrays;
@@ -55,15 +55,12 @@ public class ComputeExample {
 
         long encoder = device.createCommandEncoder("command encoder");
 
-        WgpuRawPass rawPass = WgpuJava.wgpuNative.wgpu_command_encoder_begin_compute_pass(encoder,
-                WgpuJava.createNullPointer());
+        ComputePass pass = ComputePass.create(encoder);
 
-        WgpuJava.wgpuNative.wgpu_compute_pass_set_pipeline(rawPass.getPointerTo(), pipelineId);
-        WgpuJava.wgpuNative.wgpu_compute_pass_set_bind_group(rawPass.getPointerTo(), 0, bindGroup,
-                WgpuJava.createNullPointer(), 0);
-        WgpuJava.wgpuNative.wgpu_compute_pass_dispatch(rawPass.getPointerTo(), numbers.length, 1, 1);
-        WgpuJava.wgpuNative.wgpu_compute_pass_end_pass(rawPass.getPointerTo());
-        System.out.println("t4");
+        pass.setPipeline(pipelineId);
+        pass.setBindGroup(0, bindGroup, WgpuJava.createNullPointer(), 0);
+        pass.dispatch(numbers.length, 1, 1);
+        pass.endPass();
 
         long queue = device.getDefaultQueue();
         long commandBuffer = WgpuJava.wgpuNative.wgpu_command_encoder_finish(encoder, WgpuJava.createNullPointer());

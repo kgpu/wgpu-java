@@ -112,14 +112,14 @@ public class CubeExample {
             application.init(renderPipelineSettings);
 
             while(!application.getWindow().isCloseRequested()) {
-                var swapChain = application.renderStart();
-                swapChain.setBindGroup(0, bindGroup);
-                swapChain.setVertexBuffer(vertices, 0);
-                swapChain.setIndexBuffer(indices);
+                var renderPass = application.renderStart();
+                renderPass.setBindGroup(0, bindGroup);
+                renderPass.setVertexBuffer(vertices, 0);
+                renderPass.setIndexBuffer(indices);
 
-                swapChain.drawIndexed(INDICES.length, 1, 0);
+                renderPass.drawIndexed(INDICES.length, 1, 0);
 
-                swapChain.renderEnd();
+                application.renderEnd();
 
                 var newMatrix = updateMatrix(application.getWindow(), viewMatrix);
                 float[] matrixData = newMatrix.get(new float[16]);

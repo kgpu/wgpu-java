@@ -6,14 +6,9 @@ import com.noahcharlton.wgpuj.core.input.GlfwKeyHandler;
 import com.noahcharlton.wgpuj.core.util.Dimension;
 import com.noahcharlton.wgpuj.core.util.GlfwHandler;
 import com.noahcharlton.wgpuj.core.util.Platform;
-import com.noahcharlton.wgpuj.jni.WgpuLimits;
-import com.noahcharlton.wgpuj.jni.WgpuPowerPreference;
-import com.noahcharlton.wgpuj.jni.WgpuRequestAdapterOptions;
 import jnr.ffi.Pointer;
 import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFW;
-
-import java.util.concurrent.atomic.AtomicLong;
 
 import static org.lwjgl.system.MemoryUtil.NULL;
 
@@ -60,7 +55,7 @@ public class Window {
         createNewSwapChain(device);
     }
 
-    public SwapChain renderStart(Device device){
+    public RenderPass renderStart(Device device){
         GLFW.glfwPollEvents();
         var newDimension = GlfwHandler.getWindowDimension(handle);
 
@@ -72,7 +67,11 @@ public class Window {
 
         swapChain.renderStart(renderPipeline);
 
-        return swapChain;
+        return swapChain.getRenderPass();
+    }
+
+    public void renderEnd() {
+        swapChain.renderEnd();
     }
 
     private void createNewSwapChain(Device device) {
