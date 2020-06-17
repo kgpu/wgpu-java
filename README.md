@@ -35,19 +35,27 @@ A tool to make java files out of the wgpu.h header file.
 [Click Here for more info](https://github.com/DevOrc/wgpu-java/blob/master/native/jnrgen/README.md)
 
 ###### wgpu-java/examples
-Examples based on the wgpu-native examples on how to use wgpu-java/core
+Examples of how to use wgpu-java/core
 
 ### How to run:
 Gradle will automatically build the required dll/.so/.dylib when wgpu-java/natives 
-is compiled, so you only need to run the following command:
+is compiled. So, to run an example run the following command: 
 ```
 git clone https://github.com/DevOrc/wgpu-java
-gradlew triangleExample
-gradlew computeExample
-gradlew vertexExample
-gradlew textureExample
-gradlew cubeExample
+gradlew runExample -Pexample={EXAMPLE_NAME_HERE}
+
+gradlew runExample -Pexample=TriangleExample
+gradlew runExample -Pexample=ComputeExample
 ```
+
+ Example Name | Command |
+ -------------|---------|
+ Triangle | gradlew runExample -Pexample=TriangleExample |
+ Compute | gradlew runExample -Pexample=ComputeExample |
+ Cube | gradlew runExample -Pexample=CubeExample |
+ Vertex | gradlew runExample -Pexample=VertexExample |
+ Hex World | gradlew runExample -Pexample=HexWorldExample |
+ Window Events | gradlew runExample -Pexample=WindowEventExample |
 
 ### Supported Platforms
    API   |    Windows 7/10    |  Linux                 |    macOS               |

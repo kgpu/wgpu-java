@@ -14,32 +14,11 @@ dependencies {
     implementation project(':core')
 }
 
-task(triangleExample, dependsOn: 'classes', type: JavaExec) {
-    main = 'com.noahcharlton.wgpuj.examples.TriangleExample'
+task (runExample, dependsOn: 'classes', type: JavaExec){
     classpath = sourceSets.main.runtimeClasspath
-}
+    def clazz = "TriangleExample";
 
-task(computeExample, dependsOn: 'classes', type: JavaExec) {
-    main = 'com.noahcharlton.wgpuj.examples.ComputeExample'
-    classpath = sourceSets.main.runtimeClasspath
-}
+    if(project.hasProperty("example")) clazz = project.property("example")
 
-task(vertexExample, dependsOn: 'classes', type: JavaExec) {
-    main = 'com.noahcharlton.wgpuj.examples.VertexExample'
-    classpath = sourceSets.main.runtimeClasspath
-}
-
-task(textureExample, dependsOn: 'classes', type: JavaExec) {
-    main = 'com.noahcharlton.wgpuj.examples.TextureExample'
-    classpath = sourceSets.main.runtimeClasspath
-}
-
-task(cubeExample, dependsOn: 'classes', type: JavaExec) {
-    main = 'com.noahcharlton.wgpuj.examples.CubeExample'
-    classpath = sourceSets.main.runtimeClasspath
-}
-
-task(windowEventExample, dependsOn: 'classes', type: JavaExec) {
-    main = 'com.noahcharlton.wgpuj.examples.WindowEventExample'
-    classpath = sourceSets.main.runtimeClasspath
+    main = "com.noahcharlton.wgpuj.examples.${clazz}"
 }
