@@ -3,6 +3,7 @@ package com.noahcharlton.wgpuj.jnrgen;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Parser {
 
@@ -25,7 +26,6 @@ public class Parser {
 
             if(item != null){
                 items.add(item);
-                System.out.println("Item: " + item);
             }
         }
     }
@@ -36,9 +36,65 @@ public class Parser {
 
             if(Token.identifier("enum").equals(next)){
                 return createEnum();
+            }else if(Token.identifier("struct").equals(next)){
+                return createStruct();
+            }else if(Token.identifier("void").equals(next)){
+                //Callback definition
+            }else{
+                return createTypeAlias(next);
             }
         }
         return null;
+    }
+
+    private Item createTypeAlias(Token token) {
+        List<Token> tokens = new ArrayList<>();
+
+        while(token != null && token.getType() != Token.TokenType.SEMICOLON){
+            tokens.add(token);
+            token = poll();
+        }
+
+        String alias = tokens.remove(tokens.size() - 1).getText();
+        String original = tokens.stream().map(Token::getText).collect(Collectors.joining(" "));
+
+        return new TypeAliasItem(alias, original);
+    }
+
+    private Item createStruct() {
+        List<StructItem.StructField> fields = new ArrayList<>();
+        skipWhitespace();
+
+        //might be something like typedef struct WGPUSamplerDescriptor WGPUSamplerDescriptor;
+        if(!new Token(Token.TokenType.OPEN_BRACKET).equals(peek())){
+            return null;
+        }
+
+        pollExpect(Token.TokenType.OPEN_BRACKET);
+        skipWhitespace();
+
+        while(!new Token(Token.TokenType.CLOSE_BRACKET).equals(peek())){
+            if(Token.identifier("const").equals(peek())){
+                poll();
+            }
+
+            if(Token.identifier("union").equals(peek())){
+                return null; //Unions in structs currently not supported
+            }
+
+            Token fieldType = pollExpect(Token.TokenType.IDENTIFIER);
+            Token fieldName = pollExpect(Token.TokenType.IDENTIFIER);
+            pollExpect(Token.TokenType.SEMICOLON);
+            skipWhitespace();
+
+            fields.add(new StructItem.StructField(fieldType.getText(), fieldName.getText()));
+        }
+
+        pollExpect(Token.TokenType.CLOSE_BRACKET);
+        Token structName = pollExpect(Token.TokenType.IDENTIFIER);
+        pollExpect(Token.TokenType.SEMICOLON);
+
+        return new StructItem(structName.getText(), fields);
     }
 
     private Item createEnum() {

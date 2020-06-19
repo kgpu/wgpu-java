@@ -14,17 +14,18 @@ public class JNRGenerator {
         }
 
         File outputDirectory = createOutputDirectory(args[0]);
-        Config config = new Config(outputDirectory);
+        OutputHandler outputHandler = new OutputHandler(outputDirectory);
         String header = readHeaderFile();
 
         List<Token> tokens = new Scanner(header).getTokens();
         List<Item> items = new Parser(tokens).getItems();
+        items.forEach(item -> item.preSave(outputHandler));
 
         for(Item item: items){
             try{
-                item.save(config);
-            }catch(IOException e){
-                throw new RuntimeException("Failed to save item: " + item, e);
+                item.save(outputHandler);
+            }catch(RuntimeException | IOException e){
+                System.out.println("Failed to save item " + item + ": " + e.getLocalizedMessage());
             }
         }
     }
