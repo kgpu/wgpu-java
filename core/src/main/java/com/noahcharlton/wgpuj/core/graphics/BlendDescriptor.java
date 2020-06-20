@@ -1,5 +1,6 @@
 package com.noahcharlton.wgpuj.core.graphics;
 
+import com.noahcharlton.wgpuj.jni.WgpuBlendDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
 import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
 
@@ -13,6 +14,12 @@ public class BlendDescriptor {
         this.src = src;
         this.dest = dest;
         this.operation = operation;
+    }
+
+    public void applyTo(WgpuBlendDescriptor descriptor) {
+        descriptor.setSrcFactor(src);
+        descriptor.setDstFactor(dest);
+        descriptor.setOperation(operation);
     }
 
     public WgpuBlendFactor getDest() {

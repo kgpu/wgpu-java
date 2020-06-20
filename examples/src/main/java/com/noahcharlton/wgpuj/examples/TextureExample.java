@@ -8,24 +8,24 @@ import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
 import com.noahcharlton.wgpuj.core.graphics.BlendDescriptor;
 import com.noahcharlton.wgpuj.core.graphics.ColorState;
 import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
+import com.noahcharlton.wgpuj.core.graphics.RasterizationState;
 import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
 import com.noahcharlton.wgpuj.core.util.BufferUsage;
 import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.core.util.ImageData;
+import com.noahcharlton.wgpuj.jni.Wgpu;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupEntry;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutEntry;
 import com.noahcharlton.wgpuj.jni.WgpuBindingType;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
 import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
 import com.noahcharlton.wgpuj.jni.WgpuBufferCopyView;
-import com.noahcharlton.wgpuj.jni.WgpuColorStateDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuCullMode;
 import com.noahcharlton.wgpuj.jni.WgpuExtent3d;
 import com.noahcharlton.wgpuj.jni.WgpuFrontFace;
 import com.noahcharlton.wgpuj.jni.WgpuIndexFormat;
 import com.noahcharlton.wgpuj.jni.WgpuInputStepMode;
 import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
-import com.noahcharlton.wgpuj.jni.WgpuRasterizationStateDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuTextureComponentType;
 import com.noahcharlton.wgpuj.jni.WgpuTextureCopyView;
 import com.noahcharlton.wgpuj.jni.WgpuTextureDescriptor;
@@ -135,19 +135,19 @@ public class TextureExample {
         return new RenderPipelineSettings()
                 .setVertexStage(vertex)
                 .setFragmentStage(fragment)
-                .setRasterizationState(new WgpuRasterizationStateDescriptor(
+                .setRasterizationState(RasterizationState.of(
                         WgpuFrontFace.CCW,
                         WgpuCullMode.NONE,
                         0,
                         0.0f,
-                        0.0f).getPointerTo())
+                        0.0f))
                 .setPrimitiveTopology(WgpuPrimitiveTopology.TRIANGLE_LIST)
                 .setColorStates(new ColorState(
                         WgpuTextureFormat.BGRA8_UNORM,
                         new BlendDescriptor(WgpuBlendFactor.ONE, WgpuBlendFactor.ZERO, WgpuBlendOperation.ADD),
                         new BlendDescriptor(WgpuBlendFactor.ONE, WgpuBlendFactor.ZERO, WgpuBlendOperation.ADD),
-                        WgpuColorStateDescriptor.ALL).build())
-                .setDepthStencilState(WgpuJava.createNullPointer())
+                        Wgpu.ColorWrite.ALL).build())
+                .setDepthStencilState(null)
                 .setVertexIndexFormat(WgpuIndexFormat.UINT16)
                 .setBufferLayouts(new WgpuVertexBufferLayoutDescriptor(
                         FLOATS_PER_VERTEX * Float.BYTES,

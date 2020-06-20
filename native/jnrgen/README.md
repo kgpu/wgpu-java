@@ -42,7 +42,8 @@ public class WgpuCLimits extends WgpuJavaStruct {
 
     private WgpuCLimits(){}
 
-    private WgpuCLimits(Runtime runtime){
+    @Deprecated
+    public WgpuCLimits(Runtime runtime){
         super(runtime);
     }
 

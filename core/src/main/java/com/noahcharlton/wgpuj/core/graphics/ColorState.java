@@ -18,14 +18,12 @@ public class ColorState {
     }
 
     public WgpuColorStateDescriptor build(){
-        return new WgpuColorStateDescriptor(
-                format,
-                alpha.getSrc(),
-                alpha.getDest(),
-                alpha.getOperation(),
-                color.getSrc(),
-                color.getDest(),
-                color.getOperation(),
-                writeMask);
+        var desc = WgpuColorStateDescriptor.createDirect();
+        desc.setFormat(format);
+        desc.setWriteMask(writeMask);
+        alpha.applyTo(desc.getAlphaBlend());
+        color.applyTo(desc.getColorBlend());
+
+        return desc;
     }
 }

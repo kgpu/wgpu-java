@@ -50,8 +50,13 @@ public class ComputeExample {
         long pipelineLayout = device.createPipelineLayout(bindGroupLayout);
         long shader = ShaderData.fromRawClasspathFile("/collatz.comp", "main").createModule(device);
 
-        Pointer pipelineDesc = new WgpuComputePipelineDescriptor(pipelineLayout, shader, "main").getPointerTo();
-        long pipelineId = WgpuJava.wgpuNative.wgpu_device_create_compute_pipeline(device.getId(), pipelineDesc);
+        var pipelineDesc = WgpuComputePipelineDescriptor.createDirect();
+        pipelineDesc.setLayout(pipelineLayout);
+        pipelineDesc.getComputeStage().setEntryPoint("main");
+        pipelineDesc.getComputeStage().setModule(shader);
+
+        long pipelineId = WgpuJava.wgpuNative.wgpu_device_create_compute_pipeline(device.getId(),
+                pipelineDesc.getPointerTo());
 
         long encoder = device.createCommandEncoder("command encoder");
 

@@ -23,9 +23,13 @@ public class ShaderData {
     }
 
     public WgpuProgrammableStageDescriptor build(Device device){
+        var desc = WgpuProgrammableStageDescriptor.createDirect();
         long shaderModule = createModule(device);
 
-        return new WgpuProgrammableStageDescriptor(shaderModule, entryPoint);
+        desc.setModule(shaderModule);
+        desc.setEntryPoint(entryPoint);
+
+        return desc;
     }
 
     public long createModule(Device device) {

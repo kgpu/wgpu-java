@@ -22,6 +22,7 @@ public class StructItem implements Item {
     @Override
     public void save(OutputHandler outputHandler) throws IOException {
         var writer = outputHandler.startFile(name + ".java",
+                "com.noahcharlton.wgpuj.WgpuJava",
                 "com.noahcharlton.wgpuj.util.WgpuJavaStruct",
                 "com.noahcharlton.wgpuj.util.CStrPointer",
                 "com.noahcharlton.wgpuj.util.RustCString",
@@ -57,7 +58,7 @@ public class StructItem implements Item {
         writer.write(name);
         writer.write("(){}\n\n");
 
-        writer.write("    private ");
+        writer.write("    @Deprecated\n    public ");
         writer.write(name);
         writer.write("(Runtime runtime){\n        super(runtime);\n    }\n\n");
 
@@ -99,7 +100,14 @@ public class StructItem implements Item {
         public void convertTypes(OutputHandler handler) {
             if(name.startsWith("*")) {
                 name = name.substring(1);
-                type = "Struct.Pointer";
+
+                if(handler.containsType(type)){
+                    var type = handler.resolveType(this.type).getJavaTypeName();
+                    this.type = "Struct.StructRef<" + type + ">";
+                    this.createType = "new Struct.StructRef<>(" + type + ".class);";
+                }else{
+                    type = "Struct.Pointer";
+                }
             } else if(type.equals("uintptr_t") || type.equals("uint64_t") || type.equals("unsigned long long")) {
                 type = "Struct.Unsigned64";
             } else if(type.equals("uint32_t")) {
@@ -178,7 +186,7 @@ public class StructItem implements Item {
             }
 
             writer.write("    public ");
-            writer.write(getGetterSetterType(type, handler));
+            writer.write(getGetterSetterType(type, handler, true));
             writer.write(" ");
             writer.write("get");
             writer.write(name.substring(0, 1).toUpperCase());
@@ -186,7 +194,7 @@ public class StructItem implements Item {
             writer.write("(){\n        return ");
             writer.write(name);
 
-            if(type.startsWith("Struct.")) {
+            if(type.startsWith("Struct.") && !type.startsWith("Struct.StructRef")) {
                 writer.write(".get()");
             }
 
@@ -200,16 +208,33 @@ public class StructItem implements Item {
             }else if(!type.startsWith("Struct.")){
                 //Must be an inner struct
                 return;
+            }else if(type.startsWith("Struct.StructRef")){
+                writeStructRefSetter(writer, handler);
+                return;
             }
 
             writer.write("    public void set");
             writer.write(name.substring(0, 1).toUpperCase());
             writer.write(name.substring(1));
             writer.write("(");
-            writer.write(getGetterSetterType(type, handler));
+            writer.write(getGetterSetterType(type, handler, false));
             writer.write(" x){\n        this.");
             writer.write(name);
             writer.write(".set(x);\n    }\n\n");
+        }
+
+        private void writeStructRefSetter(BufferedWriter writer, OutputHandler handler) throws IOException{
+            writer.write("    public void set");
+            writer.write(name.substring(0, 1).toUpperCase());
+            writer.write(name.substring(1));
+            writer.write("(");
+            writer.write(getGetterSetterType(type, handler, false));
+            writer.write(" x){\n        if(x.length == 0 || x[0] == null){\n");
+            writer.write("            this.");
+            writer.write(name);
+            writer.write(".set(WgpuJava.createNullPointer());\n        } else {\n            this.");
+            writer.write(name);
+            writer.write(".set(x);\n        }\n    }\n\n");
         }
 
         private void writeStringSetter(BufferedWriter writer) throws IOException{
@@ -229,7 +254,7 @@ public class StructItem implements Item {
             writer.write("(){\n        return RustCString.fromPointer(" + name + ".get());\n    }\n\n");
         }
 
-        private String getGetterSetterType(String type, OutputHandler handler) {
+        private String getGetterSetterType(String type, OutputHandler handler, boolean isGetter) {
             if(type.equals("Struct.Unsigned64") || type.equals("Struct.Signed64") || type.equals("Struct.Unsigned32")){
                 return "long";
             }else if(type.equals("Struct.Signed32")){
@@ -246,6 +271,10 @@ public class StructItem implements Item {
                 return type.split("<|>")[1];
             }else if(type.equals("Struct.Pointer")){
                 return "jnr.ffi.Pointer";
+            }else if(type.startsWith("Struct.StructRef")){
+                String javaType = type.split("<|>")[1];
+
+                return isGetter ? type : javaType + "...";
             }
 
             throw new RuntimeException("Unable to create getter/setter type for " + type);
