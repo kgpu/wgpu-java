@@ -53,6 +53,12 @@ public class WgpuJava {
         return pointer;
     }
 
+    public static Pointer createByteArrayPointer(byte[] bytes){
+        var dataBuffer = ByteBuffer.allocateDirect(bytes.length).put(bytes);
+        dataBuffer.rewind();
+
+        return WgpuJava.createByteBufferPointer(dataBuffer);
+    }
 
     public static Pointer createNullPointer(){
         return Pointer.wrap(runtime, 0x00);

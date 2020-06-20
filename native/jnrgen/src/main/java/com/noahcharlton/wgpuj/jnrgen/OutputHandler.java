@@ -4,7 +4,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class OutputHandler {
 
@@ -14,9 +17,47 @@ public class OutputHandler {
 
     private final HashMap<String, Item> types = new HashMap<>();
     private final HashMap<String, String> aliases = new HashMap<>();
+    private final HashMap<String, List<ConstantItem>> constants = new HashMap<>();
 
     public OutputHandler(File outputDirectory) {
         this.outputDirectory = outputDirectory;
+    }
+
+    public void saveConstants() throws IOException{
+        var writer = startFile("Wgpu.java");
+        writer.write("public final class Wgpu{\n\n");
+
+        for(var entry : constants.entrySet()){
+            saveConstantGroup(writer, entry);
+        }
+
+        writer.write("}");
+        writer.flush();
+        writer.close();
+    }
+
+    private void saveConstantGroup(BufferedWriter writer, Map.Entry<String, List<ConstantItem>> entry) throws IOException {
+        var hasClass = !entry.getKey().isBlank();
+
+        if(hasClass){
+            writer.write("    public static final class ");
+            writer.write(entry.getKey().replace("Wgpu", ""));
+            writer.write("{\n");
+        }
+
+        for(ConstantItem constant : entry.getValue()) {
+            if(hasClass) {
+                writer.write("    ");
+            }
+
+            constant.write(writer);
+        }
+
+        if(hasClass){
+            writer.write("    }\n");
+        }
+
+        writer.write("\n");
     }
 
     public BufferedWriter startFile(String name, String... imports) throws IOException {
@@ -46,6 +87,17 @@ public class OutputHandler {
 
     public void registerTypeAlias(String actualType, String typeAlias){
         aliases.put(typeAlias, actualType);
+    }
+
+    public void registerConstant(String associatedType, ConstantItem item){
+        if(constants.containsKey(associatedType)){
+            constants.get(associatedType).add(item);
+        }else{
+            var list = new ArrayList<ConstantItem>();
+            list.add(item);
+
+            constants.put(associatedType, list);
+        }
     }
 
     public boolean containsType(String type) {

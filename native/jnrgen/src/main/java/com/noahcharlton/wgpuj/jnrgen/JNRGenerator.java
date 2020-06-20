@@ -19,7 +19,13 @@ public class JNRGenerator {
 
         List<Token> tokens = new Scanner(header).getTokens();
         List<Item> items = new Parser(tokens).getItems();
-        items.forEach(item -> item.preSave(outputHandler));
+        for(Item item: items){
+            try{
+                item.preSave(outputHandler);
+            }catch(RuntimeException e){
+                System.out.println("Failed to parse type from item " + item + ": " + e.getLocalizedMessage());
+            }
+        }
 
         for(Item item: items){
             try{
@@ -27,6 +33,12 @@ public class JNRGenerator {
             }catch(RuntimeException | IOException e){
                 System.out.println("Failed to save item " + item + ": " + e.getLocalizedMessage());
             }
+        }
+
+        try{
+            outputHandler.saveConstants();
+        }catch(IOException e){
+            System.out.println("Failed to save constants: " + e);
         }
     }
 

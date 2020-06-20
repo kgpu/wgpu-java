@@ -1,9 +1,10 @@
 package com.noahcharlton.wgpuj.core;
 
+import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.core.util.ClasspathUtil;
 import com.noahcharlton.wgpuj.core.util.ShaderCompiler;
 import com.noahcharlton.wgpuj.jni.WgpuProgrammableStageDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuShaderModuleDescription;
+import com.noahcharlton.wgpuj.jni.WgpuShaderModuleDescriptor;
 
 import java.nio.charset.StandardCharsets;
 
@@ -28,7 +29,13 @@ public class ShaderData {
     }
 
     public long createModule(Device device) {
-        return new WgpuShaderModuleDescription(data).load(device.getId());
+        var shaderModule = WgpuShaderModuleDescriptor.createDirect();
+        var dataPtr = WgpuJava.createByteArrayPointer(data);
+
+        shaderModule.getCode().setBytes(dataPtr);
+        shaderModule.getCode().setLength(data.length / 4);
+
+        return WgpuJava.wgpuNative.wgpu_device_create_shader_module(device.getId(), shaderModule.getPointerTo());
     }
 
     public static ShaderData fromCompiledClasspathFile(String path, String entryPoint){

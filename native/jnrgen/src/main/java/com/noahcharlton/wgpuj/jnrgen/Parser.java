@@ -43,8 +43,26 @@ public class Parser {
             }else{
                 return createTypeAlias(next);
             }
+        }else if(token.getType() == Token.TokenType.HASH){
+            var macroType = pollExpect(Token.TokenType.IDENTIFIER);
+
+            if(Token.identifier("define").equals(macroType)){
+                return createConstant();
+            }
         }
         return null;
+    }
+
+    private Item createConstant() {
+        var name = pollExpect(Token.TokenType.IDENTIFIER);
+
+        if(Token.TokenType.IDENTIFIER != peek().getType()) {
+            return null;
+        }
+
+        var def = pollExpect(Token.TokenType.IDENTIFIER);
+
+        return new ConstantItem(name.getText(), def.getText());
     }
 
     private Item createTypeAlias(Token token) {

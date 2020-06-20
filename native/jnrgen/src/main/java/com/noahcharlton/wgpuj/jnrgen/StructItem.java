@@ -25,7 +25,8 @@ public class StructItem implements Item {
                 "com.noahcharlton.wgpuj.util.WgpuJavaStruct",
                 "com.noahcharlton.wgpuj.util.CStrPointer",
                 "com.noahcharlton.wgpuj.util.RustCString",
-                "jnr.ffi.Runtime");
+                "jnr.ffi.Runtime",
+                "jnr.ffi.Struct");
 
         writer.write("public class ");
         writer.write(name);
@@ -182,12 +183,22 @@ public class StructItem implements Item {
             writer.write("get");
             writer.write(name.substring(0, 1).toUpperCase());
             writer.write(name.substring(1));
-            writer.write("(){\n        return " + name + ".get();\n    }\n\n");
+            writer.write("(){\n        return ");
+            writer.write(name);
+
+            if(type.startsWith("Struct.")) {
+                writer.write(".get()");
+            }
+
+            writer.write(";\n    }\n\n");
         }
 
         public void writeSetter(BufferedWriter writer, OutputHandler handler) throws IOException {
             if(type.startsWith("@CStrPointer")){
                 writeStringSetter(writer);
+                return;
+            }else if(!type.startsWith("Struct.")){
+                //Must be an inner struct
                 return;
             }
 
@@ -205,7 +216,7 @@ public class StructItem implements Item {
             writer.write("    public void set");
             writer.write(name.substring(0, 1).toUpperCase());
             writer.write(name.substring(1));
-            writer.write("(String x){\n        this.");
+            writer.write("(java.lang.String x){\n        this.");
             writer.write(name);
             writer.write(".set(RustCString.toPointer(x));\n    }\n\n");
         }
@@ -219,9 +230,9 @@ public class StructItem implements Item {
         }
 
         private String getGetterSetterType(String type, OutputHandler handler) {
-            if(type.equals("Struct.Unsigned64") || type.equals("Struct.Signed64")){
+            if(type.equals("Struct.Unsigned64") || type.equals("Struct.Signed64") || type.equals("Struct.Unsigned32")){
                 return "long";
-            }else if(type.equals("Struct.Unsigned32") || type.equals("Struct.Signed32")){
+            }else if(type.equals("Struct.Signed32")){
                 return "int";
             }else if(type.equals("Struct.Boolean")){
                 return "boolean";
