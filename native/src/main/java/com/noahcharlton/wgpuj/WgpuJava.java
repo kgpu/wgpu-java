@@ -53,6 +53,16 @@ public class WgpuJava {
         return pointer;
     }
 
+    public static Pointer createLongArrayPointer(long[] longs){
+        Pointer ptr = WgpuJava.createDirectPointer(longs.length * Long.BYTES);
+
+        for(int i = 0; i < longs.length; i++){
+            ptr.putLongLong(i * Long.BYTES, longs[i]);
+        }
+
+        return ptr;
+    }
+
     public static Pointer createByteArrayPointer(byte[] bytes){
         var dataBuffer = ByteBuffer.allocateDirect(bytes.length).put(bytes);
         dataBuffer.rewind();

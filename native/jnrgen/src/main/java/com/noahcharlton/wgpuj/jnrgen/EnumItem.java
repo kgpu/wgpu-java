@@ -26,6 +26,10 @@ public class EnumItem implements Item {
     public void save(OutputHandler outputHandler) throws IOException {
         String className = this.name.replace("WGPU", "Wgpu");
 
+        if(outputHandler.isExcluded(name)) {
+            return;
+        }
+
         BufferedWriter writer = outputHandler.startFile(className + ".java");
 
         writer.write("public enum ");

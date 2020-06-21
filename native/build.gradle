@@ -44,6 +44,14 @@ test {
     }
 }
 
+task updateBindings(type: Copy){
+    from("${projectDir}/jnrgen/build/jnr-gen") {
+        include '**.java'
+    }
+    into "${projectDir}/src/main/java/com/noahcharlton/wgpuj/jni"
+    dependsOn ':native:jnrgen:generateBindings'
+}
+
 task createNatives(type: Copy){
     from("${projectDir}/wgpu-native/target/debug") {
         include 'wgpu_native.dll'

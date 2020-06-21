@@ -12,13 +12,13 @@ import com.noahcharlton.wgpuj.core.graphics.RasterizationState;
 import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
 import com.noahcharlton.wgpuj.core.math.MathUtils;
 import com.noahcharlton.wgpuj.core.math.MatrixUtils;
+import com.noahcharlton.wgpuj.core.util.BindGroupUtils;
 import com.noahcharlton.wgpuj.core.util.Buffer;
 import com.noahcharlton.wgpuj.core.util.BufferUsage;
 import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.core.util.Dimension;
 import com.noahcharlton.wgpuj.jni.Wgpu;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupEntry;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutEntry;
 import com.noahcharlton.wgpuj.jni.WgpuBindingType;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
 import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
@@ -28,8 +28,6 @@ import com.noahcharlton.wgpuj.jni.WgpuIndexFormat;
 import com.noahcharlton.wgpuj.jni.WgpuInputStepMode;
 import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
 import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
-import com.noahcharlton.wgpuj.jni.WgpuVertexBufferAttributeDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuVertexBufferLayoutDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuVertexFormat;
 import jnr.ffi.Pointer;
 import org.joml.Matrix4f;
@@ -107,12 +105,9 @@ public class HexWorldExample implements AutoCloseable {
                 BufferUsage.UNIFORM, BufferUsage.COPY_DST);
 
         var bindGroupLayout = device.createBindGroupLayout("matrix group layout",
-                new WgpuBindGroupLayoutEntry().setPartial(0, WgpuBindGroupLayoutEntry.SHADER_STAGE_VERTEX,
-                        WgpuBindingType.UNIFORM_BUFFER),
-                new WgpuBindGroupLayoutEntry().setPartial(1, WgpuBindGroupLayoutEntry.SHADER_STAGE_VERTEX,
-                        WgpuBindingType.STORAGE_BUFFER),
-                new WgpuBindGroupLayoutEntry().setPartial(2, WgpuBindGroupLayoutEntry.SHADER_STAGE_VERTEX,
-                        WgpuBindingType.STORAGE_BUFFER));
+                BindGroupUtils.partialLayout(0, Wgpu.ShaderStage.VERTEX, WgpuBindingType.UNIFORM_BUFFER),
+                BindGroupUtils.partialLayout(1, Wgpu.ShaderStage.VERTEX, WgpuBindingType.STORAGE_BUFFER),
+                BindGroupUtils.partialLayout(2, Wgpu.ShaderStage.VERTEX, WgpuBindingType.STORAGE_BUFFER));
 
         bindGroup = device.createBindGroup("matrix bind group", bindGroupLayout,
                 new WgpuBindGroupEntry().setBuffer(0, transMatrixBuffer.getId(), transMatrixBuffer.getSize()),
@@ -149,10 +144,10 @@ public class HexWorldExample implements AutoCloseable {
                         Wgpu.ColorWrite.ALL).build())
                 .setDepthStencilState(null)
                 .setVertexIndexFormat(WgpuIndexFormat.UINT16)
-                .setBufferLayouts(new WgpuVertexBufferLayoutDescriptor(
+                .setBufferLayouts(Buffer.createLayout(
                         Float.BYTES * FLOATS_PER_VERTEX,
                         WgpuInputStepMode.VERTEX,
-                        new WgpuVertexBufferAttributeDescriptor(0, WgpuVertexFormat.FLOAT2, 0)))
+                        Buffer.vertexAttribute(0, WgpuVertexFormat.FLOAT2, 0)))
                 .setSampleCount(1)
                 .setSampleMask(0)
                 .setAlphaToCoverage(false)

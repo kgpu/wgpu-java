@@ -4,6 +4,7 @@ import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.core.Device;
 import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.core.util.Dimension;
+import com.noahcharlton.wgpuj.jni.Wgpu;
 import com.noahcharlton.wgpuj.jni.WgpuJNI;
 import com.noahcharlton.wgpuj.jni.WgpuPresentMode;
 import com.noahcharlton.wgpuj.jni.WgpuSwapChainDescriptor;
@@ -39,17 +40,17 @@ public class SwapChain {
     }
 
     private long getSwapChainTexture() {
-        var output = new WgpuSwapChainOutput();
+        var output = WgpuSwapChainOutput.createDirect();
 
         natives.wgpu_swap_chain_get_next_texture_jnr_hack(chainID, output.getPointerTo());
 
         if(output.getStatus() != WgpuSwapChainStatus.GOOD){
             throw new RuntimeException("Wgpu Swap Chain has a bad status: " + output.getStatus());
-        }else if(output.getTextureViewID() == 0){
+        }else if(output.getViewId() == 0){
             throw new RuntimeException();
         }
 
-        return output.getTextureViewID();
+        return output.getViewId();
     }
 
     public void renderEnd(){
@@ -64,12 +65,12 @@ public class SwapChain {
     }
 
     public static SwapChain create(Dimension dimension, Device device, long surface){
-        var descriptor = new WgpuSwapChainDescriptor(
-                WgpuSwapChainDescriptor.TEXTURE_OUTPUT_ATTACHMENT,
-                WgpuTextureFormat.BGRA8_UNORM,
-                dimension.getWidth(),
-                dimension.getHeight(),
-                WgpuPresentMode.FIFO);
+        var descriptor = WgpuSwapChainDescriptor.createDirect();
+        descriptor.setUsage(Wgpu.TextureUsage.OUTPUT_ATTACHMENT);
+        descriptor.setFormat(WgpuTextureFormat.BGRA8_UNORM);
+        descriptor.setWidth(dimension.getWidth());
+        descriptor.setHeight(dimension.getHeight());
+        descriptor.setPresentMode(WgpuPresentMode.FIFO);
 
         var id = WgpuJava.wgpuNative.wgpu_device_create_swap_chain(device.getId(), surface,
                 descriptor.getPointerTo());

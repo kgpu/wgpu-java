@@ -15,13 +15,13 @@ import com.noahcharlton.wgpuj.core.graphics.WindowEventHandler;
 import com.noahcharlton.wgpuj.core.input.Key;
 import com.noahcharlton.wgpuj.core.math.MathUtils;
 import com.noahcharlton.wgpuj.core.math.MatrixUtils;
+import com.noahcharlton.wgpuj.core.util.BindGroupUtils;
 import com.noahcharlton.wgpuj.core.util.Buffer;
 import com.noahcharlton.wgpuj.core.util.BufferUsage;
 import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.core.util.Dimension;
 import com.noahcharlton.wgpuj.jni.Wgpu;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupEntry;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutEntry;
 import com.noahcharlton.wgpuj.jni.WgpuBindingType;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
 import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
@@ -31,8 +31,6 @@ import com.noahcharlton.wgpuj.jni.WgpuIndexFormat;
 import com.noahcharlton.wgpuj.jni.WgpuInputStepMode;
 import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
 import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
-import com.noahcharlton.wgpuj.jni.WgpuVertexBufferAttributeDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuVertexBufferLayoutDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuVertexFormat;
 import jnr.ffi.Pointer;
 import org.joml.Matrix4f;
@@ -92,8 +90,7 @@ public class WindowEventExample {
                     BufferUsage.UNIFORM, BufferUsage.COPY_DST);
 
             var bindGroupLayout = device.createBindGroupLayout("matrix group layout",
-                    new WgpuBindGroupLayoutEntry().setPartial(0, WgpuBindGroupLayoutEntry.SHADER_STAGE_VERTEX,
-                            WgpuBindingType.UNIFORM_BUFFER));
+                    BindGroupUtils.partialLayout(0, Wgpu.ShaderStage.VERTEX, WgpuBindingType.UNIFORM_BUFFER));
 
             bindGroup = device.createBindGroup("matrix bind group", bindGroupLayout,
                             new WgpuBindGroupEntry().setBuffer(0, matrixBuffer.getId(), matrixBuffer.getSize()));
@@ -199,11 +196,11 @@ public class WindowEventExample {
                         Wgpu.ColorWrite.ALL).build())
                 .setDepthStencilState(null)
                 .setVertexIndexFormat(WgpuIndexFormat.UINT16)
-                .setBufferLayouts(new WgpuVertexBufferLayoutDescriptor(
+                .setBufferLayouts(Buffer.createLayout(
                         Float.BYTES * FLOATS_PER_VERTEX,
                         WgpuInputStepMode.VERTEX,
-                        new WgpuVertexBufferAttributeDescriptor(0, WgpuVertexFormat.FLOAT2, 0),
-                        new WgpuVertexBufferAttributeDescriptor(Float.BYTES * 2, WgpuVertexFormat.FLOAT3, 1)))
+                        Buffer.vertexAttribute(0, WgpuVertexFormat.FLOAT2, 0),
+                        Buffer.vertexAttribute(Float.BYTES * 2, WgpuVertexFormat.FLOAT3, 1)))
                 .setSampleCount(1)
                 .setSampleMask(0)
                 .setAlphaToCoverage(false)

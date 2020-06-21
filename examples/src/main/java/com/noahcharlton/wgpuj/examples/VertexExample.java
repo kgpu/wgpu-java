@@ -9,6 +9,7 @@ import com.noahcharlton.wgpuj.core.graphics.ColorState;
 import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
 import com.noahcharlton.wgpuj.core.graphics.RasterizationState;
 import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
+import com.noahcharlton.wgpuj.core.util.Buffer;
 import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.jni.Wgpu;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
@@ -19,8 +20,6 @@ import com.noahcharlton.wgpuj.jni.WgpuIndexFormat;
 import com.noahcharlton.wgpuj.jni.WgpuInputStepMode;
 import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
 import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
-import com.noahcharlton.wgpuj.jni.WgpuVertexBufferAttributeDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuVertexBufferLayoutDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuVertexFormat;
 
 public class VertexExample {
@@ -97,10 +96,10 @@ public class VertexExample {
                         Wgpu.ColorWrite.ALL).build())
                 .setDepthStencilState(null)
                 .setVertexIndexFormat(WgpuIndexFormat.UINT16)
-                .setBufferLayouts(new WgpuVertexBufferLayoutDescriptor(
+                .setBufferLayouts(Buffer.createLayout(
                         Float.BYTES * FLOATS_PER_VERTEX,
                         WgpuInputStepMode.VERTEX,
-                        new WgpuVertexBufferAttributeDescriptor(0, WgpuVertexFormat.FLOAT3, 0)))
+                        Buffer.vertexAttribute(0, WgpuVertexFormat.FLOAT3, 0)))
                 .setSampleCount(1)
                 .setSampleMask(0)
                 .setAlphaToCoverage(false)

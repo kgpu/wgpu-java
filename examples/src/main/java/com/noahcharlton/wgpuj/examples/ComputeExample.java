@@ -6,11 +6,12 @@ import com.noahcharlton.wgpuj.core.DeviceSettings;
 import com.noahcharlton.wgpuj.core.ShaderData;
 import com.noahcharlton.wgpuj.core.WgpuCore;
 import com.noahcharlton.wgpuj.core.compute.ComputePass;
+import com.noahcharlton.wgpuj.core.util.BindGroupUtils;
 import com.noahcharlton.wgpuj.core.util.Buffer;
 import com.noahcharlton.wgpuj.core.util.BufferSettings;
 import com.noahcharlton.wgpuj.core.util.BufferUsage;
+import com.noahcharlton.wgpuj.jni.Wgpu;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupEntry;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutEntry;
 import com.noahcharlton.wgpuj.jni.WgpuBindingType;
 import com.noahcharlton.wgpuj.jni.WgpuComputePipelineDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuLogLevel;
@@ -42,8 +43,7 @@ public class ComputeExample {
                 BufferUsage.COPY_DST, BufferUsage.COPY_SRC, BufferUsage.UNIFORM);
 
         long bindGroupLayout = device.createBindGroupLayout("bind group layout",
-                new WgpuBindGroupLayoutEntry().setPartial(0, WgpuBindGroupLayoutEntry.SHADER_STAGE_COMPUTE,
-                        WgpuBindingType.STORAGE_BUFFER));
+                BindGroupUtils.partialLayout(0, Wgpu.ShaderStage.COMPUTE, WgpuBindingType.STORAGE_BUFFER));
         long bindGroup = device.createBindGroup("bind group", bindGroupLayout,
                 new WgpuBindGroupEntry().setBuffer(0, storageBuffer.getId(), bufferSize));
 

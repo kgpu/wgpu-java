@@ -5,9 +5,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public class OutputHandler {
 
@@ -18,6 +20,15 @@ public class OutputHandler {
     private final HashMap<String, Item> types = new HashMap<>();
     private final HashMap<String, String> aliases = new HashMap<>();
     private final HashMap<String, List<ConstantItem>> constants = new HashMap<>();
+
+    private final List<String> excluded = Arrays.asList(
+            "WgpuBindGroupEntry",
+            "WgpuBindingResource_WgpuBuffer_Body",
+            "WgpuBindingResource_WgpuSampler_Body",
+            "WgpuBindingResource_WgpuTextureView_Body",
+            "WgpuRenderPassColorAttachmentDescriptorBase_TextureViewId",
+            "WgpuRenderPassDepthStencilAttachmentDescriptorBase_TextureViewId",
+            "WgpuRenderPassDescriptor");
 
     public OutputHandler(File outputDirectory) {
         this.outputDirectory = outputDirectory;
@@ -114,5 +125,9 @@ public class OutputHandler {
 
     public String getAlias(String type) {
         return aliases.get(type);
+    }
+
+    public boolean isExcluded(String name) {
+        return excluded.stream().anyMatch(Predicate.isEqual(name));
     }
 }

@@ -10,30 +10,26 @@ import com.noahcharlton.wgpuj.core.graphics.ColorState;
 import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
 import com.noahcharlton.wgpuj.core.graphics.RasterizationState;
 import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
+import com.noahcharlton.wgpuj.core.util.BindGroupUtils;
+import com.noahcharlton.wgpuj.core.util.Buffer;
 import com.noahcharlton.wgpuj.core.util.BufferUsage;
 import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.core.util.ImageData;
 import com.noahcharlton.wgpuj.jni.Wgpu;
 import com.noahcharlton.wgpuj.jni.WgpuBindGroupEntry;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutEntry;
 import com.noahcharlton.wgpuj.jni.WgpuBindingType;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
 import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
-import com.noahcharlton.wgpuj.jni.WgpuBufferCopyView;
 import com.noahcharlton.wgpuj.jni.WgpuCullMode;
-import com.noahcharlton.wgpuj.jni.WgpuExtent3d;
 import com.noahcharlton.wgpuj.jni.WgpuFrontFace;
 import com.noahcharlton.wgpuj.jni.WgpuIndexFormat;
 import com.noahcharlton.wgpuj.jni.WgpuInputStepMode;
 import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
 import com.noahcharlton.wgpuj.jni.WgpuTextureComponentType;
-import com.noahcharlton.wgpuj.jni.WgpuTextureCopyView;
 import com.noahcharlton.wgpuj.jni.WgpuTextureDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuTextureDimension;
 import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
 import com.noahcharlton.wgpuj.jni.WgpuTextureViewDimension;
-import com.noahcharlton.wgpuj.jni.WgpuVertexBufferAttributeDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuVertexBufferLayoutDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuVertexFormat;
 
 import java.io.IOException;
@@ -70,9 +66,16 @@ public class TextureExample {
             Device device = application.getDevice();
 
             var vertexBuffer = device.createVertexBuffer("Vertex Buffer", VERTICES);
-            var textureDesc = new WgpuTextureDescriptor();
-            textureDesc.set("texture", texture.getWidth(), texture.getHeight(), 1, 1, 1, WgpuTextureDimension.D2,
-                    WgpuTextureFormat.RGBA8_UINT, WgpuTextureDescriptor.COPY_DST | WgpuTextureDescriptor.SAMPLED);
+            var textureDesc = WgpuTextureDescriptor.createDirect();
+            textureDesc.setLabel("Texture");
+            textureDesc.setDimension(WgpuTextureDimension.D2);
+            textureDesc.getSize().setWidth(texture.getWidth());
+            textureDesc.getSize().setHeight(texture.getHeight());
+            textureDesc.getSize().setDepth(1);
+            textureDesc.setMipLevelCount(1);
+            textureDesc.setSampleCount(1);
+            textureDesc.setFormat(WgpuTextureFormat.RGBA8_UINT);
+            textureDesc.setUsage(Wgpu.TextureUsage.COPY_DST | Wgpu.TextureUsage.SAMPLED);
             long textureId = device.createTexture(textureDesc);
 
             var textureBuffer = device.createIntBuffer("texture buffer", texture.getPixels(), BufferUsage.COPY_SRC);
@@ -80,11 +83,7 @@ public class TextureExample {
             textureBuffer.unmap();
 
             long encoder = device.createCommandEncoder("Command Encoder");
-            WgpuJava.wgpuNative.wgpu_command_encoder_copy_buffer_to_texture(encoder,
-                    new WgpuBufferCopyView(textureBuffer.getId(), 0, Integer.BYTES * texture.getWidth(),
-                            texture.getHeight()).getPointerTo(),
-                    new WgpuTextureCopyView(textureId, 0, 0, 0, 0).getPointerTo(),
-                    new WgpuExtent3d(texture.getWidth(), texture.getHeight(), 1).getPointerTo());
+            textureBuffer.copyToTexture(encoder, textureId, texture);
             WgpuJava.wgpuNative.wgpu_command_encoder_finish(encoder, WgpuJava.createNullPointer());
 
             long textureView = WgpuJava.wgpuNative.wgpu_texture_create_view(textureId, WgpuJava.createNullPointer());
@@ -93,13 +92,9 @@ public class TextureExample {
                     WgpuJava.createNullPointer());
 
             var textureBindGroupLayout = device.createBindGroupLayout("texture bind group layout",
-                    new WgpuBindGroupLayoutEntry()
-                            .setPartial(0, WgpuBindGroupLayoutEntry.SHADER_STAGE_FRAGMENT,
-                                    WgpuBindingType.SAMPLED_TEXTURE)
-                            .setSampledTextureData(false, WgpuTextureViewDimension.D2,
-                                    WgpuTextureComponentType.UINT),
-                    new WgpuBindGroupLayoutEntry()
-                            .setPartial(1, WgpuBindGroupLayoutEntry.SHADER_STAGE_FRAGMENT,
+                    BindGroupUtils.textureLayout(0, Wgpu.ShaderStage.FRAGMENT, WgpuBindingType.SAMPLED_TEXTURE,
+                            false, WgpuTextureViewDimension.D2, WgpuTextureComponentType.UINT),
+                    BindGroupUtils.partialLayout(1, Wgpu.ShaderStage.FRAGMENT,
                                     WgpuBindingType.SAMPLER));
 
             var textureBindGroup = device.createBindGroup("texture bind group", textureBindGroupLayout,
@@ -149,13 +144,11 @@ public class TextureExample {
                         Wgpu.ColorWrite.ALL).build())
                 .setDepthStencilState(null)
                 .setVertexIndexFormat(WgpuIndexFormat.UINT16)
-                .setBufferLayouts(new WgpuVertexBufferLayoutDescriptor(
+                .setBufferLayouts(Buffer.createLayout(
                         FLOATS_PER_VERTEX * Float.BYTES,
                         WgpuInputStepMode.VERTEX,
-                        new WgpuVertexBufferAttributeDescriptor(
-                                0, WgpuVertexFormat.FLOAT3, 0),
-                        new WgpuVertexBufferAttributeDescriptor(
-                                3 * Float.BYTES, WgpuVertexFormat.FLOAT2, 1)
+                        Buffer.vertexAttribute(0, WgpuVertexFormat.FLOAT3, 0),
+                        Buffer.vertexAttribute(3 * Float.BYTES, WgpuVertexFormat.FLOAT2, 1)
                 ))
                 .setSampleCount(1)
                 .setSampleMask(0)

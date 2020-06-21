@@ -21,6 +21,10 @@ public class StructItem implements Item {
 
     @Override
     public void save(OutputHandler outputHandler) throws IOException {
+        if(outputHandler.isExcluded(name)){
+            return;
+        }
+
         var writer = outputHandler.startFile(name + ".java",
                 "com.noahcharlton.wgpuj.WgpuJava",
                 "com.noahcharlton.wgpuj.util.WgpuJavaStruct",
@@ -98,14 +102,18 @@ public class StructItem implements Item {
         }
 
         public void convertTypes(OutputHandler handler) {
-            if(name.startsWith("*")) {
+            if(type.equals("const char") || (type.equals("char") && name.startsWith("*"))) {
+                type = "@CStrPointer Struct.Pointer";
+                createType = "new Struct.Pointer();";
+                name = name.replace("*", "");
+            } else if(name.startsWith("*")) {
                 name = name.substring(1);
 
-                if(handler.containsType(type)){
+                if(handler.containsType(type)) {
                     var type = handler.resolveType(this.type).getJavaTypeName();
                     this.type = "Struct.StructRef<" + type + ">";
                     this.createType = "new Struct.StructRef<>(" + type + ".class);";
-                }else{
+                } else {
                     type = "Struct.Pointer";
                 }
             } else if(type.equals("uintptr_t") || type.equals("uint64_t") || type.equals("unsigned long long")) {
@@ -120,10 +128,7 @@ public class StructItem implements Item {
                 type = "Struct.Float";
             } else if(type.equals("double")) {
                 type = "Struct.Double";
-            } else if(type.equals("const char")){
-                type = "@CStrPointer Struct.Pointer";
-                createType = "new Struct.Pointer();";
-            }else if(handler.containsType(type)) {
+            } else if(handler.containsType(type)) {
                 resolveType(handler.resolveType(type));
             } else if(handler.containsAlias(type)) {
                 type = handler.getAlias(type);
@@ -180,7 +185,7 @@ public class StructItem implements Item {
         }
 
         public void writeGetter(BufferedWriter writer, OutputHandler handler) throws IOException {
-            if(type.startsWith("@CStrPointer")){
+            if(type.startsWith("@CStrPointer")) {
                 writeStringGetter(writer);
                 return;
             }
@@ -202,13 +207,13 @@ public class StructItem implements Item {
         }
 
         public void writeSetter(BufferedWriter writer, OutputHandler handler) throws IOException {
-            if(type.startsWith("@CStrPointer")){
+            if(type.startsWith("@CStrPointer")) {
                 writeStringSetter(writer);
                 return;
-            }else if(!type.startsWith("Struct.")){
+            } else if(!type.startsWith("Struct.")) {
                 //Must be an inner struct
                 return;
-            }else if(type.startsWith("Struct.StructRef")){
+            } else if(type.startsWith("Struct.StructRef")) {
                 writeStructRefSetter(writer, handler);
                 return;
             }
@@ -223,7 +228,7 @@ public class StructItem implements Item {
             writer.write(".set(x);\n    }\n\n");
         }
 
-        private void writeStructRefSetter(BufferedWriter writer, OutputHandler handler) throws IOException{
+        private void writeStructRefSetter(BufferedWriter writer, OutputHandler handler) throws IOException {
             writer.write("    public void set");
             writer.write(name.substring(0, 1).toUpperCase());
             writer.write(name.substring(1));
@@ -237,7 +242,7 @@ public class StructItem implements Item {
             writer.write(".set(x);\n        }\n    }\n\n");
         }
 
-        private void writeStringSetter(BufferedWriter writer) throws IOException{
+        private void writeStringSetter(BufferedWriter writer) throws IOException {
             writer.write("    public void set");
             writer.write(name.substring(0, 1).toUpperCase());
             writer.write(name.substring(1));
@@ -255,23 +260,23 @@ public class StructItem implements Item {
         }
 
         private String getGetterSetterType(String type, OutputHandler handler, boolean isGetter) {
-            if(type.equals("Struct.Unsigned64") || type.equals("Struct.Signed64") || type.equals("Struct.Unsigned32")){
+            if(type.equals("Struct.Unsigned64") || type.equals("Struct.Signed64") || type.equals("Struct.Unsigned32")) {
                 return "long";
-            }else if(type.equals("Struct.Signed32")){
+            } else if(type.equals("Struct.Signed32")) {
                 return "int";
-            }else if(type.equals("Struct.Boolean")){
+            } else if(type.equals("Struct.Boolean")) {
                 return "boolean";
-            }else if(type.equals("Struct.Float")){
+            } else if(type.equals("Struct.Float")) {
                 return "float";
-            }else if(type.equals("Struct.Double")){
+            } else if(type.equals("Struct.Double")) {
                 return "double";
-            }else if(handler.containsType(type.replace("Wgpu", "WGPU"))){
+            } else if(handler.containsType(type.replace("Wgpu", "WGPU"))) {
                 return type;
-            }else if(type.startsWith("Struct.Enum")){
+            } else if(type.startsWith("Struct.Enum")) {
                 return type.split("<|>")[1];
-            }else if(type.equals("Struct.Pointer")){
+            } else if(type.equals("Struct.Pointer")) {
                 return "jnr.ffi.Pointer";
-            }else if(type.startsWith("Struct.StructRef")){
+            } else if(type.startsWith("Struct.StructRef")) {
                 String javaType = type.split("<|>")[1];
 
                 return isGetter ? type : javaType + "...";

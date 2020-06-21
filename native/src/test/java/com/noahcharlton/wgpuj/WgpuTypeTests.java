@@ -6,7 +6,7 @@ import com.noahcharlton.wgpuj.jni.WgpuBindingResourceData;
 import com.noahcharlton.wgpuj.jni.WgpuBindingResourceTag;
 import com.noahcharlton.wgpuj.jni.WgpuColor;
 import com.noahcharlton.wgpuj.jni.WgpuExtent3d;
-import com.noahcharlton.wgpuj.jni.WgpuOrigin3D;
+import com.noahcharlton.wgpuj.jni.WgpuOrigin3d;
 import com.noahcharlton.wgpuj.util.RustCString;
 import jnr.ffi.Pointer;
 import org.junit.jupiter.api.Assertions;
@@ -18,13 +18,16 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public class WgpuTypeTests extends WgpuNativeTest{
+public class WgpuTypeTests extends WgpuNativeTest {
 
     @Test
     void wgpuColorTest() {
-        WgpuColor color = new WgpuColor();
-        color.useDirectMemory();
-        color.set(1.0, .75, .5, .25);
+        WgpuColor color = WgpuColor.createDirect();
+        color.setR(1.0);
+        color.setG(.75);
+        color.setB(.5);
+        color.setA(.25);
+
         Pointer output = wgpuTest.color_to_string(color.getPointerTo());
 
         String actual = RustCString.fromPointer(output);
@@ -34,8 +37,9 @@ public class WgpuTypeTests extends WgpuNativeTest{
     }
 
     @Test
-    void bindGroupLayoutDescriptorNameTest(){
-        var descriptor = new WgpuBindGroupLayoutDescriptor("foobar9876");
+    void bindGroupLayoutDescriptorNameTest() {
+        var descriptor = WgpuBindGroupLayoutDescriptor.createDirect();
+        descriptor.setLabel("foobar9876");
 
         wgpuTest.bind_group_layout_descriptor_test(descriptor.getPointerTo());
     }
@@ -83,14 +87,20 @@ public class WgpuTypeTests extends WgpuNativeTest{
 
     @Test
     void origin3dTest() {
-        var origin = new WgpuOrigin3D(123, 456, 789);
+        var origin = WgpuOrigin3d.createDirect();
+        origin.setX(123);
+        origin.setY(456);
+        origin.setZ(789);
 
         wgpuTest.wgpu_origin_3d_test(origin.getPointerTo());
     }
 
     @Test
     void extent3dTest() {
-        var extent = new WgpuExtent3d(147, 258, 369);
+        var extent = WgpuExtent3d.createDirect();
+        extent.setWidth(147);
+        extent.setHeight(258);
+        extent.setDepth(369);
 
         wgpuTest.wgpu_extent_3d_test(extent.getPointerTo());
     }
@@ -115,7 +125,11 @@ public class WgpuTypeTests extends WgpuNativeTest{
                         WgpuBindingResourceTag.SAMPLER, "Sampler((745, 0, Empty))"),
                 Arguments.of((Consumer<WgpuBindingResourceData>) data -> data.setTextureViewId(66),
                         WgpuBindingResourceTag.TEXTURE_VIEW, "TextureView((66, 0, Empty))"),
-                Arguments.of((Consumer<WgpuBindingResourceData>) data -> data.getBinding().set(31, 45, 26),
+                Arguments.of((Consumer<WgpuBindingResourceData>) data -> {
+                            data.getBinding().setSize(26);
+                            data.getBinding().setOffset(45);
+                            data.getBinding().setBuffer(31);
+                        },
                         WgpuBindingResourceTag.BUFFER,
                         "Buffer(BufferBinding { buffer: (31, 0, Empty), offset: 45, size: BufferSize(26) })")
         );

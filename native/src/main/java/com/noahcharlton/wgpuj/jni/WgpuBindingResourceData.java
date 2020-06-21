@@ -6,7 +6,7 @@ import jnr.ffi.Union;
 public class WgpuBindingResourceData extends Union {
 
     private final Unsigned64 samplerId = new Unsigned64();
-    private final WgpuBufferBinding binding = inner(new WgpuBufferBinding());
+    private final WgpuBufferBinding binding = inner(WgpuBufferBinding.createHeap());
     private final Unsigned64 textureViewId = new Unsigned64();
 
     protected WgpuBindingResourceData() {
