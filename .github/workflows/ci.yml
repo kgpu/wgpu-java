@@ -34,3 +34,5 @@ jobs:
         run: ./gradlew assemble --stacktrace
       - name: Run tests
         run: ./gradlew test --stacktrace
+      - name: Check Format
+        run: ./gradlew spotlessCheck

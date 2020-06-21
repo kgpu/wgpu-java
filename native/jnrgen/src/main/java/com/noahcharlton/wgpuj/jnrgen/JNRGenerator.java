@@ -14,18 +14,31 @@ public class JNRGenerator {
         }
 
         File outputDirectory = createOutputDirectory(args[0]);
-        Config config = new Config(outputDirectory);
+        OutputHandler outputHandler = new OutputHandler(outputDirectory);
         String header = readHeaderFile();
 
         List<Token> tokens = new Scanner(header).getTokens();
         List<Item> items = new Parser(tokens).getItems();
+        for(Item item: items){
+            try{
+                item.preSave(outputHandler);
+            }catch(RuntimeException e){
+                System.out.println("Failed to parse type from item " + item + ": " + e.getLocalizedMessage());
+            }
+        }
 
         for(Item item: items){
             try{
-                item.save(config);
-            }catch(IOException e){
-                throw new RuntimeException("Failed to save item: " + item, e);
+                item.save(outputHandler);
+            }catch(RuntimeException | IOException e){
+                System.out.println("Failed to save item " + item + ": " + e.getLocalizedMessage());
             }
+        }
+
+        try{
+            outputHandler.saveConstants();
+        }catch(IOException e){
+            System.out.println("Failed to save constants: " + e);
         }
     }
 

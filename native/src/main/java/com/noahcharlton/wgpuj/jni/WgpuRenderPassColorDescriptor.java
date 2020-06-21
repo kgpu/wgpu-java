@@ -20,7 +20,7 @@ public class WgpuRenderPassColorDescriptor extends WgpuJavaStruct {
         this.resolveTarget = new Struct.Unsigned64();
         this.loadOp = new Struct.Enum<>(WgpuLoadOp.class);
         this.storeOp = new Struct.Enum<>(WgpuStoreOp.class);
-        this.clearColor = inner(new WgpuColor());
+        this.clearColor = inner(WgpuColor.createHeap());
     }
 
     public WgpuRenderPassColorDescriptor(long attachment, WgpuLoadOp loadOp, WgpuStoreOp storeOp,
@@ -31,6 +31,9 @@ public class WgpuRenderPassColorDescriptor extends WgpuJavaStruct {
         this.attachment.set(attachment);
         this.loadOp.set(loadOp);
         this.storeOp.set(storeOp);
-        this.clearColor.set(clearR, clearG, clearB, clearA);
+        this.clearColor.setR(clearR);
+        this.clearColor.setG(clearG);
+        this.clearColor.setB(clearB);
+        this.clearColor.setA(clearA);
     }
 }

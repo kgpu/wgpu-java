@@ -18,10 +18,19 @@ public class EnumItem implements Item {
     }
 
     @Override
-    public void save(Config config) throws IOException {
+    public void preSave(OutputHandler outputHandler) {
+        outputHandler.registerType(name, this);
+    }
+
+    @Override
+    public void save(OutputHandler outputHandler) throws IOException {
         String className = this.name.replace("WGPU", "Wgpu");
 
-        BufferedWriter writer = config.startFile(className + ".java");
+        if(outputHandler.isExcluded(name)) {
+            return;
+        }
+
+        BufferedWriter writer = outputHandler.startFile(className + ".java");
 
         writer.write("public enum ");
         writer.write(className.replace("WGPU", "Wgpu"));
@@ -43,6 +52,11 @@ public class EnumItem implements Item {
         }
     }
 
+    @Override
+    public String getJavaTypeName() {
+        return this.name.replace("WGPU", "Wgpu");
+    }
+
     private String toFieldName(String fieldName) {
         //Replace tag due to CBindgen adding "Tag" for enum names, but not for each field for some reason
         String cFieldHeader = this.name.replace("Tag", "");
@@ -58,6 +72,11 @@ public class EnumItem implements Item {
         }
 
         return output.toString();
+    }
+
+    @Override
+    public String toString() {
+        return "Enum(" + name + ")";
     }
 
     static class EnumField{

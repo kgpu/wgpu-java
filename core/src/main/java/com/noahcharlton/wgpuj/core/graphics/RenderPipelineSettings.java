@@ -4,20 +4,21 @@ import com.noahcharlton.wgpuj.core.Device;
 import com.noahcharlton.wgpuj.core.ShaderData;
 import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.jni.WgpuColorStateDescriptor;
+import com.noahcharlton.wgpuj.jni.WgpuDepthStencilStateDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuIndexFormat;
 import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
+import com.noahcharlton.wgpuj.jni.WgpuRasterizationStateDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuRenderPipelineDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuVertexBufferLayoutDescriptor;
-import jnr.ffi.Pointer;
 
 public class RenderPipelineSettings {
 
     private ShaderData vertexStage;
     private ShaderData fragmentStage;
     private WgpuPrimitiveTopology primitiveTopology;
-    private Pointer rasterizationState;
+    private WgpuRasterizationStateDescriptor rasterizationState;
     private WgpuColorStateDescriptor[] colorStates;
-    private Pointer depthStencilState;
+    private WgpuDepthStencilStateDescriptor depthStencilState;
     private WgpuIndexFormat vertexIndexFormat;
     private WgpuVertexBufferLayoutDescriptor[] bufferLayouts;
     private Color clearColor;
@@ -31,22 +32,26 @@ public class RenderPipelineSettings {
     }
 
     public WgpuRenderPipelineDescriptor build(Device device, long layout){
-        WgpuRenderPipelineDescriptor descriptor = new WgpuRenderPipelineDescriptor();
-        Pointer fragment = fragmentStage.build(device).getPointerTo();
+        var descriptor = WgpuRenderPipelineDescriptor.createDirect();
+
+        var fragment = fragmentStage.build(device);
         long vertexModule = vertexStage.createModule(device);
 
-        descriptor.getLayout().set(layout);
-        descriptor.getVertexStage().set(vertexModule, vertexStage.getEntryPoint());
-        descriptor.getFragmentStage().set(fragment);
-        descriptor.getPrimitiveTopology().set(primitiveTopology);
-        descriptor.getRasterizationState().set(rasterizationState);
-        descriptor.getColorStates().set(colorStates);
-        descriptor.getColorStatesLength().set(colorStates.length);
-        descriptor.getDepthStencilState().set(depthStencilState);
-        descriptor.getVertexState().set(vertexIndexFormat, bufferLayouts);
-        descriptor.getSampleCount().set(sampleCount);
-        descriptor.getSampleMask().set(sampleMask);
-        descriptor.getAlphaToCoverage().set(alphaToCoverage);
+        descriptor.setLayout(layout);
+        descriptor.getVertexStage().setModule(vertexModule);
+        descriptor.getVertexStage().setEntryPoint(vertexStage.getEntryPoint());
+        descriptor.setFragmentStage(fragment);
+        descriptor.setPrimitiveTopology(primitiveTopology);
+        descriptor.setRasterizationState(rasterizationState);
+        descriptor.setColorStates(colorStates);
+        descriptor.setColorStatesLength(colorStates.length);
+        descriptor.setDepthStencilState(depthStencilState);
+        descriptor.getVertexState().setIndexFormat(vertexIndexFormat);
+        descriptor.getVertexState().setVertexBuffers(bufferLayouts);
+        descriptor.getVertexState().setVertexBuffersLength(bufferLayouts.length);
+        descriptor.setSampleCount(sampleCount);
+        descriptor.setSampleMask(sampleMask);
+        descriptor.setAlphaToCoverageEnabled(alphaToCoverage);
 
         return descriptor;
     }
@@ -89,11 +94,11 @@ public class RenderPipelineSettings {
         return bufferLayouts;
     }
 
-    public Pointer getRasterizationState() {
+    public WgpuRasterizationStateDescriptor getRasterizationState() {
         return rasterizationState;
     }
 
-    public RenderPipelineSettings setRasterizationState(Pointer rasterizationState) {
+    public RenderPipelineSettings setRasterizationState(WgpuRasterizationStateDescriptor rasterizationState) {
         this.rasterizationState = rasterizationState;
 
         return this;
@@ -109,11 +114,11 @@ public class RenderPipelineSettings {
         return this;
     }
 
-    public Pointer getDepthStencilState() {
+    public WgpuDepthStencilStateDescriptor getDepthStencilState() {
         return depthStencilState;
     }
 
-    public RenderPipelineSettings setDepthStencilState(Pointer depthStencilState) {
+    public RenderPipelineSettings setDepthStencilState(WgpuDepthStencilStateDescriptor depthStencilState) {
         this.depthStencilState = depthStencilState;
 
         return this;

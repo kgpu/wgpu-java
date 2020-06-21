@@ -40,6 +40,7 @@ public class Window {
         long osHandle = GlfwHandler.getOsWindowHandle(this.handle);
 
         if(Platform.isWindows){
+            //Note: this must be a pointer on the heap (i.e. non-direct). I am not sure why...
             Pointer hwnd = WgpuJava.createLongPointer(osHandle);
 
             return WgpuJava.wgpuNative.wgpu_create_surface_from_windows_hwnd(WgpuJava.createNullPointer(), hwnd);

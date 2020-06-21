@@ -7,5 +7,4 @@ public interface BufferMapCallback {
 
     @Delegate
     void callback(WgpuBufferMapAsyncStatus status, Pointer userdata);
-
 }

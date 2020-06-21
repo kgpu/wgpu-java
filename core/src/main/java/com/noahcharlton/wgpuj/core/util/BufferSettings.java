@@ -19,12 +19,13 @@ public class BufferSettings {
     }
 
     public WgpuBufferDescriptor toDescriptor(){
-        return new WgpuBufferDescriptor(
-                label,
-                size,
-                calculateUsage(),
-                mapped
-        );
+        var desc = WgpuBufferDescriptor.createDirect();
+        desc.setLabel(label);
+        desc.setMappedAtCreation(mapped);
+        desc.setSize(size);
+        desc.setUsage(calculateUsage());
+
+        return desc;
     }
 
     int calculateUsage() {
