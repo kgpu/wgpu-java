@@ -1,6 +1,5 @@
 package com.noahcharlton.wgpuj.jni;
 
-import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.util.WgpuJavaStruct;
 import com.noahcharlton.wgpuj.util.CStrPointer;
 import com.noahcharlton.wgpuj.util.RustCString;
