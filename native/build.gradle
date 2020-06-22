@@ -25,6 +25,10 @@ test {
 
     testLogging {
         showStandardStreams = true
+
+        info{
+            events "started", "passed"
+        }
         events "skipped", "failed"
 
         showExceptions true
@@ -42,6 +46,11 @@ test {
             println "${result.skippedTestCount} skipped)"
         }
     }
+}
+
+task openNativeDocs(type: Exec){
+    workingDir "${projectDir}/wgpu-native"
+    commandLine 'cargo', 'doc', '--open'
 }
 
 task updateBindings(type: Copy){

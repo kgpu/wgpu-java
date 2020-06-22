@@ -5,6 +5,7 @@ import com.noahcharlton.wgpuj.jni.WgpuBindingType;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
 import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
 import com.noahcharlton.wgpuj.jni.WgpuBufferMapAsyncStatus;
+import com.noahcharlton.wgpuj.jni.WgpuCompareFunction;
 import com.noahcharlton.wgpuj.jni.WgpuCullMode;
 import com.noahcharlton.wgpuj.jni.WgpuFrontFace;
 import com.noahcharlton.wgpuj.jni.WgpuIndexFormat;
@@ -14,6 +15,7 @@ import com.noahcharlton.wgpuj.jni.WgpuLogLevel;
 import com.noahcharlton.wgpuj.jni.WgpuPowerPreference;
 import com.noahcharlton.wgpuj.jni.WgpuPresentMode;
 import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
+import com.noahcharlton.wgpuj.jni.WgpuStencilOperation;
 import com.noahcharlton.wgpuj.jni.WgpuStoreOp;
 import com.noahcharlton.wgpuj.jni.WgpuSwapChainStatus;
 import com.noahcharlton.wgpuj.jni.WgpuTextureAspect;
@@ -47,6 +49,52 @@ public interface WgpuTest {
     void wgpu_origin_3d_test(Pointer origin3d);
 
     void wgpu_extent_3d_test(Pointer extent3d);
+
+    void wgpu_climits_test(Pointer cLimits);
+
+    void wgpu_blend_descriptor_test(Pointer blendDesc);
+
+    void wgpu_buffer_descriptor_test(Pointer bufferDesc);
+
+    void wgpu_buffer_copy_view_test(Pointer copyView);
+
+    void wgpu_bind_group_descriptor_test(Pointer bindGroup);
+
+    void wgpu_color_state_descriptor_test(Pointer colorStateDesc);
+
+    void wgpu_command_buffer_descriptor_test(Pointer cmdBufferDesc);
+
+    void wgpu_command_encoder_descriptor_test(Pointer cmdEncoderDesc);
+
+    void wgpu_compute_pipeline_descriptor_test(Pointer computePipelineDesc);
+
+    void wgpu_depth_stencil_state_descriptor(Pointer depthStencilStateDesc);
+
+    void wgpu_pipeline_layout_descriptor(Pointer pipelineLayoutDesc);
+
+    void wgpu_compute_pass_descriptor(Pointer computePasDesc);
+
+    void wgpu_rasterization_state_descriptor(Pointer rasterizationStateDesc);
+
+    void wgpu_render_pass_descriptor_test(Pointer renderPassDesc);
+
+    void wgpu_shader_module_test(Pointer module);
+
+    void wgpu_request_adapter_options_test(Pointer adapter);
+
+    void wgpu_render_pipeline_descriptor_test(Pointer pipeline);
+
+    void wgpu_swap_chain_output_test(Pointer output);
+
+    void wgpu_swap_chain_descriptor_test(Pointer desc);
+
+    void wgpu_texture_view_descriptor_test(Pointer textureView);
+
+    void wgpu_texture_descriptor_test(Pointer textureDesc);
+
+    void wgpu_texture_copy_view_test(Pointer copyView);
+
+    Pointer get_raw_pass_test(long cmdEncoderId);
 
     Pointer bind_group_entry_resource_to_string(Pointer bindGroupEntry);
 
@@ -91,4 +139,9 @@ public interface WgpuTest {
     Pointer get_wgpu_texture_dimension_name(WgpuTextureDimension dimension);
 
     Pointer get_wgpu_texture_aspect_name(WgpuTextureAspect aspect);
+
+    Pointer get_wgpu_stencil_operation_name(WgpuStencilOperation operation);
+
+    Pointer get_wgpu_compare_function_name(WgpuCompareFunction function);
+
 }

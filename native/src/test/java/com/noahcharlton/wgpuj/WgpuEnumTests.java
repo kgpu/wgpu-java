@@ -4,6 +4,7 @@ import com.noahcharlton.wgpuj.jni.WgpuBindingType;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
 import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
 import com.noahcharlton.wgpuj.jni.WgpuBufferMapAsyncStatus;
+import com.noahcharlton.wgpuj.jni.WgpuCompareFunction;
 import com.noahcharlton.wgpuj.jni.WgpuCullMode;
 import com.noahcharlton.wgpuj.jni.WgpuFrontFace;
 import com.noahcharlton.wgpuj.jni.WgpuIndexFormat;
@@ -13,6 +14,7 @@ import com.noahcharlton.wgpuj.jni.WgpuLogLevel;
 import com.noahcharlton.wgpuj.jni.WgpuPowerPreference;
 import com.noahcharlton.wgpuj.jni.WgpuPresentMode;
 import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
+import com.noahcharlton.wgpuj.jni.WgpuStencilOperation;
 import com.noahcharlton.wgpuj.jni.WgpuStoreOp;
 import com.noahcharlton.wgpuj.jni.WgpuSwapChainStatus;
 import com.noahcharlton.wgpuj.jni.WgpuTextureAspect;
@@ -200,14 +202,30 @@ public class WgpuEnumTests extends WgpuNativeTest {
         standardEnumTest(aspect, output);
     }
 
-    private <E extends Enum> void standardEnumTest(E e, Pointer output) {
+    @ParameterizedTest
+    @EnumSource(WgpuStencilOperation.class)
+    void wgpuStencilOperationTest(WgpuStencilOperation operation) {
+        Pointer output = wgpuTest.get_wgpu_stencil_operation_name(operation);
+
+        standardEnumTest(operation, output);
+    }
+
+    @ParameterizedTest
+    @EnumSource(WgpuCompareFunction.class)
+    void wgpuCompareFunctionTest(WgpuCompareFunction function) {
+        Pointer output = wgpuTest.get_wgpu_compare_function_name(function);
+
+        standardEnumTest(function, output);
+    }
+
+    private <E extends Enum<E>> void standardEnumTest(E e, Pointer output) {
         String actual = RustCString.fromPointer(output);
         String expected = toRustEnumName(e);
 
         Assertions.assertEquals(expected, actual);
     }
 
-    private <E extends Enum> String toRustEnumName(E enumType) {
+    private <E extends Enum<E>> String toRustEnumName(E enumType) {
         var nameParts = enumType.name().split("_");
 
         return Arrays.stream(nameParts).map(input ->

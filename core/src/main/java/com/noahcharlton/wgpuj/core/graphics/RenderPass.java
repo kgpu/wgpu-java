@@ -6,7 +6,7 @@ import com.noahcharlton.wgpuj.core.util.Buffer;
 import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.jni.WgpuLoadOp;
 import com.noahcharlton.wgpuj.jni.WgpuRawPass;
-import com.noahcharlton.wgpuj.jni.WgpuRawPassDescriptor;
+import com.noahcharlton.wgpuj.jni.WgpuRenderPassDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuRenderPassColorDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuStoreOp;
 
@@ -48,7 +48,7 @@ public class RenderPass extends RawPass {
     }
 
     static RenderPass create(long commandEncoder, long swapchainTexture, Color clearColor){
-        var rawPassDescriptor = new WgpuRawPassDescriptor(null, new WgpuRenderPassColorDescriptor(swapchainTexture,
+        var rawPassDescriptor = new WgpuRenderPassDescriptor(null, new WgpuRenderPassColorDescriptor(swapchainTexture,
                 WgpuLoadOp.CLEAR, WgpuStoreOp.STORE, clearColor.r, clearColor.g, clearColor.b, clearColor.a));
 
         var pass = WgpuJava.wgpuNative.wgpu_command_encoder_begin_render_pass(commandEncoder,

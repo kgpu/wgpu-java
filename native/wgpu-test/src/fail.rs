@@ -30,16 +30,13 @@ macro_rules! assert_ffi {
     });
 }
 
-macro_rules! fail_ffi {
-    ($($arg:tt)*) => ($crate::fail::fail_test(format!($($arg)*)));
-}
-
 pub type TestFailCallback = unsafe extern "C" fn(msg: *const c_char);
 
 static mut FAIL_CALLBACK: Option<TestFailCallback> = None;
 
-pub fn fail_test(msg: String) {
-    let msg = CString::new(msg).unwrap();
+#[no_mangle]
+pub extern "C" fn fail_test(msg: String) {
+    let msg = CString::new(msg).expect("Fail Message had null bytes!");
 
     unsafe {
         let callback = FAIL_CALLBACK.unwrap();
@@ -49,11 +46,21 @@ pub fn fail_test(msg: String) {
 }
 
 #[no_mangle]
-pub unsafe extern fn set_fail_callback(callback: TestFailCallback) {
+pub unsafe extern "C" fn set_fail_callback(callback: TestFailCallback) {
     match &FAIL_CALLBACK {
         Some(_) => panic!("The fail callback can only be set once."),
         None => (),
     }
 
     FAIL_CALLBACK = Some(callback);
+
+    std::panic::set_hook(Box::new(|panic_info| {
+    if let Some(s) = panic_info.payload().downcast_ref::<&str>() {
+        println!("Rust panicked: {:?}", s);
+        fail_test(String::new());
+    } else {
+        println!("Rust panicked for unknown reason!");
+        fail_test(String::new());
+    }
+}));
 }
