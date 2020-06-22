@@ -33,6 +33,8 @@ jobs:
       - name: Build gradle
         run: ./gradlew assemble --stacktrace
       - name: Run tests
-        run: ./gradlew test --stacktrace
+        run: |
+            set RUST_BACKTRACE=1
+            ./gradlew test --stacktrace --info
       - name: Check Format
         run: ./gradlew spotlessCheck

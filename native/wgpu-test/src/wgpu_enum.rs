@@ -14,10 +14,12 @@
 /// ```
 macro_rules! enum_name_test {
     ($func_name:ident, $enum_type:ty) => {
-#[no_mangle]
-pub extern fn $func_name(x : $enum_type) -> *const std::os::raw::c_char{
-    std::ffi::CString::new(format!("{:?}", x)).unwrap().into_raw()
-}
+        #[no_mangle]
+        pub extern "C" fn $func_name(x: $enum_type) -> *const std::os::raw::c_char {
+            std::ffi::CString::new(format!("{:?}", x))
+                .unwrap()
+                .into_raw()
+        }
     };
 }
 
@@ -35,10 +37,21 @@ enum_name_test!(get_log_level_name, wgn::LogLevel);
 enum_name_test!(get_swap_chain_status_name, wgt::SwapChainStatus);
 enum_name_test!(get_texture_format_name, wgt::TextureFormat);
 enum_name_test!(get_wgpu_binding_type_name, wgc::binding_model::BindingType);
-enum_name_test!(get_wgpu_buffer_map_async_status_name, wgc::resource::BufferMapAsyncStatus);
-enum_name_test!(get_wgpu_texture_view_dimension_name, wgt::TextureViewDimension);
-enum_name_test!(get_wgpu_texture_component_type_name, wgt::TextureComponentType);
+enum_name_test!(
+    get_wgpu_buffer_map_async_status_name,
+    wgc::resource::BufferMapAsyncStatus
+);
+enum_name_test!(
+    get_wgpu_texture_view_dimension_name,
+    wgt::TextureViewDimension
+);
+enum_name_test!(
+    get_wgpu_texture_component_type_name,
+    wgt::TextureComponentType
+);
 enum_name_test!(get_wgpu_input_step_mode_name, wgt::InputStepMode);
 enum_name_test!(get_wgpu_vertex_format_name, wgt::VertexFormat);
 enum_name_test!(get_wgpu_texture_dimension_name, wgt::TextureDimension);
 enum_name_test!(get_wgpu_texture_aspect_name, wgt::TextureAspect);
+enum_name_test!(get_wgpu_compare_function_name, wgt::CompareFunction);
+enum_name_test!(get_wgpu_stencil_operation_name, wgt::StencilOperation);

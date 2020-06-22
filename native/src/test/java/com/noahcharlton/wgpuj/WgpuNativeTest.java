@@ -3,6 +3,7 @@ package com.noahcharlton.wgpuj;
 import com.noahcharlton.wgpuj.fail.RustFailCallback;
 import com.noahcharlton.wgpuj.util.SharedLibraryLoader;
 import jnr.ffi.LibraryLoader;
+import jnr.ffi.Pointer;
 import jnr.ffi.Runtime;
 
 public class WgpuNativeTest {
@@ -24,5 +25,9 @@ public class WgpuNativeTest {
 
             throw new RuntimeException(e);
         }
+    }
+
+    protected static Pointer longAsPointer(long address) {
+        return Pointer.wrap(WgpuJava.getRuntime(), address);
     }
 }
