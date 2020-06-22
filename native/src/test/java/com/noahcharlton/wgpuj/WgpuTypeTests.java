@@ -48,7 +48,6 @@ import com.noahcharlton.wgpuj.jni.WgpuTextureViewDimension;
 import com.noahcharlton.wgpuj.util.RustCString;
 import jnr.ffi.Pointer;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -174,8 +173,8 @@ public class WgpuTypeTests extends WgpuNativeTest {
         );
     }
 
-    @Test
-    @Disabled("CLimits has private fields")
+//  --- Blocked by wgpu-native having a private field ---
+//  @Test
     void cLimitsMaxBindGroupsTest() {
         var cLimits = WgpuCLimits.createDirect();
         cLimits.setMaxBindGroups(951);

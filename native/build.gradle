@@ -44,6 +44,10 @@ test {
             print "${result.successfulTestCount} successes, "
             print "${result.failedTestCount} failures, "
             println "${result.skippedTestCount} skipped)"
+
+            if(result.skippedTestCount > 0){
+                throw new RuntimeException("Tests cannot be skipped for wgpuj/native!");
+            }
         }
     }
 }

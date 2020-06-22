@@ -8,6 +8,8 @@ import jnr.ffi.Runtime;
 
 public class WgpuNativeTest {
 
+    private static final RustFailCallback callback = new RustFailCallback.RustFailCallbackImpl();
+
     protected static WgpuTest wgpuTest;
 
     static {
@@ -17,7 +19,7 @@ public class WgpuNativeTest {
             wgpuTest = LibraryLoader.create(WgpuTest.class).load(file.getAbsolutePath());
             WgpuJava.setRuntime(Runtime.getRuntime(wgpuTest));
 
-            wgpuTest.set_fail_callback(new RustFailCallback.RustFailCallbackImpl());
+            wgpuTest.set_fail_callback(callback);
         }catch(Exception e){
             System.err.println("Failed to initialize wgpu test library!");
 
