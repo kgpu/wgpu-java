@@ -8,13 +8,15 @@ public class ConstantItem implements Item {
 
     private final String cName;
     private final String value;
+    private final String comment;
 
     private String javaType;
     private String variableName;
 
-    public ConstantItem(String cName, String value) {
+    public ConstantItem(String cName, String value, String comment) {
         this.cName = cName;
         this.value = value;
+        this.comment = comment;
     }
 
     @Override
@@ -22,8 +24,15 @@ public class ConstantItem implements Item {
 
     }
 
-    public void write(BufferedWriter writer) throws IOException {
-        writer.write("    public static final ");
+    public void write(BufferedWriter writer, String indent) throws IOException {
+        if(!comment.isEmpty()){
+            writer.write(indent);
+            writer.write(comment.replace("\n", "\n" + indent));
+            writer.write("\n");
+        }
+
+        writer.write(indent);
+        writer.write("public static final ");
         writer.write(javaType);
         writer.write(" ");
         writer.write(variableName);

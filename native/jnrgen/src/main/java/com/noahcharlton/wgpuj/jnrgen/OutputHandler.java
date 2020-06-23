@@ -57,11 +57,7 @@ public class OutputHandler {
         }
 
         for(ConstantItem constant : entry.getValue()) {
-            if(hasClass) {
-                writer.write("    ");
-            }
-
-            constant.write(writer);
+            constant.write(writer, hasClass ? "        " : "    ");
         }
 
         if(hasClass){
