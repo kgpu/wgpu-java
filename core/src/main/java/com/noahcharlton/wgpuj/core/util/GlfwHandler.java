@@ -1,9 +1,6 @@
 package com.noahcharlton.wgpuj.core.util;
 
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWErrorCallback;
-import org.lwjgl.glfw.GLFWNativeWin32;
-import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.glfw.*;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.IntBuffer;
@@ -55,6 +52,8 @@ public class GlfwHandler {
     public static long getOsWindowHandle(long handle){
         if(Platform.isWindows){
             return GLFWNativeWin32.glfwGetWin32Window(handle);
+        }else if(Platform.isLinux){
+            return GLFWNativeX11.glfwGetX11Window(handle);
         }else{
             throw new UnsupportedOperationException("Platform not supported. See " +
                     "https://github.com/DevOrc/wgpu-java/issues/4");

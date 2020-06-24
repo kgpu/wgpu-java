@@ -62,7 +62,7 @@ gradlew runExample -Pexample=ComputeExample
   -----  | ------------------ | ------------------     | ------------------     |
   DX11   | :white_check_mark: |                        |                        |
   DX12   | :white_check_mark: |                        |                        |
-  Vulkan | :white_check_mark: | :large_orange_diamond: |                        |
+  Vulkan | :white_check_mark: | :white_check_mark:     |                        |
   Metal  |                    |                        | :large_orange_diamond: |
   OpenGL | :construction:     | :construction:         | :construction:         |
   

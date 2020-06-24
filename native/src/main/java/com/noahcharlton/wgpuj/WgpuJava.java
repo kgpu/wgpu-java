@@ -42,10 +42,6 @@ public class WgpuJava {
         return String.format("%d.%d.%d", major, minor, patch);
     }
 
-    public static Pointer createLongPointer(long value){
-        return Pointer.wrap(runtime, value);
-    }
-
     public static Pointer createDirectLongPointer(long value){
         var pointer = createDirectPointer(Long.BYTES);
         pointer.putLongLong(0, value);

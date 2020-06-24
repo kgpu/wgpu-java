@@ -11,7 +11,7 @@ public interface WgpuJNI {
     int wgpu_get_version();
 
     @u_int64_t
-    long wgpu_create_surface_from_windows_hwnd(Pointer hInstance, Pointer hwnd);
+    long wgpu_create_surface_from_windows_hwnd(Pointer hInstance, @u_int64_t long hwnd);
 
     int wgpu_set_log_level(WgpuLogLevel level);
 
@@ -102,9 +102,11 @@ public interface WgpuJNI {
 
     void wgpu_compute_pass_end_pass(Pointer rawPass);
 
+    //Note: The last argument is a pointer because JNR will corrupt the sixth argument if its a long :(
+    //See https://github.com/jnr/jnr-ffi/issues/181
     void wgpu_command_encoder_copy_buffer_to_buffer(@u_int64_t long commandEncoderId, @u_int64_t long srcBuffer,
                                                     @u_int64_t long srcOffset, @u_int64_t long dstBuffer,
-                                                    @u_int64_t long dstOffset, @u_int64_t long size);
+                                                    @u_int64_t long dstOffset, Pointer size);
 
     void wgpu_buffer_map_read_async(@u_int64_t long buffer, @u_int64_t long start, @u_int64_t long size,
                                     BufferMapCallback callback, Pointer userData);
@@ -135,4 +137,7 @@ public interface WgpuJNI {
 
     void wgpu_queue_write_buffer(@u_int64_t long queue, @u_int64_t long buffer, @u_int64_t long offset,
                                  Pointer data, @intptr_t int dataLength);
+
+    @u_int64_t
+    long wgpu_create_surface_from_xlib(@u_int64_t long display, @u_int64_t long window);
 }
