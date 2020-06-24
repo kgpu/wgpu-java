@@ -1,7 +1,6 @@
 package com.noahcharlton.wgpuj.core.util;
 
 import org.lwjgl.glfw.*;
-import org.lwjgl.system.Configuration;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.IntBuffer;

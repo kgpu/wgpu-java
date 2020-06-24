@@ -75,7 +75,7 @@ public class Buffer {
 
     public void copyTo(Buffer destination, long commandEncoder){
         WgpuJava.wgpuNative.wgpu_command_encoder_copy_buffer_to_buffer(commandEncoder,
-                id, 0, destination.id, 0, size);
+                id, 0, destination.id, 0, Pointer.wrap(WgpuJava.getRuntime(), size));
     }
 
     public Pointer getMappedData(){

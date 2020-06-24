@@ -6,8 +6,6 @@ import com.noahcharlton.wgpuj.core.input.GlfwKeyHandler;
 import com.noahcharlton.wgpuj.core.util.Dimension;
 import com.noahcharlton.wgpuj.core.util.GlfwHandler;
 import com.noahcharlton.wgpuj.core.util.Platform;
-import com.noahcharlton.wgpuj.jni.Wgpu;
-import jnr.ffi.Pointer;
 import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWNativeX11;
