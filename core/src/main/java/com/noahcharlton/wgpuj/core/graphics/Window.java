@@ -6,9 +6,11 @@ import com.noahcharlton.wgpuj.core.input.GlfwKeyHandler;
 import com.noahcharlton.wgpuj.core.util.Dimension;
 import com.noahcharlton.wgpuj.core.util.GlfwHandler;
 import com.noahcharlton.wgpuj.core.util.Platform;
+import com.noahcharlton.wgpuj.jni.Wgpu;
 import jnr.ffi.Pointer;
 import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWNativeX11;
 
 import static org.lwjgl.system.MemoryUtil.NULL;
 
@@ -40,10 +42,11 @@ public class Window {
         long osHandle = GlfwHandler.getOsWindowHandle(this.handle);
 
         if(Platform.isWindows){
-            //Note: this must be a pointer on the heap (i.e. non-direct). I am not sure why...
-            Pointer hwnd = WgpuJava.createLongPointer(osHandle);
+            return WgpuJava.wgpuNative.wgpu_create_surface_from_windows_hwnd(WgpuJava.createNullPointer(), osHandle);
+        }else if(Platform.isLinux){
+            long display = GLFWNativeX11.glfwGetX11Display();
 
-            return WgpuJava.wgpuNative.wgpu_create_surface_from_windows_hwnd(WgpuJava.createNullPointer(), hwnd);
+            return WgpuJava.wgpuNative.wgpu_create_surface_from_xlib(display, osHandle);
         }
 
         throw new UnsupportedOperationException("Platform not supported. See " +
