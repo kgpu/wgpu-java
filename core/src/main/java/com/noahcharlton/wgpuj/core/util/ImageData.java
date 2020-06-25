@@ -37,7 +37,7 @@ public class ImageData {
             for(int y = 0; y < image.getWidth(); y++){
                 int argb = image.getRGB(x, y);
 
-                pixels[x + y * image.getHeight()] = argbToRgba(argb);
+                pixels[x + y * image.getWidth()] = argbToRgba(argb);
             }
         }
 
