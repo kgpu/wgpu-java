@@ -10,6 +10,7 @@ public class Parser {
     private final List<Item> items = new ArrayList<>();
     private final List<Token> tokens;
 
+    private Token lastComment;
     private int index = 0;
 
     public Parser(List<Token> tokens) {
@@ -25,6 +26,7 @@ public class Parser {
             var item = createItem(token);
 
             if(item != null){
+                lastComment = null;
                 items.add(item);
             }
         }
@@ -49,6 +51,8 @@ public class Parser {
             if(Token.identifier("define").equals(macroType)){
                 return createConstant();
             }
+        }else if(token.getType() == Token.TokenType.COMMENT){
+            lastComment = token;
         }
         return null;
     }
@@ -62,7 +66,7 @@ public class Parser {
 
         var def = pollExpect(Token.TokenType.IDENTIFIER);
 
-        return new ConstantItem(name.getText(), def.getText());
+        return new ConstantItem(name.getText(), def.getText(), getLastCommentOrEmpty());
     }
 
     private Item createTypeAlias(Token token) {
@@ -120,6 +124,7 @@ public class Parser {
 
         skipWhitespace();
         pollExpect(Token.TokenType.OPEN_BRACKET);
+        lastComment = null;
         skipWhitespace();
 
         Token token;
@@ -128,16 +133,17 @@ public class Parser {
             Token equalOrComma = Objects.requireNonNull(poll());
 
             if(equalOrComma.getType() == Token.TokenType.COMMA){
-                fields.add(new EnumItem.EnumField(identifier.getText(), fields.size()));
+                fields.add(new EnumItem.EnumField(identifier.getText(), fields.size(), getLastCommentOrEmpty()));
             }else{
                 Token valueToken = pollExpect(Token.TokenType.IDENTIFIER);
                 int value = Integer.parseInt(valueToken.getText());
 
-                fields.add(new EnumItem.EnumField(identifier.getText(), value));
+                fields.add(new EnumItem.EnumField(identifier.getText(), value, getLastCommentOrEmpty()));
 
                 pollExpect(Token.TokenType.COMMA);
             }
 
+            lastComment = null;
             skipWhitespace();
         }
 
@@ -148,6 +154,9 @@ public class Parser {
 
     private void skipWhitespace(){
         while(peek().getType() == Token.TokenType.NEWLINE || peek().getType() == Token.TokenType.COMMENT){
+            if(peek().getType() == Token.TokenType.COMMENT)
+                lastComment = peek();
+
             poll();
         }
     }
@@ -160,6 +169,10 @@ public class Parser {
         }
 
         return token;
+    }
+
+    private String getLastCommentOrEmpty(){
+        return lastComment == null ? "" : lastComment.getText();
     }
 
     private Token poll(){

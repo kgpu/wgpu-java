@@ -46,6 +46,12 @@ public class EnumItem implements Item {
 
     private void saveFields(BufferedWriter writer) throws IOException {
         for(EnumField field : fields){
+            if(!field.comment.isEmpty()){
+                writer.write("     ");
+                writer.write(field.comment.replace("\n", "\n    "));
+                writer.write("\n");
+            }
+
             writer.write("    ");
             writer.write(toFieldName(field.name));
             writer.write(",\n");
@@ -82,10 +88,12 @@ public class EnumItem implements Item {
     static class EnumField{
         private final String name;
         private final int index;
+        private final String comment;
 
-        public EnumField(String name, int index) {
+        public EnumField(String name, int index, String comment) {
             this.name = name;
             this.index = index;
+            this.comment = comment;
         }
     }
 }
