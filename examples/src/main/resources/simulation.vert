@@ -8,8 +8,18 @@ layout(set = 0, binding = 0) uniform Locals {
    mat4 u_Transform;
 };
 
+layout(set = 0, binding = 1) buffer InstanceModels {
+   mat4 iModels[];
+};
+
+layout(set = 0, binding = 2) buffer InstanceColors {
+   vec4 iColors[];
+};
+
+layout(location=0) out vec4 fColors;
 layout(location=0) in vec2 positions;
 
 void main() {
-    gl_Position = u_Transform * vec4(positions, 0.0, 1.0);
+    fColors = iColors[gl_InstanceIndex];
+    gl_Position = u_Transform * iModels[gl_InstanceIndex] * vec4(positions, 0.0, 1.0);
 }
