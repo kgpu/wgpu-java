@@ -5,10 +5,15 @@ import com.noahcharlton.wgpuj.core.Device;
 import com.noahcharlton.wgpuj.core.input.GlfwKeyHandler;
 import com.noahcharlton.wgpuj.core.util.Dimension;
 import com.noahcharlton.wgpuj.core.util.GlfwHandler;
+import com.noahcharlton.wgpuj.core.util.ImageData;
 import com.noahcharlton.wgpuj.core.util.Platform;
 import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.glfw.GLFWNativeX11;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import static org.lwjgl.system.MemoryUtil.NULL;
 
@@ -34,6 +39,26 @@ public class Window {
 
         surface = createSurface();
         eventHandler = new WindowEventHandler.EmptyWindowHandler();
+    }
+
+    public void setIcon(ImageData data){
+        ByteBuffer buffer = ByteBuffer.allocateDirect(data.getPixels().length * Integer.BYTES);
+        buffer.order(ByteOrder.BIG_ENDIAN); //Red Channel comes first
+
+        for(int pixel : data.getPixels()){
+            buffer.putInt(pixel);
+        }
+        buffer.position(0);
+
+        GLFWImage icon = GLFWImage.malloc();
+        icon.set(data.getWidth(), data.getHeight(), buffer);
+        GLFWImage.Buffer imgBuffer = GLFWImage.malloc(1);
+        imgBuffer.put(0, icon);
+
+        GLFW.glfwSetWindowIcon(handle, imgBuffer);
+
+        imgBuffer.free();
+        icon.free();
     }
 
     private long createSurface() {

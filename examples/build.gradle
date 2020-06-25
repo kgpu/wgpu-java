@@ -22,3 +22,14 @@ task (runExample, dependsOn: 'classes', type: JavaExec){
 
     main = "com.noahcharlton.wgpuj.examples.${clazz}"
 }
+
+task triangleFatJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': "com.noahcharlton.wgpuj.examples.TriangleExample"
+    }
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar
+}

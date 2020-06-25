@@ -32,7 +32,7 @@ public class ImageDataTests {
     @ParameterizedTest
     @MethodSource("getImageDataInputs")
     public void imageDataTest(int x, int y, String expected) {
-        int actual = testImage.getPixels()[x + y * testImage.getHeight()];
+        int actual = testImage.getPixels()[x + y * testImage.getWidth()];
 
         Assertions.assertEquals(expected, Integer.toUnsignedString(actual, 16));
     }
