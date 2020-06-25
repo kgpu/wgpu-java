@@ -15,6 +15,7 @@ import com.noahcharlton.wgpuj.jni.WgpuPipelineLayoutDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuPowerPreference;
 import com.noahcharlton.wgpuj.jni.WgpuRequestAdapterOptions;
 import com.noahcharlton.wgpuj.jni.WgpuTextureDescriptor;
+import com.noahcharlton.wgpuj.util.RustCString;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -140,11 +141,13 @@ public class Device {
         optionsDesc.setCompatibleSurface(surface);
         optionsDesc.setPowerPreference(WgpuPowerPreference.DEFAULT);
 
+        var tracePath = RustCString.toPointer(settings.getTracePath());
         var limitsDesc = WgpuCLimits.createDirect();
         limitsDesc.setMaxBindGroups(16);
 
         var adapter = requestAdapter(optionsDesc, settings);
-        long id = WgpuJava.wgpuNative.wgpu_adapter_request_device(adapter, 0, limitsDesc.getPointerTo(), null);
+        long id = WgpuJava.wgpuNative.wgpu_adapter_request_device(adapter, settings.getExtensions(),
+                limitsDesc.getPointerTo(), tracePath);
 
         return new Device(id);
     }

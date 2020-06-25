@@ -27,7 +27,7 @@ public interface WgpuJNI {
     long wgpu_adapter_request_device(@u_int64_t long adapter,
                                      @u_int64_t long extensions,
                                      Pointer limits,
-                                     String tracePath);
+                                     Pointer tracePath);
 
     @u_int64_t
     long wgpu_device_create_shader_module(@u_int64_t long device, Pointer shaderModuleDescriptor);

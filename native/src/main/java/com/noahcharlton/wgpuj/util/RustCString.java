@@ -26,6 +26,9 @@ public class RustCString {
     }
 
     public static Pointer toPointer(String string){
+        if(string == null)
+            return WgpuJava.createNullPointer();
+
         byte[] bytes = string.getBytes(StandardCharsets.US_ASCII);
         ByteBuffer buffer = ByteBuffer.allocateDirect(bytes.length + 1);
 
