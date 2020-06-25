@@ -61,6 +61,8 @@ task updateBindings(type: Copy){
     dependsOn ':native:jnrgen:generateBindings'
 }
 
+updateBindings.finalizedBy spotlessApply
+
 task createNatives(type: Copy){
     from("${projectDir}/wgpu-native/target/debug") {
         include 'wgpu_native.dll'

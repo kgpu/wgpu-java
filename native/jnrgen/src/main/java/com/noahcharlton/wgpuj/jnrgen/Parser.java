@@ -124,6 +124,7 @@ public class Parser {
 
         skipWhitespace();
         pollExpect(Token.TokenType.OPEN_BRACKET);
+        lastComment = null;
         skipWhitespace();
 
         Token token;
