@@ -11,8 +11,8 @@ import com.noahcharlton.wgpuj.core.math.MatrixUtils;
 import com.noahcharlton.wgpuj.core.util.*;
 import com.noahcharlton.wgpuj.jni.*;
 import jnr.ffi.Pointer;
-import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 
 import java.util.Random;
 
@@ -30,6 +30,20 @@ public class SimulationExample {
     static class Person{
         final Matrix4f matrix = new Matrix4f();
         boolean infected = false;
+
+
+        Vector2f position = new Vector2f(0, 0);
+        float angle;
+        float angularVelocity;
+        float velocity;
+
+        public Matrix4f updateMatrix(){
+            matrix.zero().m00(1.0f).m11(1.0f).m22(1.0f).m33(1.0f);
+            matrix.translate(position.x, position.y, 0);
+            matrix.rotate(angle, MathUtils.UNIT_Z);
+
+            return matrix;
+        }
 
         Color getColor(){
             return infected ? Color.RED : Color.GREEN;
@@ -59,7 +73,7 @@ public class SimulationExample {
         var projMatrix = createProjectionMatrix();
         projMatrixBuffer = device.createFloatBuffer("Projection Matrix buffer", MatrixUtils.toFloats(projMatrix),
                 BufferUsage.UNIFORM, BufferUsage.COPY_DST);
-        peoplePosBuffer = device.createFloatBuffer("People Matrices Buffer", getPeopleMatrices(),
+        peoplePosBuffer = device.createFloatBuffer("People Matrices Buffer", getPeoplePositions(),
                 BufferUsage.STORAGE, BufferUsage.COPY_DST);
         peopleColorBuffer = device.createFloatBuffer("People Color Buffer", getPeopleColors(), BufferUsage.STORAGE);
 
@@ -87,8 +101,10 @@ public class SimulationExample {
 
         for(int i = 0; i < people.length; i++){
             var person = new Person();
-            person.matrix.rotate(rng.nextFloat() * MathUtils.PIf * 2, MathUtils.UNIT_Z);
-            person.matrix.translate(rng.nextInt(500) - 250, rng.nextInt(500) - 250, 0);
+            person.position.x = rng.nextInt(600) - 300;
+            person.position.y = rng.nextInt(600) - 300;
+            person.angle = rng.nextFloat() * 2 * MathUtils.PIf;
+            person.velocity = rng.nextFloat() + .5f;
             person.infected = rng.nextBoolean();
 
             people[i] = person;
@@ -109,11 +125,12 @@ public class SimulationExample {
         return output;
     }
 
-    private float[] getPeopleMatrices(){
+    private float[] getPeoplePositions(){
         float[] output = new float[people.length * 16];
 
         for(int i = 0; i < people.length; i++){
-            var person = MatrixUtils.toFloats(people[i].matrix);
+
+            var person = MatrixUtils.toFloats(people[i].updateMatrix());
 
             System.arraycopy(person, 0, output, i * 16, 16);
         }
@@ -125,18 +142,57 @@ public class SimulationExample {
         while(!window.isCloseRequested()){
             render();
             update();
+
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         app.close();
     }
 
     private void update() {
+        Vector2f target = calcAveragePosition();
+
         for(Person person : people){
-            person.matrix.rotate(.01f, MathUtils.UNIT_Z);
-            person.matrix.translate(1, 0, 0);
+            var angle = wrapAngle(angleBetween(target, person.position));
+            var errorAngle = wrapAngle(person.angle - angle);
+
+            person.angularVelocity = errorAngle < 0 ? .1f : -.1f;
+            person.angularVelocity *= Math.abs(errorAngle) * .2f;
+
+            person.angle = wrapAngle(person.angle + person.angularVelocity);
+            person.position.x += Math.cos(person.angle) * person.velocity;
+            person.position.y += Math.sin(person.angle) * person.velocity;
         }
 
         updateBuffers();
+    }
+
+    private Vector2f calcAveragePosition() {
+        var pos = new Vector2f();
+
+        for(Person person : people){
+            pos.add(person.position);
+        }
+
+        return pos.div(people.length);
+    }
+
+    private float wrapAngle(float angle) {
+        while(Math.abs(angle) > Math.PI){
+            angle -= Math.PI * 2 * Math.signum(angle);
+        }
+
+        return angle;
+    }
+
+    private float angleBetween(Vector2f x1, Vector2f x2){
+        float angle = (float) Math.atan2(x1.y - x2.y, x1.x - x2.x);
+
+        return angle < 0 ? angle + MathUtils.PIf * 2 : angle;
     }
 
     private void updateBuffers() {
@@ -147,7 +203,7 @@ public class SimulationExample {
         matrixData.put(0, MatrixUtils.toFloats(matrix), 0, 16);
 
         Pointer peoplePosData = WgpuJava.createDirectPointer(16 * Float.BYTES * people.length);
-        peoplePosData.put(0, getPeopleMatrices(), 0, 16 * people.length);
+        peoplePosData.put(0, getPeoplePositions(), 0, 16 * people.length);
 
         WgpuJava.wgpuNative.wgpu_queue_write_buffer(queue, projMatrixBuffer.getId(), 0, matrixData, 16 * Float.BYTES);
         WgpuJava.wgpuNative.wgpu_queue_write_buffer(queue, peoplePosBuffer.getId(), 0, peoplePosData,
