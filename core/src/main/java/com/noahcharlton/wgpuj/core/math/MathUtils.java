@@ -1,5 +1,6 @@
 package com.noahcharlton.wgpuj.core.math;
 
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 public class MathUtils {
@@ -12,6 +13,10 @@ public class MathUtils {
 
     public static float toRadians(float degrees){
         return degrees * PIf / 180f;
+    }
+
+    public static float clamp(float val, float min, float max){
+        return Math.min(max, Math.max(min, val));
     }
 
 }
