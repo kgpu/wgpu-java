@@ -86,6 +86,8 @@ public class Parser {
     private Item createStruct() {
         List<StructItem.StructField> fields = new ArrayList<>();
         skipWhitespace();
+        pollExpect(Token.TokenType.IDENTIFIER);
+        skipWhitespace();
 
         //might be something like typedef struct WGPUSamplerDescriptor WGPUSamplerDescriptor;
         if(!new Token(Token.TokenType.OPEN_BRACKET).equals(peek())){
@@ -122,6 +124,8 @@ public class Parser {
     private Item createEnum() {
         List<EnumItem.EnumField> fields = new ArrayList<>();
 
+        skipWhitespace();
+        pollExpect(Token.TokenType.IDENTIFIER);
         skipWhitespace();
         pollExpect(Token.TokenType.OPEN_BRACKET);
         lastComment = null;

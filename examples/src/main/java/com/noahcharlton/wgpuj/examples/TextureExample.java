@@ -55,9 +55,6 @@ public class TextureExample {
     public static void main(String[] args) {
         WgpuCore.loadWgpuNative();
 
-        if(true)
-            throw new UnsupportedOperationException("This example is currently disabled due to an issue in wgpu-native");
-
         ImageData texture = loadTexture();
         RenderPipelineSettings renderPipelineSettings = createPipelineSettings();
         GraphicApplicationSettings appSettings = new GraphicApplicationSettings("Wgpu-Java Texture Example", 640, 400);
@@ -79,15 +76,12 @@ public class TextureExample {
             long textureId = device.createTexture(textureDesc);
 
             var textureBuffer = device.createIntBuffer("texture buffer", texture.getPixels(), BufferUsage.COPY_SRC);
-            textureBuffer.getMappedData().put(0, texture.getPixels(), 0, texture.getPixels().length);
-            textureBuffer.unmap();
 
             long encoder = device.createCommandEncoder("Command Encoder");
             textureBuffer.copyToTexture(encoder, textureId, texture);
             WgpuJava.wgpuNative.wgpu_command_encoder_finish(encoder, WgpuJava.createNullPointer());
 
             long textureView = WgpuJava.wgpuNative.wgpu_texture_create_view(textureId, WgpuJava.createNullPointer());
-            //See WgpuSamplerDescriptor, blocked by https://github.com/gfx-rs/wgpu-native/pull/34
             long sampler = WgpuJava.wgpuNative.wgpu_device_create_sampler(application.getDevice().getId(),
                     WgpuJava.createNullPointer());
 

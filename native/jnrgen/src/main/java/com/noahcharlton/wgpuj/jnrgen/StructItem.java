@@ -122,7 +122,9 @@ public class StructItem implements Item {
                 type = "Struct.Unsigned32";
             } else if(type.equals("int32_t")) {
                 type = "Struct.Signed32";
-            } else if(type.equals("bool")) {
+            } else if(type.equals("uint8_t")){
+                type = "Struct.Unsigned8";
+            }else if(type.equals("bool")) {
                 type = "Struct.Boolean";
             } else if(type.equals("float")) {
                 type = "Struct.Float";
@@ -264,7 +266,9 @@ public class StructItem implements Item {
                 return "long";
             } else if(type.equals("Struct.Signed32")) {
                 return "int";
-            } else if(type.equals("Struct.Boolean")) {
+            } else if(type.equals("Struct.Unsigned8")){
+                return "short";
+            }else if(type.equals("Struct.Boolean")) {
                 return "boolean";
             } else if(type.equals("Struct.Float")) {
                 return "float";
