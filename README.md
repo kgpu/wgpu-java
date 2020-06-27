@@ -8,8 +8,8 @@ Java bindings for [Wgpu](https://github.com/gfx-rs/wgpu) based on
 - Rust 
 - Java JDK 11+
 
-![Cube Example](images/cube_example.png)
-![Vertex Example](images/vertex_example.png)
+![Boid Example](images/boid_simulation.png)
+![Cube Example](images/cube.png)
 
 
 ### Structure :
@@ -39,11 +39,15 @@ Examples of how to use wgpu-java/core
 
 ### How to run:
 Gradle will automatically build the required dll/.so/.dylib when wgpu-java/natives 
-is compiled. So, to run an example run the following command: 
-```
+is compiled. To run the default example, execute the following command: 
+```bash
 git clone https://github.com/DevOrc/wgpu-java
-gradlew runExample -Pexample={EXAMPLE_NAME_HERE}
+gradlew runExample
+```
 
+To run a specific example:
+```bash
+gradlew runExample -Pexample={EXAMPLE_NAME_HERE}
 gradlew runExample -Pexample=TriangleExample
 gradlew runExample -Pexample=ComputeExample
 ```
@@ -56,17 +60,18 @@ gradlew runExample -Pexample=ComputeExample
  Vertex | gradlew runExample -Pexample=VertexExample |
  Hex World | gradlew runExample -Pexample=HexWorldExample |
  Window Events | gradlew runExample -Pexample=WindowEventExample |
+ Boid Simulation | gradlew runExample -Pexample=BoidExample |
 
 ### Supported Platforms
    API   |    Windows 7/10    |  Linux                 |    macOS               |
   -----  | ------------------ | ------------------     | ------------------     |
-  DX11   | :white_check_mark: |                        |                        |
-  DX12   | :white_check_mark: |                        |                        |
-  Vulkan | :white_check_mark: | :white_check_mark:     |                        |
+  DX11   | :heavy_check_mark: |                        |                        |
+  DX12   | :heavy_check_mark: |                        |                        |
+  Vulkan | :heavy_check_mark: | :heavy_check_mark:     |                        |
   Metal  |                    |                        | :large_orange_diamond: |
   OpenGL | :construction:     | :construction:         | :construction:         |
   
-:white_check_mark: = Supported
+:heavy_check_mark: = Supported
 
 :large_orange_diamond: = Intermediate Support: See [Issue #4](https://github.com/DevOrc/wgpu-java/issues/4)
 
