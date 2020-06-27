@@ -14,4 +14,8 @@ public class MathUtils {
         return degrees * PIf / 180f;
     }
 
+    public static float clamp(float val, float min, float max){
+        return Math.min(max, Math.max(min, val));
+    }
+
 }

@@ -23,6 +23,10 @@ public class Color {
         this.a = a;
     }
 
+    public float[] toFloats() {
+        return new float[]{(float)  r, (float)  g, (float)  b, (float) a};
+    }
+
     @Override
     public boolean equals(Object o) {
         if(this == o) return true;
