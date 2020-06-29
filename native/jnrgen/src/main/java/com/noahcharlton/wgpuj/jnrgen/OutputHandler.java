@@ -21,14 +21,24 @@ public class OutputHandler {
     private final HashMap<String, String> aliases = new HashMap<>();
     private final HashMap<String, List<ConstantItem>> constants = new HashMap<>();
 
-    private final List<String> excluded = Arrays.asList(
+    private static final List<String> excluded = Arrays.asList(
             "WgpuBindGroupEntry",
             "WgpuBindingResource_WgpuBuffer_Body",
             "WgpuBindingResource_WgpuSampler_Body",
             "WgpuBindingResource_WgpuTextureView_Body",
-            "WgpuRenderPassColorAttachmentDescriptorBase_TextureViewId",
             "WgpuRenderPassDepthStencilAttachmentDescriptorBase_TextureViewId",
-            "WgpuRenderPassDescriptor");
+            "WgpuRenderPassDescriptor",
+            "WgpuSamplerDescriptor",
+            "WgpuChainedStruct");
+
+    private static final Map<String, String> exportNames = Map.of(
+            "SURFACE_DESCRIPTOR_FROM_WINDOWS_H_W_N_D", "SURFACE_DESCRIPTOR_FROM_WINDOWS_HWND",
+            "SURFACE_DESCRIPTOR_FROM_H_T_M_L_CANVAS_ID", "SURFACE_DESCRIPTOR_FROM_HTML_CANVAS_ID",
+            "SHADER_MODULE_S_P_I_R_V_DESCRIPTOR", "SHADER_MODULE_SPIRV_DESCRIPTOR",
+            "SHADER_MODULE_W_G_S_L_DESCRIPTOR", "SHADER_MODULE_WGSL_DESCRIPTOR",
+            "WgpuRenderPassDepthStencilAttachmentDescriptorBase_TextureViewId", "WgpuRenderPassDepthStencilDescriptor",
+            "WgpuRenderPassColorAttachmentDescriptorBase_TextureViewId", "WgpuRenderPassColorDescriptor"
+    );
 
     public OutputHandler(File outputDirectory) {
         this.outputDirectory = outputDirectory;
@@ -107,6 +117,10 @@ public class OutputHandler {
         }
     }
 
+    public static String toExportName(String key){
+        return exportNames.getOrDefault(key, key);
+    }
+
     public boolean containsType(String type) {
         return types.containsKey(type);
     }
@@ -123,7 +137,7 @@ public class OutputHandler {
         return aliases.get(type);
     }
 
-    public boolean isExcluded(String name) {
+    public static boolean isExcluded(String name) {
         return excluded.stream().anyMatch(Predicate.isEqual(name));
     }
 }

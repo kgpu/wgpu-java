@@ -25,7 +25,7 @@ task (runExample, dependsOn: 'classes', type: JavaExec){
 
 task triangleFatJar(type: Jar) {
     manifest {
-        attributes 'Main-Class': "com.noahcharlton.wgpuj.examples.TriangleExample"
+        attributes 'Main-Class': "com.noahcharlton.wgpuj.examples.TextureExample"
     }
     dependsOn configurations.runtimeClasspath
     from {

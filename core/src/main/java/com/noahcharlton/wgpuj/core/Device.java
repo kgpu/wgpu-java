@@ -57,6 +57,7 @@ public class Device {
 
     public long createBindGroupLayout(String label, WgpuBindGroupLayoutEntry... entries) {
         var desc = WgpuBindGroupLayoutDescriptor.createDirect();
+        desc.setLabel(label);
         desc.setEntries(entries);
         desc.setEntriesLength(entries.length);
 

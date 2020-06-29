@@ -9,7 +9,7 @@ import jnr.ffi.Struct;
 public class WgpuAnisotropicSamplerDescriptorExt extends WgpuJavaStruct {
 
     private final Struct.StructRef<WgpuChainedStruct> nextInChain = new Struct.StructRef<>(WgpuChainedStruct.class);
-    private final Struct.Unsigned32 sType = new Struct.Unsigned32();
+    private final Struct.Enum<WgpuSType> sType = new Struct.Enum<>(WgpuSType.class);
     private final Struct.Unsigned8 anisotropicClamp = new Struct.Unsigned8();
 
     private WgpuAnisotropicSamplerDescriptorExt(){}
@@ -42,11 +42,11 @@ public class WgpuAnisotropicSamplerDescriptorExt extends WgpuJavaStruct {
         }
     }
 
-    public long getSType(){
+    public WgpuSType getSType(){
         return sType.get();
     }
 
-    public void setSType(long x){
+    public void setSType(WgpuSType x){
         this.sType.set(x);
     }
 

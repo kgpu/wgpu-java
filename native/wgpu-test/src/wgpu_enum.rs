@@ -14,9 +14,12 @@
 /// ```
 macro_rules! enum_name_test {
     ($func_name:ident, $enum_type:ty) => {
+        enum_name_test!($func_name, $enum_type, x, format!("{:?}", x));
+    };
+    ($func_name:ident, $enum_type:ty, $format_input:ident, $format:expr) => {
         #[no_mangle]
-        pub extern "C" fn $func_name(x: $enum_type) -> *const std::os::raw::c_char {
-            std::ffi::CString::new(format!("{:?}", x))
+        pub extern "C" fn $func_name($format_input: $enum_type) -> *const std::os::raw::c_char {
+            std::ffi::CString::new($format)
                 .unwrap()
                 .into_raw()
         }
@@ -55,3 +58,5 @@ enum_name_test!(get_wgpu_texture_dimension_name, wgt::TextureDimension);
 enum_name_test!(get_wgpu_texture_aspect_name, wgt::TextureAspect);
 enum_name_test!(get_wgpu_compare_function_name, wgt::CompareFunction);
 enum_name_test!(get_wgpu_stencil_operation_name, wgt::StencilOperation);
+enum_name_test!(get_address_mode_name, wgt::AddressMode);
+enum_name_test!(get_filter_mode_name, wgt::FilterMode);

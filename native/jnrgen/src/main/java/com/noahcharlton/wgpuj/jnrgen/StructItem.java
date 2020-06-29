@@ -10,7 +10,7 @@ public class StructItem implements Item {
     private final List<StructField> fields;
 
     public StructItem(String name, List<StructField> fields) {
-        this.name = name.replace("WGPU", "Wgpu");
+        this.name = OutputHandler.toExportName(name.replace("WGPU", "Wgpu"));
         this.fields = fields;
     }
 
@@ -21,7 +21,7 @@ public class StructItem implements Item {
 
     @Override
     public void save(OutputHandler outputHandler) throws IOException {
-        if(outputHandler.isExcluded(name)){
+        if(OutputHandler.isExcluded(name)){
             return;
         }
 

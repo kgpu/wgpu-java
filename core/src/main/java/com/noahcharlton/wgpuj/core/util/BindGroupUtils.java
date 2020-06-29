@@ -1,9 +1,6 @@
 package com.noahcharlton.wgpuj.core.util;
 
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutEntry;
-import com.noahcharlton.wgpuj.jni.WgpuBindingType;
-import com.noahcharlton.wgpuj.jni.WgpuTextureComponentType;
-import com.noahcharlton.wgpuj.jni.WgpuTextureViewDimension;
+import com.noahcharlton.wgpuj.jni.*;
 
 public class BindGroupUtils {
 
@@ -12,6 +9,17 @@ public class BindGroupUtils {
         desc.setBinding(binding);
         desc.setVisibility(visibility);
         desc.setTy(type);
+
+        return desc;
+    }
+
+    public static WgpuBindGroupLayoutEntry samplerLayout(int binding, int visibility, WgpuBindingType type,
+                                                         boolean comparison){
+        var desc = WgpuBindGroupLayoutEntry.createDirect();
+        desc.setBinding(binding);
+        desc.setVisibility(visibility);
+        desc.setTy(type);
+        desc.setMultisampled(comparison);
 
         return desc;
     }

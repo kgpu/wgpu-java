@@ -313,3 +313,36 @@ pub extern "C" fn wgpu_texture_copy_view_test(desc: &wgc::command::TextureCopyVi
     assert_ffi!(201, desc.mip_level);
     assert_ffi!(expected_origin, desc.origin);
 }
+
+#[no_mangle]
+pub unsafe extern "C" fn wgpu_sampler_descriptor_test(
+    sampler: &wgn::SamplerDescriptor){
+    let label = CStr::from_ptr(sampler.label).to_str().unwrap();
+
+    assert_ffi!(true, sampler.next_in_chain.is_some());
+    assert_ffi!("OtterSampler", label);
+    assert_ffi!(wgt::AddressMode::Repeat, sampler.address_mode_u);
+    assert_ffi!(wgt::AddressMode::ClampToEdge, sampler.address_mode_v);
+    assert_ffi!(wgt::AddressMode::MirrorRepeat, sampler.address_mode_w);
+    assert_ffi!(wgt::FilterMode::Nearest, sampler.mag_filter);
+    assert_ffi!(wgt::FilterMode::Nearest, sampler.min_filter);
+    assert_ffi!(wgt::FilterMode::Linear, sampler.mipmap_filter);
+    assert_ffi!(23.0, sampler.lod_min_clamp);
+    assert_ffi!(24.0, sampler.lod_max_clamp);
+    assert_ffi!(wgt::CompareFunction::LessEqual, sampler.compare);
+}
+
+#[no_mangle]
+pub extern "C" fn wgpu_render_pass_depth_stencil_descriptor(
+    pass: &wgt::RenderPassDepthStencilAttachmentDescriptorBase<wgc::id::TextureViewId>
+){
+    assert_ffi!("(123, 0, Empty)", format!("{:?}", pass.attachment));
+    assert_ffi!(wgt::LoadOp::Load, pass.depth_load_op);
+    assert_ffi!(wgt::StoreOp::Store, pass.depth_store_op);
+    assert_ffi!(10.0, pass.clear_depth);
+    assert_ffi!(true, pass.depth_read_only);
+    assert_ffi!(wgt::LoadOp::Load, pass.stencil_load_op);
+    assert_ffi!(wgt::StoreOp::Clear, pass.stencil_store_op);
+    assert_ffi!(11, pass.clear_stencil);
+    assert_ffi!(true, pass.stencil_read_only);
+}
