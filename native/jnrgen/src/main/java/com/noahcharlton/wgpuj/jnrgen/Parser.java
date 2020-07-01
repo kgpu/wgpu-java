@@ -53,6 +53,8 @@ public class Parser {
             }
         }else if(token.getType() == Token.TokenType.COMMENT){
             lastComment = token;
+        }else if(Token.identifier("enum").equals(token)){
+            return createEnum();
         }
         return null;
     }
@@ -85,6 +87,8 @@ public class Parser {
 
     private Item createStruct() {
         List<StructItem.StructField> fields = new ArrayList<>();
+        skipWhitespace();
+        pollExpect(Token.TokenType.IDENTIFIER);
         skipWhitespace();
 
         //might be something like typedef struct WGPUSamplerDescriptor WGPUSamplerDescriptor;
@@ -123,6 +127,8 @@ public class Parser {
         List<EnumItem.EnumField> fields = new ArrayList<>();
 
         skipWhitespace();
+        var enumIdentifier = pollExpect(Token.TokenType.IDENTIFIER);
+        skipWhitespace();
         pollExpect(Token.TokenType.OPEN_BRACKET);
         lastComment = null;
         skipWhitespace();
@@ -147,9 +153,7 @@ public class Parser {
             skipWhitespace();
         }
 
-        Token identifier = pollExpect(Token.TokenType.IDENTIFIER);
-
-        return new EnumItem(identifier.getText(), fields);
+        return new EnumItem(enumIdentifier.getText(), fields);
     }
 
     private void skipWhitespace(){

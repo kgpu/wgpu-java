@@ -20,5 +20,5 @@ version = "0.5"
 
 [dependencies.wgn]
 package = "wgpu-native"
-git = "https://github.com/gfx-rs/wgpu-native"
+path = "../wgpu-native"
 version = "0.5"

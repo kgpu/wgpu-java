@@ -77,7 +77,7 @@ public class EnumItem implements Item {
             output.append(Character.toUpperCase(c));
         }
 
-        return output.toString();
+        return OutputHandler.toExportName(output.toString());
     }
 
     @Override

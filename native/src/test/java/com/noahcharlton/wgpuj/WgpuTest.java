@@ -1,29 +1,7 @@
 package com.noahcharlton.wgpuj;
 
 import com.noahcharlton.wgpuj.fail.RustFailCallback;
-import com.noahcharlton.wgpuj.jni.WgpuBindingType;
-import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
-import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
-import com.noahcharlton.wgpuj.jni.WgpuBufferMapAsyncStatus;
-import com.noahcharlton.wgpuj.jni.WgpuCompareFunction;
-import com.noahcharlton.wgpuj.jni.WgpuCullMode;
-import com.noahcharlton.wgpuj.jni.WgpuFrontFace;
-import com.noahcharlton.wgpuj.jni.WgpuIndexFormat;
-import com.noahcharlton.wgpuj.jni.WgpuInputStepMode;
-import com.noahcharlton.wgpuj.jni.WgpuLoadOp;
-import com.noahcharlton.wgpuj.jni.WgpuLogLevel;
-import com.noahcharlton.wgpuj.jni.WgpuPowerPreference;
-import com.noahcharlton.wgpuj.jni.WgpuPresentMode;
-import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
-import com.noahcharlton.wgpuj.jni.WgpuStencilOperation;
-import com.noahcharlton.wgpuj.jni.WgpuStoreOp;
-import com.noahcharlton.wgpuj.jni.WgpuSwapChainStatus;
-import com.noahcharlton.wgpuj.jni.WgpuTextureAspect;
-import com.noahcharlton.wgpuj.jni.WgpuTextureComponentType;
-import com.noahcharlton.wgpuj.jni.WgpuTextureDimension;
-import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
-import com.noahcharlton.wgpuj.jni.WgpuTextureViewDimension;
-import com.noahcharlton.wgpuj.jni.WgpuVertexFormat;
+import com.noahcharlton.wgpuj.jni.*;
 import jnr.ffi.Pointer;
 
 public interface WgpuTest {
@@ -94,6 +72,10 @@ public interface WgpuTest {
 
     void wgpu_texture_copy_view_test(Pointer copyView);
 
+    void wgpu_sampler_descriptor_test(Pointer descriptor);
+
+    void wgpu_render_pass_depth_stencil_descriptor(Pointer descriptor);
+
     Pointer get_raw_pass_test(long cmdEncoderId);
 
     Pointer bind_group_entry_resource_to_string(Pointer bindGroupEntry);
@@ -144,4 +126,7 @@ public interface WgpuTest {
 
     Pointer get_wgpu_compare_function_name(WgpuCompareFunction function);
 
+    Pointer get_address_mode_name(WgpuAddressMode mode);
+
+    Pointer get_filter_mode_name(WgpuFilterMode mode);
 }

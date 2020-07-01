@@ -32,17 +32,17 @@ public class ImageDataTests {
     @ParameterizedTest
     @MethodSource("getImageDataInputs")
     public void imageDataTest(int x, int y, String expected) {
-        int actual = testImage.getPixels()[x + y * testImage.getWidth()];
+        int actual = testImage.getPixel(x, y);
 
         Assertions.assertEquals(expected, Integer.toUnsignedString(actual, 16));
     }
 
     static Stream<Arguments> getImageDataInputs() {
         return Stream.of(
-                Arguments.of(0, 0, "ea6432ff"),
-                Arguments.of(1, 0, "2f7b2bff"),
-                Arguments.of(0, 1, "3c4b9bff"),
-                Arguments.of(1, 1, "ffffff8c")
+                Arguments.of(0, 0, "ff3264ea"),
+                Arguments.of(1, 0, "ff2b7b2f"),
+                Arguments.of(0, 1, "ff9b4b3c"),
+                Arguments.of(1, 1, "8cffffff")
         );
     }
 
@@ -57,8 +57,8 @@ public class ImageDataTests {
 
     static Stream<Arguments> getArgbToRgbaInputs() {
         return Stream.of(
-                Arguments.of("11223344", "22334411"),
-                Arguments.of("1a2a3a4a", "2a3a4a1a")
+                Arguments.of("11223344", "11443322"),
+                Arguments.of("1a2a3a4a", "1a4a3a2a")
         );
     }
 }

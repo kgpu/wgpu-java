@@ -15,6 +15,7 @@ dependencies {
     api group: 'com.github.jnr', name: 'jnr-ffi', version: '2.1.15'
     implementation group: 'com.github.jnr', name: 'jffi', version: '1.2.23'
 
+    testImplementation(project(":native:jnrgen"))
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.4.2")
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'

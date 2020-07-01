@@ -6,7 +6,18 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
- * Represents an image in rgba8
+ * Represents an image in rgba where
+ * each pixel is an int with 1 byte for each channel:
+ * <ul>
+ *     <b>Least Significant Bits</b>
+ *     <p>Red</p>
+ *     <p>Green</p>
+ *     <p>Blue</p>
+ *     <p>Alpha</p>
+ *     <b>Most Significant Bits</b>
+ * </ul>
+ *
+ * @see com.noahcharlton.wgpuj.jni.WgpuTextureFormat#RGBA8_UNORM_SRGB
  */
 public class ImageData {
 
@@ -44,13 +55,17 @@ public class ImageData {
         return new ImageData(pixels, image.getWidth(), image.getHeight());
     }
 
+    public int getPixel(int x, int y){
+       return pixels[x + y * width];
+    }
+
     static int argbToRgba(int argb) {
         int a = (argb & 0xff000000) >>> 24;
         int r = (argb & 0x00ff0000) >>> 16;
         int g = (argb & 0x0000ff00) >>> 8;
         int b = (argb & 0x000000ff);
 
-        return (r << 24) | (g << 16) | (b << 8) | a;
+        return (a << 24) | (b << 16) | (g << 8) | r;
     }
 
     public int[] getPixels() {

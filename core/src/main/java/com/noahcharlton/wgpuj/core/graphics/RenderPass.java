@@ -48,8 +48,16 @@ public class RenderPass extends RawPass {
     }
 
     static RenderPass create(long commandEncoder, long swapchainTexture, Color clearColor){
-        var rawPassDescriptor = new WgpuRenderPassDescriptor(null, new WgpuRenderPassColorDescriptor(swapchainTexture,
-                WgpuLoadOp.CLEAR, WgpuStoreOp.STORE, clearColor.r, clearColor.g, clearColor.b, clearColor.a));
+        var colorDescriptor = WgpuRenderPassColorDescriptor.createDirect();
+        colorDescriptor.setAttachment(swapchainTexture);
+        colorDescriptor.setLoadOp(WgpuLoadOp.CLEAR);
+        colorDescriptor.setStoreOp(WgpuStoreOp.STORE);
+        colorDescriptor.getClearColor().setR(clearColor.r);
+        colorDescriptor.getClearColor().setR(clearColor.g);
+        colorDescriptor.getClearColor().setR(clearColor.b);
+        colorDescriptor.getClearColor().setR(clearColor.a);
+
+        var rawPassDescriptor = new WgpuRenderPassDescriptor(null, colorDescriptor);
 
         var pass = WgpuJava.wgpuNative.wgpu_command_encoder_begin_render_pass(commandEncoder,
                 rawPassDescriptor.getPointerTo());

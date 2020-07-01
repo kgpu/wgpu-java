@@ -1,28 +1,7 @@
 package com.noahcharlton.wgpuj;
 
-import com.noahcharlton.wgpuj.jni.WgpuBindingType;
-import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
-import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
-import com.noahcharlton.wgpuj.jni.WgpuBufferMapAsyncStatus;
-import com.noahcharlton.wgpuj.jni.WgpuCompareFunction;
-import com.noahcharlton.wgpuj.jni.WgpuCullMode;
-import com.noahcharlton.wgpuj.jni.WgpuFrontFace;
-import com.noahcharlton.wgpuj.jni.WgpuIndexFormat;
-import com.noahcharlton.wgpuj.jni.WgpuInputStepMode;
-import com.noahcharlton.wgpuj.jni.WgpuLoadOp;
-import com.noahcharlton.wgpuj.jni.WgpuLogLevel;
-import com.noahcharlton.wgpuj.jni.WgpuPowerPreference;
-import com.noahcharlton.wgpuj.jni.WgpuPresentMode;
-import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
-import com.noahcharlton.wgpuj.jni.WgpuStencilOperation;
-import com.noahcharlton.wgpuj.jni.WgpuStoreOp;
-import com.noahcharlton.wgpuj.jni.WgpuSwapChainStatus;
-import com.noahcharlton.wgpuj.jni.WgpuTextureAspect;
-import com.noahcharlton.wgpuj.jni.WgpuTextureComponentType;
-import com.noahcharlton.wgpuj.jni.WgpuTextureDimension;
-import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
-import com.noahcharlton.wgpuj.jni.WgpuTextureViewDimension;
-import com.noahcharlton.wgpuj.jni.WgpuVertexFormat;
+import com.noahcharlton.wgpuj.jni.*;
+import com.noahcharlton.wgpuj.jnrgen.OutputHandler;
 import com.noahcharlton.wgpuj.util.RustCString;
 import jnr.ffi.Pointer;
 import org.junit.jupiter.api.Assertions;
@@ -218,8 +197,24 @@ public class WgpuEnumTests extends WgpuNativeTest {
         standardEnumTest(function, output);
     }
 
+    @ParameterizedTest
+    @EnumSource(WgpuAddressMode.class)
+    void wgpuAddressModeNameTest(WgpuAddressMode mode) {
+        Pointer output = wgpuTest.get_address_mode_name(mode);
+
+        standardEnumTest(mode, output);
+    }
+
+    @ParameterizedTest
+    @EnumSource(WgpuFilterMode.class)
+    void wgpuFilterModeNameTest(WgpuFilterMode mode) {
+        Pointer output = wgpuTest.get_filter_mode_name(mode);
+
+        standardEnumTest(mode, output);
+    }
+
     private <E extends Enum<E>> void standardEnumTest(E e, Pointer output) {
-        String actual = RustCString.fromPointer(output);
+        String actual = OutputHandler.toExportName(RustCString.fromPointer(output));
         String expected = toRustEnumName(e);
 
         Assertions.assertEquals(expected, actual);

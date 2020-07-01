@@ -1,50 +1,6 @@
 package com.noahcharlton.wgpuj;
 
-import com.noahcharlton.wgpuj.jni.Wgpu;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupEntry;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuBindingResourceData;
-import com.noahcharlton.wgpuj.jni.WgpuBindingResourceTag;
-import com.noahcharlton.wgpuj.jni.WgpuBlendDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
-import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
-import com.noahcharlton.wgpuj.jni.WgpuBufferCopyView;
-import com.noahcharlton.wgpuj.jni.WgpuBufferDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuCLimits;
-import com.noahcharlton.wgpuj.jni.WgpuColor;
-import com.noahcharlton.wgpuj.jni.WgpuColorStateDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuCommandBufferDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuCommandEncoderDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuCompareFunction;
-import com.noahcharlton.wgpuj.jni.WgpuComputePassDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuComputePipelineDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuCullMode;
-import com.noahcharlton.wgpuj.jni.WgpuDepthStencilStateDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuExtent3d;
-import com.noahcharlton.wgpuj.jni.WgpuFrontFace;
-import com.noahcharlton.wgpuj.jni.WgpuOrigin3d;
-import com.noahcharlton.wgpuj.jni.WgpuPipelineLayoutDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuPowerPreference;
-import com.noahcharlton.wgpuj.jni.WgpuPresentMode;
-import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
-import com.noahcharlton.wgpuj.jni.WgpuRasterizationStateDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuRawPass;
-import com.noahcharlton.wgpuj.jni.WgpuRenderPassDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuRenderPipelineDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuRequestAdapterOptions;
-import com.noahcharlton.wgpuj.jni.WgpuShaderModuleDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuStencilOperation;
-import com.noahcharlton.wgpuj.jni.WgpuSwapChainDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuSwapChainOutput;
-import com.noahcharlton.wgpuj.jni.WgpuSwapChainStatus;
-import com.noahcharlton.wgpuj.jni.WgpuTextureAspect;
-import com.noahcharlton.wgpuj.jni.WgpuTextureCopyView;
-import com.noahcharlton.wgpuj.jni.WgpuTextureDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuTextureDimension;
-import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
-import com.noahcharlton.wgpuj.jni.WgpuTextureViewDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuTextureViewDimension;
+import com.noahcharlton.wgpuj.jni.*;
 import com.noahcharlton.wgpuj.util.RustCString;
 import jnr.ffi.Pointer;
 import org.junit.jupiter.api.Assertions;
@@ -425,5 +381,39 @@ public class WgpuTypeTests extends WgpuNativeTest {
         descriptor.getOrigin().setZ(963);
 
         wgpuTest.wgpu_texture_copy_view_test(descriptor.getPointerTo());
+    }
+
+    @Test
+    void samplerDescriptorTest() {
+        var descriptor = WgpuSamplerDescriptor.createDirect();
+        descriptor.setNextInChain(WgpuChainedStruct.createDirect().getPointerTo());
+        descriptor.setLabel("OtterSampler");
+        descriptor.setAddressModeU(WgpuAddressMode.REPEAT);
+        descriptor.setAddressModeV(WgpuAddressMode.CLAMP_TO_EDGE);
+        descriptor.setAddressModeW(WgpuAddressMode.MIRROR_REPEAT);
+        descriptor.setMagFilter(WgpuFilterMode.NEAREST);
+        descriptor.setMinFilter(WgpuFilterMode.NEAREST);
+        descriptor.setMipmapFilter(WgpuFilterMode.LINEAR);
+        descriptor.setLodMinClamp(23f);
+        descriptor.setLodMaxClamp(24f);
+        descriptor.setCompare(WgpuCompareFunction.LESS_EQUAL);
+
+        wgpuTest.wgpu_sampler_descriptor_test(descriptor.getPointerTo());
+    }
+
+    @Test
+    void renderPassDepthStencilDescriptor() {
+        var descriptor = WgpuRenderPassDepthStencilDescriptor.createDirect();
+        descriptor.setAttachment(123);
+        descriptor.setDepthLoadOp(WgpuLoadOp.LOAD);
+        descriptor.setDepthStoreOp(WgpuStoreOp.STORE);
+        descriptor.setClearDepth(10f);
+        descriptor.setDepthReadOnly(true);
+        descriptor.setStencilLoadOp(WgpuLoadOp.LOAD);
+        descriptor.setStencilStoreOp(WgpuStoreOp.CLEAR);
+        descriptor.setClearStencil(11);
+        descriptor.setStencilReadOnly(true);
+
+        wgpuTest.wgpu_render_pass_depth_stencil_descriptor(descriptor.getPointerTo());
     }
 }
