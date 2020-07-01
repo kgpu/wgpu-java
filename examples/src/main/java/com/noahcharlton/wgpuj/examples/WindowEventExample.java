@@ -84,7 +84,7 @@ public class WindowEventExample {
             indexBuffer = device.createIndexBuffer("Index buffer", INDICES);
 
             Matrix4f projection = createProjectionMatrix();
-            Matrix4f transformationMatrix = MatrixUtils.generateMatrix(projection, viewMatrix);
+            Matrix4f transformationMatrix = MatrixUtils.generateTransMatrix(projection, viewMatrix);
 
             matrixBuffer = device.createFloatBuffer("Matrix", MatrixUtils.toFloats(transformationMatrix),
                     BufferUsage.UNIFORM, BufferUsage.COPY_DST);
@@ -113,7 +113,7 @@ public class WindowEventExample {
 
     private void updateMatrix() {
         Matrix4f projection = createProjectionMatrix();
-        Matrix4f transformationMatrix = MatrixUtils.generateMatrix(projection, viewMatrix);
+        Matrix4f transformationMatrix = MatrixUtils.generateTransMatrix(projection, viewMatrix);
 
         Pointer pointer = WgpuJava.createDirectPointer(16 * Float.BYTES);
         pointer.put(0, MatrixUtils.toFloats(transformationMatrix), 0, 16);

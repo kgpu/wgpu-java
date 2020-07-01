@@ -10,7 +10,7 @@ Java bindings for [Wgpu](https://github.com/gfx-rs/wgpu) based on
 
 ![Boid Example](images/boid_simulation.png)
 ![Cube Example](images/cube.png)
-
+![Earth Example](images/earth.png)
 
 ### Structure :
 ###### wgpu-java/core

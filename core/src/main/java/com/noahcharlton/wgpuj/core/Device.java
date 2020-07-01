@@ -16,6 +16,7 @@ import com.noahcharlton.wgpuj.jni.WgpuPowerPreference;
 import com.noahcharlton.wgpuj.jni.WgpuRequestAdapterOptions;
 import com.noahcharlton.wgpuj.jni.WgpuTextureDescriptor;
 import com.noahcharlton.wgpuj.util.RustCString;
+import jnr.ffi.Pointer;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -87,11 +88,7 @@ public class Device {
                 .setUsages(usages)
                 .createBuffer(this);
         var ptr = buffer.getMappedData();
-
-        for(int i = 0; i < data.length; i++) {
-            ptr.put(0, data, 0, data.length);
-        }
-
+        ptr.put(0, data, 0, data.length);
         buffer.unmap();
 
         return buffer;
@@ -105,11 +102,7 @@ public class Device {
                 .setUsages(usages)
                 .createBuffer(this);
         var ptr = buffer.getMappedData();
-
-        for(int i = 0; i < data.length; i++) {
-            ptr.put(0, data, 0, data.length);
-        }
-
+        ptr.put(0, data, 0, data.length);
         buffer.unmap();
 
         return buffer;
@@ -127,14 +120,18 @@ public class Device {
                 .setUsages(usages)
                 .createBuffer(this);
         var ptr = buffer.getMappedData();
-
-        for(int i = 0; i < data.length; i++) {
-            ptr.put(0, data, 0, data.length);
-        }
+        ptr.put(0, data, 0, data.length);
 
         buffer.unmap();
 
         return buffer;
+    }
+
+    public void queueWriteFloatBuffer(Buffer buffer, float[] data){
+        Pointer ptr = WgpuJava.createDirectPointer(data.length * Float.BYTES);
+        ptr.put(0, data, 0, data.length);
+
+        WgpuJava.wgpuNative.wgpu_queue_write_buffer(defaultQueue, buffer.getId(), 0, ptr, data.length * Float.BYTES);
     }
 
     public static Device create(DeviceSettings settings, long surface) {

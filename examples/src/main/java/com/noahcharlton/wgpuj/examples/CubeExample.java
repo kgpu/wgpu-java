@@ -138,7 +138,7 @@ public class CubeExample {
 
         view.rotate(.01f, MathUtils.UNIT_Z);
 
-        return MatrixUtils.generateMatrix(projection, view);
+        return MatrixUtils.generateTransMatrix(projection, view);
     }
 
     private static RenderPipelineSettings createPipelineSettings() {
