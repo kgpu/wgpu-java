@@ -6,13 +6,7 @@ import jnr.ffi.Struct;
 
 public class WgpuChainedStruct extends WgpuJavaStruct {
 
-    /**
-     * This is a pointer because of unknown bug that is crashing for
-     * self referencing structs.
-     *
-     * See https://github.com/DevOrc/wgpu-java/issues/24
-     */
-    private final Struct.Pointer next = new Struct.Pointer();
+    private final DynamicStructRef<WgpuChainedStruct> next = new DynamicStructRef<>(WgpuChainedStruct.class);
     private final Struct.Enum<WgpuSType> sType = new Struct.Enum<>(WgpuSType.class);
 
     private WgpuChainedStruct(){}
@@ -33,11 +27,11 @@ public class WgpuChainedStruct extends WgpuJavaStruct {
     }
 
 
-    public void setNext(jnr.ffi.Pointer value){
+    public void setNext(WgpuChainedStruct value){
         next.set(value);
     }
 
-    public Pointer getNext() {
+    public DynamicStructRef<WgpuChainedStruct> getNext() {
         return next;
     }
 
