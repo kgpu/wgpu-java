@@ -11,7 +11,7 @@ import jnr.ffi.Struct;
 public class WgpuBindGroupLayoutDescriptor extends WgpuJavaStruct {
 
     private final @CStrPointer Struct.Pointer label = new Struct.Pointer();
-    private final Struct.StructRef<WgpuBindGroupLayoutEntry> entries = new Struct.StructRef<>(WgpuBindGroupLayoutEntry.class);
+    private final DynamicStructRef<WgpuBindGroupLayoutEntry> entries = new DynamicStructRef<>(WgpuBindGroupLayoutEntry.class);
     private final Struct.Unsigned64 entriesLength = new Struct.Unsigned64();
 
     private WgpuBindGroupLayoutDescriptor(){}
@@ -40,7 +40,7 @@ public class WgpuBindGroupLayoutDescriptor extends WgpuJavaStruct {
         this.label.set(RustCString.toPointer(x));
     }
 
-    public Struct.StructRef<WgpuBindGroupLayoutEntry> getEntries(){
+    public DynamicStructRef<WgpuBindGroupLayoutEntry> getEntries(){
         return entries;
     }
 

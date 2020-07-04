@@ -12,7 +12,7 @@ public class WgpuBindGroupDescriptor extends WgpuJavaStruct {
 
     private final @CStrPointer Struct.Pointer label = new Struct.Pointer();
     private final Struct.Unsigned64 layout = new Struct.Unsigned64();
-    private final Struct.StructRef<WgpuBindGroupEntry> entries = new Struct.StructRef<>(WgpuBindGroupEntry.class);
+    private final DynamicStructRef<WgpuBindGroupEntry> entries = new DynamicStructRef<>(WgpuBindGroupEntry.class);
     private final Struct.Unsigned64 entriesLength = new Struct.Unsigned64();
 
     private WgpuBindGroupDescriptor(){}
@@ -49,7 +49,7 @@ public class WgpuBindGroupDescriptor extends WgpuJavaStruct {
         this.layout.set(x);
     }
 
-    public Struct.StructRef<WgpuBindGroupEntry> getEntries(){
+    public DynamicStructRef<WgpuBindGroupEntry> getEntries(){
         return entries;
     }
 
