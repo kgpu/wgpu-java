@@ -1,7 +1,6 @@
 package com.noahcharlton.wgpuj.util;
 
 import com.noahcharlton.wgpuj.WgpuJava;
-import jnr.ffi.Memory;
 import jnr.ffi.Runtime;
 import jnr.ffi.Struct;
 
@@ -33,6 +32,9 @@ public class WgpuJavaStruct extends Struct {
      * A rewrite of {@link jnr.ffi.Struct.StructRef} to allow chained
      * structs. It achieves this by calculating the size of the struct at the time
      * the memory is used, instead of in the constructor.
+     *
+     * Additionally, dynamic struct ref uses a non runtime constructor that is standard
+     * for Wgpuj structs.
      *
      * @see <a href=https://github.com/DevOrc/wgpu-java/issues/24>Github Issue #24</a>
      */

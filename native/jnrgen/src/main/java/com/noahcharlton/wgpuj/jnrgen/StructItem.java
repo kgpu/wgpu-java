@@ -111,8 +111,8 @@ public class StructItem implements Item {
 
                 if(handler.containsType(type)) {
                     var type = handler.resolveType(this.type).getJavaTypeName();
-                    this.type = "Struct.StructRef<" + type + ">";
-                    this.createType = "new Struct.StructRef<>(" + type + ".class);";
+                    this.type = "DynamicStructRef<" + type + ">";
+                    this.createType = "new DynamicStructRef<>(" + type + ".class);";
                 } else {
                     type = "Struct.Pointer";
                 }
@@ -201,7 +201,7 @@ public class StructItem implements Item {
             writer.write("(){\n        return ");
             writer.write(name);
 
-            if(type.startsWith("Struct.") && !type.startsWith("Struct.StructRef")) {
+            if(type.startsWith("Struct.")) {
                 writer.write(".get()");
             }
 
@@ -212,11 +212,11 @@ public class StructItem implements Item {
             if(type.startsWith("@CStrPointer")) {
                 writeStringSetter(writer);
                 return;
+            } else if(type.startsWith("DynamicStructRef")) {
+                writeStructRefSetter(writer, handler);
+                return;
             } else if(!type.startsWith("Struct.")) {
                 //Must be an inner struct
-                return;
-            } else if(type.startsWith("Struct.StructRef")) {
-                writeStructRefSetter(writer, handler);
                 return;
             }
 
@@ -280,7 +280,7 @@ public class StructItem implements Item {
                 return type.split("<|>")[1];
             } else if(type.equals("Struct.Pointer")) {
                 return "jnr.ffi.Pointer";
-            } else if(type.startsWith("Struct.StructRef")) {
+            } else if(type.startsWith("DynamicStructRef")) {
                 String javaType = type.split("<|>")[1];
 
                 return isGetter ? type : javaType + "...";

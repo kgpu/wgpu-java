@@ -10,7 +10,7 @@ public class WgpuVertexBufferLayoutDescriptor extends WgpuJavaStruct {
 
     private final Struct.Unsigned64 arrayStride = new Struct.Unsigned64();
     private final Struct.Enum<WgpuInputStepMode> stepMode = new Struct.Enum<>(WgpuInputStepMode.class);
-    private final Struct.StructRef<WgpuVertexAttributeDescriptor> attributes = new Struct.StructRef<>(WgpuVertexAttributeDescriptor.class);
+    private final DynamicStructRef<WgpuVertexAttributeDescriptor> attributes = new DynamicStructRef<>(WgpuVertexAttributeDescriptor.class);
     private final Struct.Unsigned64 attributesLength = new Struct.Unsigned64();
 
     private WgpuVertexBufferLayoutDescriptor(){}
@@ -47,7 +47,7 @@ public class WgpuVertexBufferLayoutDescriptor extends WgpuJavaStruct {
         this.stepMode.set(x);
     }
 
-    public Struct.StructRef<WgpuVertexAttributeDescriptor> getAttributes(){
+    public DynamicStructRef<WgpuVertexAttributeDescriptor> getAttributes(){
         return attributes;
     }
 
