@@ -17,6 +17,10 @@ public class GraphicApplicationSettings extends DeviceSettings {
         this.title = title;
     }
 
+    public GraphicApplicationSettings() {
+        this("", 0, 0);
+    }
+
     long createWindow(){
         return GLFW.glfwCreateWindow(width, height, title, NULL, NULL);
     }

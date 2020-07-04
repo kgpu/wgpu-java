@@ -18,4 +18,16 @@ public class MathUtils {
         return Math.min(max, Math.max(min, val));
     }
 
+    public static float sinf(float val){
+        return (float) Math.sin(val);
+    }
+
+    public static float cosf(float val){
+        return (float) Math.cos(val);
+    }
+
+    public static float tanf(float val){
+        return (float) Math.tan(val);
+    }
+
 }

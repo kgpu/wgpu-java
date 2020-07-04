@@ -45,7 +45,7 @@ public class ImageData {
         int[] pixels = new int[image.getWidth() * image.getHeight()];
 
         for(int x = 0; x < image.getWidth(); x++){
-            for(int y = 0; y < image.getWidth(); y++){
+            for(int y = 0; y < image.getHeight(); y++){
                 int argb = image.getRGB(x, y);
 
                 pixels[x + y * image.getWidth()] = argbToRgba(argb);

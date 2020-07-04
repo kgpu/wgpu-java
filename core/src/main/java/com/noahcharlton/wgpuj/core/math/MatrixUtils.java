@@ -10,7 +10,7 @@ public class MatrixUtils {
             0.0f, 0.0f, 0.5f, 0.0f,
             0.0f, 0.0f, 0.5f, 1.0f);
 
-    public static Matrix4f generateMatrix(Matrix4f projection, Matrix4f view){
+    public static Matrix4f generateTransMatrix(Matrix4f projection, Matrix4f view){
         return new Matrix4f(OPEN_GL_TO_WGPU).mul(projection).mul(view);
     }
 

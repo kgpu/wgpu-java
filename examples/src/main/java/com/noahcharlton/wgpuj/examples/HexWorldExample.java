@@ -192,7 +192,7 @@ public class HexWorldExample implements AutoCloseable {
     }
 
     private Matrix4f createTransformationMatrix() {
-        return MatrixUtils.generateMatrix(createProjectionMatrix(), viewMatrix);
+        return MatrixUtils.generateTransMatrix(createProjectionMatrix(), viewMatrix);
     }
 
     private Matrix4f createProjectionMatrix() {
