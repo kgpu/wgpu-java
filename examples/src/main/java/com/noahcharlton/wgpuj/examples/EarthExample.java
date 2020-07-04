@@ -172,12 +172,12 @@ public class EarthExample {
                 BindGroupUtils.partialLayout(5, Wgpu.ShaderStage.VERTEX, WgpuBindingType.UNIFORM_BUFFER));
 
         bindGroupId = device.createBindGroup("Bind group", bindGroupLayout,
-                new WgpuBindGroupEntry().setBuffer(0, transMatrixBuffer.getId(), transMatrixBuffer.getSize()),
-                new WgpuBindGroupEntry().setTextureView(1, textureView),
-                new WgpuBindGroupEntry().setSampler(2, sampler),
-                new WgpuBindGroupEntry().setBuffer(3, lightSrcBuffer.getId(), lightSrcBuffer.getSize()),
-                new WgpuBindGroupEntry().setBuffer(4, modelMatrixBuffer.getId(), modelMatrixBuffer.getSize()),
-                new WgpuBindGroupEntry().setBuffer(5, normalMatrixBuffer.getId(), normalMatrixBuffer.getSize()));
+                BindGroupUtils.bufferEntry(0, transMatrixBuffer),
+                BindGroupUtils.textureViewEntry(1, textureView),
+                BindGroupUtils.samplerEntry(2, sampler),
+                BindGroupUtils.bufferEntry(3, lightSrcBuffer),
+                BindGroupUtils.bufferEntry(4, modelMatrixBuffer),
+                BindGroupUtils.bufferEntry(5, normalMatrixBuffer));
 
         var pipeline = createPipelineSettings();
         pipeline.setBindGroupLayouts(bindGroupLayout);

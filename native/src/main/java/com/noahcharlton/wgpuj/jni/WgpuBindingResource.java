@@ -8,8 +8,8 @@ public class WgpuBindingResource extends WgpuJavaStruct {
     private final Struct.Enum<WgpuBindingResourceTag> tag = new Struct.Enum<>(WgpuBindingResourceTag.class);
     private final WgpuBindingResourceData id = inner(new WgpuBindingResourceData());
 
-    public WgpuBindingResource() {
-
+    public static WgpuBindingResource createHeap() {
+        return new WgpuBindingResource();
     }
 
     public void setTag(WgpuBindingResourceTag tag){

@@ -38,4 +38,32 @@ public class BindGroupUtils {
         return desc;
     }
 
+    public static WgpuBindGroupEntry textureViewEntry(int binding, long textureViewId){
+        var entry = WgpuBindGroupEntry.createDirect();
+        entry.setBinding(binding);
+        entry.getResource().setTag(WgpuBindingResourceTag.TEXTURE_VIEW);
+        entry.getResource().getData().setTextureViewId(textureViewId);
+
+        return entry;
+    }
+
+    public static WgpuBindGroupEntry samplerEntry(int binding, long samplerId){
+        var entry = WgpuBindGroupEntry.createDirect();
+        entry.setBinding(binding);
+        entry.getResource().setTag(WgpuBindingResourceTag.SAMPLER);
+        entry.getResource().getData().setSamplerId(samplerId);
+
+        return entry;
+    }
+
+    public static WgpuBindGroupEntry bufferEntry(int binding, Buffer buffer){
+        var entry = WgpuBindGroupEntry.createDirect();
+        entry.setBinding(binding);
+        entry.getResource().setTag(WgpuBindingResourceTag.BUFFER);
+        entry.getResource().getData().getBinding().setBuffer(buffer.getId());
+        entry.getResource().getData().getBinding().setSize(buffer.getSize());
+
+        return entry;
+    }
+
 }

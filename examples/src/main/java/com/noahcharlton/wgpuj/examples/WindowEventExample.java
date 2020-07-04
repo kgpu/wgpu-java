@@ -93,7 +93,7 @@ public class WindowEventExample {
                     BindGroupUtils.partialLayout(0, Wgpu.ShaderStage.VERTEX, WgpuBindingType.UNIFORM_BUFFER));
 
             bindGroup = device.createBindGroup("matrix bind group", bindGroupLayout,
-                            new WgpuBindGroupEntry().setBuffer(0, matrixBuffer.getId(), matrixBuffer.getSize()));
+                            BindGroupUtils.bufferEntry(0, matrixBuffer));
 
             renderPipelineSettings.setBindGroupLayouts(bindGroupLayout);
             application.init(renderPipelineSettings);

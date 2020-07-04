@@ -64,8 +64,7 @@ public class BoidExample {
                 BindGroupUtils.partialLayout(0, Wgpu.ShaderStage.VERTEX, WgpuBindingType.STORAGE_BUFFER));
 
         bindGroup = device.createBindGroup("Bind Group", bindGroupLayout,
-                new WgpuBindGroupEntry().setBuffer(0, boidPositionBuffer.getId(), boidPositionBuffer.getSize()));
-
+                BindGroupUtils.bufferEntry(0, boidPositionBuffer));
 
         var pipelineSettings = createPipelineSettings();
         pipelineSettings.setBindGroupLayouts(bindGroupLayout);

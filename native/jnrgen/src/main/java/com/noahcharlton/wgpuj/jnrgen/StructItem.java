@@ -6,6 +6,8 @@ import java.util.List;
 
 public class StructItem implements Item {
 
+    public static final String doNotUsePrefix = "_NO_USE_";
+
     private final String name;
     private final List<StructField> fields;
 
@@ -17,6 +19,7 @@ public class StructItem implements Item {
     @Override
     public void preSave(OutputHandler outputHandler) {
         outputHandler.registerType(name.replace("Wgpu", "WGPU"), this);
+        outputHandler.runHooks(this);
     }
 
     @Override
@@ -45,8 +48,10 @@ public class StructItem implements Item {
         writeConstructors(writer);
 
         for(StructField field : fields) {
-            field.writeGetter(writer, outputHandler);
-            field.writeSetter(writer, outputHandler);
+            if(!field.name.startsWith(doNotUsePrefix)){
+                field.writeGetter(writer, outputHandler);
+                field.writeSetter(writer, outputHandler);
+            }
         }
 
         writer.write("}");
@@ -97,7 +102,11 @@ public class StructItem implements Item {
         private String createType;
 
         public StructField(String type, String name) {
-            this.name = toCamelCase(name);
+            this(type, name, true);
+        }
+
+        public StructField(String type, String name, boolean convertCase) {
+            this.name = convertCase ? toCamelCase(name) : name;
             this.type = type;
         }
 
@@ -144,7 +153,7 @@ public class StructItem implements Item {
             if(item instanceof EnumItem) {
                 type = "Struct.Enum<" + item.getJavaTypeName() + ">";
                 createType = "new Struct.Enum<>(" + item.getJavaTypeName() + ".class);";
-            } else if(item instanceof StructItem) {
+            } else if(item instanceof StructItem || item instanceof MockStructItem) {
                 type = item.getJavaTypeName();
                 createType = "inner(" + item.getJavaTypeName() + ".createHeap());";
             }
@@ -288,5 +297,9 @@ public class StructItem implements Item {
 
             throw new RuntimeException("Unable to create getter/setter type for " + type);
         }
+    }
+
+    public List<StructField> getFields() {
+        return fields;
     }
 }

@@ -45,7 +45,7 @@ public class ComputeExample {
         long bindGroupLayout = device.createBindGroupLayout("bind group layout",
                 BindGroupUtils.partialLayout(0, Wgpu.ShaderStage.COMPUTE, WgpuBindingType.STORAGE_BUFFER));
         long bindGroup = device.createBindGroup("bind group", bindGroupLayout,
-                new WgpuBindGroupEntry().setBuffer(0, storageBuffer.getId(), bufferSize));
+                BindGroupUtils.bufferEntry(0, storageBuffer));
 
         long pipelineLayout = device.createPipelineLayout(bindGroupLayout);
         long shader = ShaderData.fromRawClasspathFile("/collatz.comp", "main").createModule(device);

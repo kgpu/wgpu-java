@@ -96,8 +96,8 @@ public class TextureExample {
                                     WgpuBindingType.SAMPLER, false));
 
             var textureBindGroup = device.createBindGroup("texture bind group", textureBindGroupLayout,
-                    new WgpuBindGroupEntry().setTextureView(0, textureView),
-                    new WgpuBindGroupEntry().setSampler(1, sampler));
+                    BindGroupUtils.textureViewEntry(0, textureView),
+                    BindGroupUtils.samplerEntry(1, sampler));
 
             renderPipelineSettings.setBindGroupLayouts(textureBindGroup);
             application.init(renderPipelineSettings);

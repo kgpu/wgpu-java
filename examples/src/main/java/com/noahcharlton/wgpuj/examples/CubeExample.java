@@ -101,11 +101,10 @@ public class CubeExample {
                     BufferUsage.UNIFORM, BufferUsage.COPY_DST);
 
             var bindGroupLayout = device.createBindGroupLayout("matrix group layout",
-                    BindGroupUtils.partialLayout(0, Wgpu.ShaderStage.VERTEX,
-                            WgpuBindingType.UNIFORM_BUFFER));
+                    BindGroupUtils.partialLayout(0, Wgpu.ShaderStage.VERTEX, WgpuBindingType.UNIFORM_BUFFER));
 
             var bindGroup = device.createBindGroup("matrix bind group", bindGroupLayout,
-                            new WgpuBindGroupEntry().setBuffer(0, matrixBuffer.getId(), matrixBuffer.getSize()));
+                            BindGroupUtils.bufferEntry(0, matrixBuffer));
 
             renderPipelineSettings.setBindGroupLayouts(bindGroupLayout);
             application.init(renderPipelineSettings);

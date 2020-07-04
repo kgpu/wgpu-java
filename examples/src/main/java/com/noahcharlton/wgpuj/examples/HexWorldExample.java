@@ -110,9 +110,9 @@ public class HexWorldExample implements AutoCloseable {
                 BindGroupUtils.partialLayout(2, Wgpu.ShaderStage.VERTEX, WgpuBindingType.STORAGE_BUFFER));
 
         bindGroup = device.createBindGroup("matrix bind group", bindGroupLayout,
-                new WgpuBindGroupEntry().setBuffer(0, transMatrixBuffer.getId(), transMatrixBuffer.getSize()),
-                new WgpuBindGroupEntry().setBuffer(1, modelsBuffer.getId(), modelsBuffer.getSize()),
-                new WgpuBindGroupEntry().setBuffer(2, colorsBuffer.getId(), colorsBuffer.getSize()));
+                BindGroupUtils.bufferEntry(0, transMatrixBuffer),
+                BindGroupUtils.bufferEntry(1, modelsBuffer),
+                BindGroupUtils.bufferEntry(2, colorsBuffer));
 
         var pipelineSettings = createRenderPipelineSettings();
         pipelineSettings.setBindGroupLayouts(bindGroupLayout);
