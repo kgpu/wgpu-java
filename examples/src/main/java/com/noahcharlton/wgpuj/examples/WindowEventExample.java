@@ -1,10 +1,7 @@
 package com.noahcharlton.wgpuj.examples;
 
 import com.noahcharlton.wgpuj.WgpuJava;
-import com.noahcharlton.wgpuj.core.Device;
-import com.noahcharlton.wgpuj.core.ShaderData;
-import com.noahcharlton.wgpuj.core.WgpuCore;
-import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
+import com.noahcharlton.wgpuj.core.*;
 import com.noahcharlton.wgpuj.core.graphics.BlendDescriptor;
 import com.noahcharlton.wgpuj.core.graphics.ColorState;
 import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
@@ -63,11 +60,12 @@ public class WindowEventExample {
     );
 
     private final Window window;
+    private final Device device;
+    private final Queue queue;
     private final Buffer vertexBuffer;
     private final Buffer indexBuffer;
     private final Buffer matrixBuffer;
     private final long bindGroup;
-    private final long queue;
     private final EnumSet<Key> keysPressed = EnumSet.noneOf(Key.class);
 
     public WindowEventExample() {
@@ -75,10 +73,10 @@ public class WindowEventExample {
         GraphicApplicationSettings appSettings = new GraphicApplicationSettings("Wgpu-Java event example", 640, 480);
 
         try(var application = WgpuGraphicApplication.create(appSettings)) {
-            Device device = application.getDevice();
+            device = application.getDevice();
             window = application.getWindow();
+            queue = application.getDefaultQueue();
             window.setEventHandler(new WindowHandler(this));
-            queue = application.getQueue();
 
             vertexBuffer = device.createVertexBuffer("Vertex buffer", VERTICES);
             indexBuffer = device.createIndexBuffer("Index buffer", INDICES);
@@ -115,10 +113,7 @@ public class WindowEventExample {
         Matrix4f projection = createProjectionMatrix();
         Matrix4f transformationMatrix = MatrixUtils.generateTransMatrix(projection, viewMatrix);
 
-        Pointer pointer = WgpuJava.createDirectPointer(16 * Float.BYTES);
-        pointer.put(0, MatrixUtils.toFloats(transformationMatrix), 0, 16);
-
-        WgpuJava.wgpuNative.wgpu_queue_write_buffer(queue, matrixBuffer.getId(), 0, pointer, 16 * Float.BYTES);
+        queue.writeFloatsToBuffer(matrixBuffer, MatrixUtils.toFloats(transformationMatrix));
     }
 
     private void runMainLoop(WgpuGraphicApplication application) {

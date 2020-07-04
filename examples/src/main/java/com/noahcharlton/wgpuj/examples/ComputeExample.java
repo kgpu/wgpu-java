@@ -1,20 +1,14 @@
 package com.noahcharlton.wgpuj.examples;
 
 import com.noahcharlton.wgpuj.WgpuJava;
-import com.noahcharlton.wgpuj.core.Device;
-import com.noahcharlton.wgpuj.core.DeviceSettings;
-import com.noahcharlton.wgpuj.core.ShaderData;
-import com.noahcharlton.wgpuj.core.WgpuCore;
+import com.noahcharlton.wgpuj.core.*;
 import com.noahcharlton.wgpuj.core.compute.ComputePass;
+import com.noahcharlton.wgpuj.core.compute.ComputePipeline;
 import com.noahcharlton.wgpuj.core.util.BindGroupUtils;
 import com.noahcharlton.wgpuj.core.util.Buffer;
 import com.noahcharlton.wgpuj.core.util.BufferSettings;
 import com.noahcharlton.wgpuj.core.util.BufferUsage;
-import com.noahcharlton.wgpuj.jni.Wgpu;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupEntry;
-import com.noahcharlton.wgpuj.jni.WgpuBindingType;
-import com.noahcharlton.wgpuj.jni.WgpuComputePipelineDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuLogLevel;
+import com.noahcharlton.wgpuj.jni.*;
 import jnr.ffi.Pointer;
 
 import java.util.Arrays;
@@ -48,31 +42,24 @@ public class ComputeExample {
                 BindGroupUtils.bufferEntry(0, storageBuffer));
 
         long pipelineLayout = device.createPipelineLayout(bindGroupLayout);
-        long shader = ShaderData.fromRawClasspathFile("/collatz.comp", "main").createModule(device);
-
-        var pipelineDesc = WgpuComputePipelineDescriptor.createDirect();
-        pipelineDesc.setLayout(pipelineLayout);
-        pipelineDesc.getComputeStage().setEntryPoint("main");
-        pipelineDesc.getComputeStage().setModule(shader);
+        ShaderData shader = ShaderData.fromRawClasspathFile("/collatz.comp", "main");
+        WgpuComputePipelineDescriptor pipelineDesc = ComputePipeline.of(device, pipelineLayout, shader);
 
         long pipelineId = WgpuJava.wgpuNative.wgpu_device_create_compute_pipeline(device.getId(),
                 pipelineDesc.getPointerTo());
 
-        long encoder = device.createCommandEncoder("command encoder");
-
-        ComputePass pass = ComputePass.create(encoder);
+        CommandEncoder encoder = device.createCommandEncoder("command encoder");
+        ComputePass pass = encoder.beginComputePass(WgpuComputePassDescriptor.createDirect());
 
         pass.setPipeline(pipelineId);
         pass.setBindGroup(0, bindGroup, WgpuJava.createNullPointer(), 0);
         pass.dispatch(numbers.length, 1, 1);
         pass.endPass();
 
-        long queue = device.getDefaultQueue();
-        long commandBuffer = WgpuJava.wgpuNative.wgpu_command_encoder_finish(encoder, WgpuJava.createNullPointer());
-
-        storageBuffer.copyTo(stagingBuffer, encoder);
-
-        WgpuJava.wgpuNative.wgpu_queue_submit(queue, WgpuJava.createDirectLongPointer(commandBuffer), 1);
+        Queue queue = device.getDefaultQueue();
+        encoder.copyBufferToBuffer(storageBuffer, stagingBuffer);
+        long commandBuffer = encoder.finish(WgpuCommandBufferDescriptor.createDirect());
+        queue.submit(commandBuffer);
 
         stagingBuffer.readAsync();
 

@@ -1,10 +1,7 @@
 package com.noahcharlton.wgpuj.examples;
 
 import com.noahcharlton.wgpuj.WgpuJava;
-import com.noahcharlton.wgpuj.core.Device;
-import com.noahcharlton.wgpuj.core.ShaderData;
-import com.noahcharlton.wgpuj.core.WgpuCore;
-import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
+import com.noahcharlton.wgpuj.core.*;
 import com.noahcharlton.wgpuj.core.graphics.*;
 import com.noahcharlton.wgpuj.core.math.MathUtils;
 import com.noahcharlton.wgpuj.core.math.MatrixUtils;
@@ -93,6 +90,7 @@ public class EarthExample {
     private final WgpuGraphicApplication app;
     private final Window window;
     private final Device device;
+    private final Queue queue;
 
     private final Matrix4f modelMatrix = new Matrix4f().rotateY(0.2f);
     private final Matrix4f viewMatrix = new Matrix4f().lookAt(
@@ -112,6 +110,7 @@ public class EarthExample {
         app = WgpuGraphicApplication.create(settings);
         device = app.getDevice();
         window = app.getWindow();
+        queue = app.getDefaultQueue();
 
         var sphere = new Sphere(100, 100);
 
@@ -141,11 +140,10 @@ public class EarthExample {
         long textureId = device.createTexture(textureDesc);
         var textureBuffer = device.createIntBuffer("texture buffer", texture.getPixels(), BufferUsage.COPY_SRC);
 
-        long encoder = device.createCommandEncoder("Command Encoder");
-        textureBuffer.copyToTexture(encoder, textureId, texture);
-        long commandBuffer = WgpuJava.wgpuNative.wgpu_command_encoder_finish(encoder, WgpuJava.createNullPointer());
-        WgpuJava.wgpuNative.wgpu_queue_submit(device.getDefaultQueue(),
-                WgpuJava.createDirectLongPointer(commandBuffer), 1);
+        CommandEncoder encoder = device.createCommandEncoder("Command Encoder");
+        encoder.copyBufferToTexture(textureBuffer, textureId, texture);
+        long commandBuffer = encoder.finish(WgpuCommandBufferDescriptor.createDirect());
+        queue.submit(commandBuffer);
 
         var samplerDesc = WgpuSamplerDescriptor.createDirect();
         samplerDesc.setAddressModeU(WgpuAddressMode.MIRROR_REPEAT);
@@ -203,9 +201,9 @@ public class EarthExample {
             app.renderEnd();
 
             modelMatrix.rotate(.01f, MathUtils.UNIT_Z);
-            device.queueWriteFloatBuffer(modelMatrixBuffer, MatrixUtils.toFloats(modelMatrix));
-            device.queueWriteFloatBuffer(transMatrixBuffer, getTransformationMatrixData());
-            device.queueWriteFloatBuffer(normalMatrixBuffer, getNormalMatrixData());
+            queue.writeFloatsToBuffer(modelMatrixBuffer, MatrixUtils.toFloats(modelMatrix));
+            queue.writeFloatsToBuffer(transMatrixBuffer, getTransformationMatrixData());
+            queue.writeFloatsToBuffer(normalMatrixBuffer, getNormalMatrixData());
         }
     }
 

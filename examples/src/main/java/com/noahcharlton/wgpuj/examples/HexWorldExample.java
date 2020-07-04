@@ -1,10 +1,7 @@
 package com.noahcharlton.wgpuj.examples;
 
 import com.noahcharlton.wgpuj.WgpuJava;
-import com.noahcharlton.wgpuj.core.Device;
-import com.noahcharlton.wgpuj.core.ShaderData;
-import com.noahcharlton.wgpuj.core.WgpuCore;
-import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
+import com.noahcharlton.wgpuj.core.*;
 import com.noahcharlton.wgpuj.core.graphics.BlendDescriptor;
 import com.noahcharlton.wgpuj.core.graphics.ColorState;
 import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
@@ -70,6 +67,7 @@ public class HexWorldExample implements AutoCloseable {
 
     private final WgpuGraphicApplication application;
     private final Device device;
+    private final Queue queue;
 
     private Buffer vertexBuffer;
     private Buffer indexBuffer;
@@ -80,6 +78,7 @@ public class HexWorldExample implements AutoCloseable {
     public HexWorldExample(GraphicApplicationSettings settings) {
         application = WgpuGraphicApplication.create(settings);
         device = application.getDevice();
+        queue = application.getDefaultQueue();
         viewMatrix = new Matrix4f();
     }
 
@@ -157,7 +156,7 @@ public class HexWorldExample implements AutoCloseable {
 
     private void run() {
         while(!application.getWindow().isCloseRequested()) {
-            updateTransMatrixBuffer();
+            queue.writeFloatsToBuffer(transMatrixBuffer, MatrixUtils.toFloats(createTransformationMatrix()));
 
             var renderPass = application.renderStart();
 
@@ -168,16 +167,6 @@ public class HexWorldExample implements AutoCloseable {
 
             application.renderEnd();
         }
-    }
-
-    private void updateTransMatrixBuffer() {
-        Pointer pointer = WgpuJava.createDirectPointer(16 * Float.BYTES);
-        pointer.put(0, MatrixUtils.toFloats(createTransformationMatrix()), 0, 16);
-
-        long queue = device.getDefaultQueue();
-        long bufferId = transMatrixBuffer.getId();
-
-        WgpuJava.wgpuNative.wgpu_queue_write_buffer(queue, bufferId, 0, pointer, 16 * Float.BYTES);
     }
 
     public static void main(String[] args) {

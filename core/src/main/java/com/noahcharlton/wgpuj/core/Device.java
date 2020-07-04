@@ -1,20 +1,11 @@
 package com.noahcharlton.wgpuj.core;
 
 import com.noahcharlton.wgpuj.WgpuJava;
+import com.noahcharlton.wgpuj.core.graphics.SwapChain;
 import com.noahcharlton.wgpuj.core.util.Buffer;
 import com.noahcharlton.wgpuj.core.util.BufferSettings;
 import com.noahcharlton.wgpuj.core.util.BufferUsage;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupEntry;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutEntry;
-import com.noahcharlton.wgpuj.jni.WgpuCLimits;
-import com.noahcharlton.wgpuj.jni.WgpuCommandEncoderDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuJNI;
-import com.noahcharlton.wgpuj.jni.WgpuPipelineLayoutDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuPowerPreference;
-import com.noahcharlton.wgpuj.jni.WgpuRequestAdapterOptions;
-import com.noahcharlton.wgpuj.jni.WgpuTextureDescriptor;
+import com.noahcharlton.wgpuj.jni.*;
 import com.noahcharlton.wgpuj.util.RustCString;
 import jnr.ffi.Pointer;
 
@@ -23,12 +14,12 @@ import java.util.concurrent.atomic.AtomicLong;
 public class Device {
 
     private final WgpuJNI natives = WgpuJava.wgpuNative;
+    private final Queue defaultQueue;
     private final long deviceId;
-    private final long defaultQueue;
 
     public Device(long id) {
         deviceId = id;
-        defaultQueue = natives.wgpu_device_get_default_queue(deviceId);
+        defaultQueue = new Queue(natives.wgpu_device_get_default_queue(deviceId));
     }
 
     public void poll(boolean forceWait){
@@ -45,11 +36,13 @@ public class Device {
         return natives.wgpu_device_create_pipeline_layout(deviceId, desc.getPointerTo());
     }
 
-    public long createCommandEncoder(String name){
+    public CommandEncoder createCommandEncoder(String name){
         var desc = WgpuCommandEncoderDescriptor.createDirect();
         desc.setLabel(name);
 
-        return natives.wgpu_device_create_command_encoder(deviceId, desc.getPointerTo());
+        var encoderId = natives.wgpu_device_create_command_encoder(deviceId, desc.getPointerTo());
+
+        return new CommandEncoder(encoderId);
     }
 
     public long createTexture(WgpuTextureDescriptor descriptor){
@@ -94,6 +87,13 @@ public class Device {
         return buffer;
     }
 
+    public SwapChain createSwapChain(long surface, WgpuSwapChainDescriptor desc){
+        var swapChainID = WgpuJava.wgpuNative.wgpu_device_create_swap_chain(deviceId, surface,
+                desc.getPointerTo());
+
+        return new SwapChain(swapChainID, this);
+    }
+
     public Buffer createIntBuffer(String name, int[] data, BufferUsage... usages) {
         var buffer = new BufferSettings()
                 .setLabel(name)
@@ -125,13 +125,6 @@ public class Device {
         buffer.unmap();
 
         return buffer;
-    }
-
-    public void queueWriteFloatBuffer(Buffer buffer, float[] data){
-        Pointer ptr = WgpuJava.createDirectPointer(data.length * Float.BYTES);
-        ptr.put(0, data, 0, data.length);
-
-        WgpuJava.wgpuNative.wgpu_queue_write_buffer(defaultQueue, buffer.getId(), 0, ptr, data.length * Float.BYTES);
     }
 
     public static Device create(DeviceSettings settings, long surface) {
@@ -166,7 +159,7 @@ public class Device {
         return adapter.get();
     }
 
-    public long getDefaultQueue(){
+    public Queue getDefaultQueue() {
         return defaultQueue;
     }
 

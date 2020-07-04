@@ -1,10 +1,7 @@
 package com.noahcharlton.wgpuj.examples;
 
 import com.noahcharlton.wgpuj.WgpuJava;
-import com.noahcharlton.wgpuj.core.Device;
-import com.noahcharlton.wgpuj.core.ShaderData;
-import com.noahcharlton.wgpuj.core.WgpuCore;
-import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
+import com.noahcharlton.wgpuj.core.*;
 import com.noahcharlton.wgpuj.core.graphics.*;
 import com.noahcharlton.wgpuj.core.math.MathUtils;
 import com.noahcharlton.wgpuj.core.math.MatrixUtils;
@@ -43,6 +40,7 @@ public class BoidExample {
 
     private final WgpuGraphicApplication app;
     private final Device device;
+    private final Queue queue;
     private final Window window;
     private final Buffer vertexBuffer;
     private final Boid[] boids;
@@ -55,6 +53,7 @@ public class BoidExample {
         device = app.getDevice();
         window = app.getWindow();
         boids = createBoids();
+        queue = app.getDefaultQueue();
 
         vertexBuffer = device.createVertexBuffer("Vertex Buffer", VERTICES);
         boidPositionBuffer = device.createFloatBuffer("Boid Position Buffer", getBoidPositionData(),
@@ -79,7 +78,7 @@ public class BoidExample {
 
         for (int i = 0; i < boids.length; i++) {
             var boid = new Boid();
-            boid.position.x = 2 * rng.nextFloat() -1f;
+            boid.position.x = 2 * rng.nextFloat() - 1f;
             boid.position.y = 2 * rng.nextFloat() - 1f;
             boid.velocity.x = .2f * rng.nextFloat() -.1f;
             boid.velocity.y = .2f * rng.nextFloat() - .1f;
@@ -97,12 +96,12 @@ public class BoidExample {
         for (int i = 0; i < boids.length; i++) {
             float angle = (float) Math.atan2(boids[i].velocity.y, boids[i].velocity.x);
 
-            matrix.zero().m00(1.0f).m11(1.0f).m22(1.0f).m33(1.0f);
             matrix.translate(boids[i].position.x, boids[i].position.y, 0);
             matrix.rotate(angle, MathUtils.UNIT_Z);
 
             var matrixFloats = MatrixUtils.toFloats(matrix);
             System.arraycopy(matrixFloats, 0, output, i * 16, 16);
+            MatrixUtils.reset(matrix);
         }
 
         return output;
@@ -176,17 +175,7 @@ public class BoidExample {
             cohesionCount = 0;
         }
 
-        updateBuffers();
-    }
-
-    private void updateBuffers() {
-        long queue = device.getDefaultQueue();
-
-        Pointer peoplePosData = WgpuJava.createDirectPointer(16 * Float.BYTES * boids.length);
-        peoplePosData.put(0, getBoidPositionData(), 0, 16 * boids.length);
-
-        WgpuJava.wgpuNative.wgpu_queue_write_buffer(queue, boidPositionBuffer.getId(), 0, peoplePosData,
-                16 * Float.BYTES * boids.length);
+        queue.writeFloatsToBuffer(boidPositionBuffer, getBoidPositionData());
     }
 
     private void render() {

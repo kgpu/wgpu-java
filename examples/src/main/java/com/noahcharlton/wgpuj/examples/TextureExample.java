@@ -1,10 +1,7 @@
 package com.noahcharlton.wgpuj.examples;
 
 import com.noahcharlton.wgpuj.WgpuJava;
-import com.noahcharlton.wgpuj.core.Device;
-import com.noahcharlton.wgpuj.core.ShaderData;
-import com.noahcharlton.wgpuj.core.WgpuCore;
-import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
+import com.noahcharlton.wgpuj.core.*;
 import com.noahcharlton.wgpuj.core.graphics.BlendDescriptor;
 import com.noahcharlton.wgpuj.core.graphics.ColorState;
 import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
@@ -51,12 +48,13 @@ public class TextureExample {
 
         try(var application = WgpuGraphicApplication.create(appSettings)) {
             Device device = application.getDevice();
+            Queue queue = application.getDefaultQueue();
 
             var vertexBuffer = device.createVertexBuffer("Vertex Buffer", VERTICES);
             var indexBuffer = device.createIndexBuffer("index buffer", INDICES);
 
             var textureDesc = WgpuTextureDescriptor.createDirect();
-            textureDesc.setLabel("Wgpuj Icon");
+            textureDesc.setLabel("Texture");
             textureDesc.setDimension(WgpuTextureDimension.D2);
             textureDesc.getSize().setWidth(texture.getWidth());
             textureDesc.getSize().setHeight(texture.getHeight());
@@ -68,11 +66,10 @@ public class TextureExample {
             long textureId = device.createTexture(textureDesc);
             var textureBuffer = device.createIntBuffer("texture buffer", texture.getPixels(), BufferUsage.COPY_SRC);
 
-            long encoder = device.createCommandEncoder("Command Encoder");
-            textureBuffer.copyToTexture(encoder, textureId, texture);
-            long commandBuffer = WgpuJava.wgpuNative.wgpu_command_encoder_finish(encoder, WgpuJava.createNullPointer());
-            WgpuJava.wgpuNative.wgpu_queue_submit(device.getDefaultQueue(),
-                    WgpuJava.createDirectLongPointer(commandBuffer), 1);
+            CommandEncoder encoder = device.createCommandEncoder("Command Encoder");
+            encoder.copyBufferToTexture(textureBuffer, textureId, texture);
+            long commandBuffer = encoder.finish(WgpuCommandBufferDescriptor.createDirect());
+            queue.submit(commandBuffer);
 
             var samplerDesc = WgpuSamplerDescriptor.createDirect();
             samplerDesc.setAddressModeU(WgpuAddressMode.CLAMP_TO_EDGE);

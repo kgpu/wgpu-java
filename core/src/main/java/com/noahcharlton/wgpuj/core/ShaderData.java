@@ -66,7 +66,7 @@ public class ShaderData {
     public static ShaderData fromRawClasspathFile(String path, String entryPoint, int type){
         String text = ClasspathUtil.readText(path, StandardCharsets.UTF_8);
 
-        return new ShaderData(entryPoint, ShaderCompiler.compile(text, type));
+        return new ShaderData(entryPoint, ShaderCompiler.compile(path, text, type));
     }
 
     public byte[] getData() {

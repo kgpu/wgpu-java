@@ -1,10 +1,7 @@
 package com.noahcharlton.wgpuj.examples;
 
 import com.noahcharlton.wgpuj.WgpuJava;
-import com.noahcharlton.wgpuj.core.Device;
-import com.noahcharlton.wgpuj.core.ShaderData;
-import com.noahcharlton.wgpuj.core.WgpuCore;
-import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
+import com.noahcharlton.wgpuj.core.*;
 import com.noahcharlton.wgpuj.core.graphics.BlendDescriptor;
 import com.noahcharlton.wgpuj.core.graphics.ColorState;
 import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
@@ -93,6 +90,7 @@ public class CubeExample {
 
         try(var application = WgpuGraphicApplication.create(appSettings)) {
             Device device = application.getDevice();
+            Queue queue = application.getDefaultQueue();
             Matrix4f matrix = updateMatrix(application.getWindow(), viewMatrix);
 
             var vertices = device.createVertexBuffer("Vertices", VERTICES);
@@ -120,12 +118,7 @@ public class CubeExample {
                 application.renderEnd();
 
                 var newMatrix = updateMatrix(application.getWindow(), viewMatrix);
-                float[] matrixData = newMatrix.get(new float[16]);
-
-                Pointer pointer = WgpuJava.createDirectPointer(16 * Float.BYTES);
-                pointer.put(0, matrixData, 0, 16);
-                WgpuJava.wgpuNative.wgpu_queue_write_buffer(application.getQueue(), matrixBuffer.getId(), 0,
-                        pointer, 16 * Float.BYTES);
+                queue.writeFloatsToBuffer(matrixBuffer, MatrixUtils.toFloats(newMatrix));
             }
         }
     }
