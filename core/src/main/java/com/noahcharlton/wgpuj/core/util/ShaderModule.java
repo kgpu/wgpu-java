@@ -1,9 +1,7 @@
 package com.noahcharlton.wgpuj.core.util;
 
-import com.noahcharlton.wgpuj.core.Device;
 import com.noahcharlton.wgpuj.jni.WgpuProgrammableStageDescriptor;
 
-import java.nio.charset.StandardCharsets;
 
 /**
  * A wrapper around Shader Module

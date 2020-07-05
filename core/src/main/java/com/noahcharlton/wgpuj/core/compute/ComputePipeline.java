@@ -3,7 +3,6 @@ package com.noahcharlton.wgpuj.core.compute;
 import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.core.Device;
 import com.noahcharlton.wgpuj.core.util.ShaderConfig;
-import com.noahcharlton.wgpuj.core.util.ShaderModule;
 import com.noahcharlton.wgpuj.jni.WgpuComputePipelineDescriptor;
 
 public class ComputePipeline {
