@@ -52,8 +52,8 @@ public class VertexExample {
 
         try(var application = WgpuGraphicApplication.create(appConfig)) {
             Device device = application.getDevice();
-            RenderPipelineSettings renderPipelineSettings = createPipelineSettings(device);
-            RenderPipeline pipeline = device.createRenderPipeline(renderPipelineSettings);
+            RenderPipelineConfig pipelineConfig = createPipelineConfig(device);
+            RenderPipeline pipeline = device.createRenderPipeline(pipelineConfig);
 
             var vertexBuffer = device.createVertexBuffer("Vertex Buffer", VERTICES);
             var indexBuffer = device.createIndexBuffer("Index Buffer", INDICES);
@@ -74,11 +74,11 @@ public class VertexExample {
         }
     }
 
-    private static RenderPipelineSettings createPipelineSettings(Device device){
+    private static RenderPipelineConfig createPipelineConfig(Device device){
         ShaderConfig vertex = ShaderConfig.fromRawClasspathFile("/vertex.vert", "main");
         ShaderConfig fragment = ShaderConfig.fromRawClasspathFile("/vertex.frag", "main");
 
-        return new RenderPipelineSettings()
+        return new RenderPipelineConfig()
                 .setVertexStage(device.createShaderModule(vertex))
                 .setFragmentStage(device.createShaderModule(fragment))
                 .setRasterizationState(RasterizationState.of(

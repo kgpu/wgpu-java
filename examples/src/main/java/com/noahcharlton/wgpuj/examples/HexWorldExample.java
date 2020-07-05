@@ -103,20 +103,20 @@ public class HexWorldExample implements AutoCloseable {
                 BindGroupUtils.bufferEntry(1, modelsBuffer),
                 BindGroupUtils.bufferEntry(2, colorsBuffer));
 
-        var pipelineSettings = createRenderPipelineSettings(device);
-        pipelineSettings.setBindGroupLayouts(bindGroupLayout);
+        var pipelineConfig = createPipelineConfig(device);
+        pipelineConfig.setBindGroupLayouts(bindGroupLayout);
 
         vertexBuffer = device.createVertexBuffer("Vertices", VERTICES);
         indexBuffer = device.createIndexBuffer("Indices", INDICES);
-        pipeline = device.createRenderPipeline(pipelineSettings);
+        pipeline = device.createRenderPipeline(pipelineConfig);
         application.initializeSwapChain();
     }
 
-    private RenderPipelineSettings createRenderPipelineSettings(Device device) {
+    private RenderPipelineConfig createPipelineConfig(Device device) {
         ShaderConfig vertex = ShaderConfig.fromRawClasspathFile("/hex_world.vert", "main");
         ShaderConfig fragment = ShaderConfig.fromRawClasspathFile("/hex_world.frag", "main");
 
-        return new RenderPipelineSettings()
+        return new RenderPipelineConfig()
                 .setVertexStage(device.createShaderModule(vertex))
                 .setFragmentStage(device.createShaderModule(fragment))
                 .setRasterizationState(RasterizationState.of(

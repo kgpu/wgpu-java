@@ -23,8 +23,8 @@ public class TriangleExample {
         GraphicApplicationConfig appConfig = new GraphicApplicationConfig("Wgpu-Java example", 640, 480);
 
         try(var application = WgpuGraphicApplication.create(appConfig)) {
-            RenderPipelineSettings renderPipelineSettings = createPipelineSettings(application.getDevice());
-            RenderPipeline pipeline = application.getDevice().createRenderPipeline(renderPipelineSettings);
+            RenderPipelineConfig pipelineConfig = createPipelineConfig(application.getDevice());
+            RenderPipeline pipeline = application.getDevice().createRenderPipeline(pipelineConfig);
             application.initializeSwapChain();
 
             while(!application.getWindow().isCloseRequested()){
@@ -38,11 +38,11 @@ public class TriangleExample {
         }
     }
 
-    private static RenderPipelineSettings createPipelineSettings(Device device){
+    private static RenderPipelineConfig createPipelineConfig(Device device){
         ShaderConfig vertex = ShaderConfig.fromRawClasspathFile("/triangle.vert", "main");
         ShaderConfig fragment = ShaderConfig.fromRawClasspathFile("/triangle.frag", "main");
 
-        return new RenderPipelineSettings()
+        return new RenderPipelineConfig()
                 .setVertexStage(device.createShaderModule(vertex))
                 .setFragmentStage(device.createShaderModule(fragment))
                 .setRasterizationState(RasterizationState.of(

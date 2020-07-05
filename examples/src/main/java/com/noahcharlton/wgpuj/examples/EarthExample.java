@@ -178,10 +178,10 @@ public class EarthExample {
                 BindGroupUtils.bufferEntry(4, modelMatrixBuffer),
                 BindGroupUtils.bufferEntry(5, normalMatrixBuffer));
 
-        var pipelineSettings = createPipelineSettings(device);
-        pipelineSettings.setBindGroupLayouts(bindGroupLayout);
+        var pipelineConfig = createPipelineConfig(device);
+        pipelineConfig.setBindGroupLayouts(bindGroupLayout);
 
-        pipeline = device.createRenderPipeline(pipelineSettings);
+        pipeline = device.createRenderPipeline(pipelineConfig);
         app.initializeSwapChain();
     }
 
@@ -235,11 +235,11 @@ public class EarthExample {
         new EarthExample(config).run();
     }
 
-    private static RenderPipelineSettings createPipelineSettings(Device device) {
+    private static RenderPipelineConfig createPipelineConfig(Device device) {
         ShaderConfig vertex = ShaderConfig.fromRawClasspathFile("/earth.vert", "main");
         ShaderConfig fragment = ShaderConfig.fromRawClasspathFile("/earth.frag", "main");
 
-        return new RenderPipelineSettings()
+        return new RenderPipelineConfig()
                 .setVertexStage(device.createShaderModule(vertex))
                 .setFragmentStage(device.createShaderModule(fragment))
                 .setRasterizationState(RasterizationState.of(

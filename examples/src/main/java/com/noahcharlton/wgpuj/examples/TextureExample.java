@@ -87,10 +87,10 @@ public class TextureExample {
                     BindGroupUtils.textureViewEntry(0, textureView),
                     BindGroupUtils.samplerEntry(1, sampler));
 
-            RenderPipelineSettings renderPipelineSettings = createPipelineSettings(device);
-            renderPipelineSettings.setBindGroupLayouts(textureBindGroup);
+            RenderPipelineConfig pipelineConfig = createPipelineConfig(device);
+            pipelineConfig.setBindGroupLayouts(textureBindGroup);
             application.initializeSwapChain();
-            RenderPipeline pipeline = device.createRenderPipeline(renderPipelineSettings);
+            RenderPipeline pipeline = device.createRenderPipeline(pipelineConfig);
 
             while(!application.getWindow().isCloseRequested()) {
                 RenderPass renderPass = application.renderStart(Color.BLACK);
@@ -114,11 +114,11 @@ public class TextureExample {
         }
     }
 
-    private static RenderPipelineSettings createPipelineSettings(Device device) {
+    private static RenderPipelineConfig createPipelineConfig(Device device) {
         ShaderConfig vertex = ShaderConfig.fromRawClasspathFile("/texture.vert", "main");
         ShaderConfig fragment = ShaderConfig.fromRawClasspathFile("/texture.frag", "main");
 
-        return new RenderPipelineSettings()
+        return new RenderPipelineConfig()
                 .setVertexStage(device.createShaderModule(vertex))
                 .setFragmentStage(device.createShaderModule(fragment))
                 .setRasterizationState(RasterizationState.of(

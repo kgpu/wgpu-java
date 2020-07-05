@@ -79,11 +79,11 @@ public class WindowEventExample {
             bindGroup = device.createBindGroup("matrix bind group", bindGroupLayout,
                             BindGroupUtils.bufferEntry(0, matrixBuffer));
 
-            RenderPipelineSettings renderPipelineSettings = createPipelineSettings(device);
-            renderPipelineSettings.setBindGroupLayouts(bindGroupLayout);
+            RenderPipelineConfig pipelineConfig = createPipelineConfig(device);
+            pipelineConfig.setBindGroupLayouts(bindGroupLayout);
             application.initializeSwapChain();
 
-            runMainLoop(application, device.createRenderPipeline(renderPipelineSettings));
+            runMainLoop(application, device.createRenderPipeline(pipelineConfig));
         }
     }
 
@@ -159,11 +159,11 @@ public class WindowEventExample {
             updateMatrix();
     }
 
-    private RenderPipelineSettings createPipelineSettings(Device device) {
+    private RenderPipelineConfig createPipelineConfig(Device device) {
         ShaderConfig vertex = ShaderConfig.fromRawClasspathFile("/window.vert", "main");
         ShaderConfig fragment = ShaderConfig.fromRawClasspathFile("/window.frag", "main");
 
-        return new RenderPipelineSettings()
+        return new RenderPipelineConfig()
                 .setVertexStage(device.createShaderModule(vertex))
                 .setFragmentStage(device.createShaderModule(fragment))
                 .setRasterizationState(RasterizationState.of(

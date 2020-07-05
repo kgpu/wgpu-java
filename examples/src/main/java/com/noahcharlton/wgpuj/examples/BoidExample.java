@@ -64,10 +64,10 @@ public class BoidExample {
         bindGroup = device.createBindGroup("Bind Group", bindGroupLayout,
                 BindGroupUtils.bufferEntry(0, boidPositionBuffer));
 
-        var pipelineSettings = createPipelineSettings(device);
-        pipelineSettings.setBindGroupLayouts(bindGroupLayout);
+        var pipelineConfig = createPipelineConfig(device);
+        pipelineConfig.setBindGroupLayouts(bindGroupLayout);
 
-        pipeline = device.createRenderPipeline(pipelineSettings);
+        pipeline = device.createRenderPipeline(pipelineConfig);
         app.initializeSwapChain();
         run();
     }
@@ -197,11 +197,11 @@ public class BoidExample {
         new BoidExample(config);
     }
 
-    private static RenderPipelineSettings createPipelineSettings(Device device) {
+    private static RenderPipelineConfig createPipelineConfig(Device device) {
         var vertex = ShaderConfig.fromRawClasspathFile("/boid.vert", "main");
         var fragment = ShaderConfig.fromRawClasspathFile("/boid.frag", "main");
 
-        return new RenderPipelineSettings()
+        return new RenderPipelineConfig()
                 .setVertexStage(device.createShaderModule(vertex))
                 .setFragmentStage(device.createShaderModule(fragment))
                 .setRasterizationState(RasterizationState.of(

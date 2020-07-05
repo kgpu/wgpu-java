@@ -6,17 +6,10 @@ import com.noahcharlton.wgpuj.jni.WgpuRenderPipelineDescriptor;
 
 public class RenderPipeline {
 
-    private final Device device;
     private final long pipelineID;
 
-    public RenderPipeline(RenderPipelineSettings settings, Device device){
-        this.device = device;
-
-        long pipelineLayoutID = device.createPipelineLayout(settings.getBindGroupLayouts());
-
-        WgpuRenderPipelineDescriptor pipelineDesc = settings.build(pipelineLayoutID);
-        pipelineID = WgpuJava.wgpuNative.wgpu_device_create_render_pipeline(device.getId(),
-                pipelineDesc.getPointerTo());
+    public RenderPipeline(long pipelineID) {
+        this.pipelineID = pipelineID;
     }
 
     public long getPipelineID() {

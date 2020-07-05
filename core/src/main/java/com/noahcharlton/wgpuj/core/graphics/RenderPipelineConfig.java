@@ -1,6 +1,5 @@
 package com.noahcharlton.wgpuj.core.graphics;
 
-import com.noahcharlton.wgpuj.core.Device;
 import com.noahcharlton.wgpuj.core.util.ShaderModule;
 import com.noahcharlton.wgpuj.jni.WgpuColorStateDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuDepthStencilStateDescriptor;
@@ -10,7 +9,7 @@ import com.noahcharlton.wgpuj.jni.WgpuRasterizationStateDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuRenderPipelineDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuVertexBufferLayoutDescriptor;
 
-public class RenderPipelineSettings {
+public class RenderPipelineConfig {
 
     private ShaderModule vertexStage;
     private ShaderModule fragmentStage;
@@ -25,7 +24,7 @@ public class RenderPipelineSettings {
     private boolean alphaToCoverage;
     private long[] bindGroupLayouts;
 
-    public RenderPipelineSettings() {
+    public RenderPipelineConfig() {
 
     }
 
@@ -58,7 +57,7 @@ public class RenderPipelineSettings {
         return vertexStage;
     }
 
-    public RenderPipelineSettings setVertexStage(ShaderModule vertexStage) {
+    public RenderPipelineConfig setVertexStage(ShaderModule vertexStage) {
         this.vertexStage = vertexStage;
         return this;
     }
@@ -67,7 +66,7 @@ public class RenderPipelineSettings {
         return fragmentStage;
     }
 
-    public RenderPipelineSettings setFragmentStage(ShaderModule fragmentStage) {
+    public RenderPipelineConfig setFragmentStage(ShaderModule fragmentStage) {
         this.fragmentStage = fragmentStage;
         return this;
     }
@@ -76,13 +75,13 @@ public class RenderPipelineSettings {
         return primitiveTopology;
     }
 
-    public RenderPipelineSettings setPrimitiveTopology(WgpuPrimitiveTopology primitiveTopology) {
+    public RenderPipelineConfig setPrimitiveTopology(WgpuPrimitiveTopology primitiveTopology) {
         this.primitiveTopology = primitiveTopology;
 
         return this;
     }
 
-    public RenderPipelineSettings setBufferLayouts(WgpuVertexBufferLayoutDescriptor... bufferLayouts) {
+    public RenderPipelineConfig setBufferLayouts(WgpuVertexBufferLayoutDescriptor... bufferLayouts) {
         this.bufferLayouts = bufferLayouts;
 
         return this;
@@ -96,7 +95,7 @@ public class RenderPipelineSettings {
         return rasterizationState;
     }
 
-    public RenderPipelineSettings setRasterizationState(WgpuRasterizationStateDescriptor rasterizationState) {
+    public RenderPipelineConfig setRasterizationState(WgpuRasterizationStateDescriptor rasterizationState) {
         this.rasterizationState = rasterizationState;
 
         return this;
@@ -106,7 +105,7 @@ public class RenderPipelineSettings {
         return colorStates;
     }
 
-    public RenderPipelineSettings setColorStates(WgpuColorStateDescriptor... colorStates) {
+    public RenderPipelineConfig setColorStates(WgpuColorStateDescriptor... colorStates) {
         this.colorStates = colorStates;
 
         return this;
@@ -116,7 +115,7 @@ public class RenderPipelineSettings {
         return depthStencilState;
     }
 
-    public RenderPipelineSettings setDepthStencilState(WgpuDepthStencilStateDescriptor depthStencilState) {
+    public RenderPipelineConfig setDepthStencilState(WgpuDepthStencilStateDescriptor depthStencilState) {
         this.depthStencilState = depthStencilState;
 
         return this;
@@ -126,7 +125,7 @@ public class RenderPipelineSettings {
         return vertexIndexFormat;
     }
 
-    public RenderPipelineSettings setVertexIndexFormat(WgpuIndexFormat vertexIndexFormat) {
+    public RenderPipelineConfig setVertexIndexFormat(WgpuIndexFormat vertexIndexFormat) {
         this.vertexIndexFormat = vertexIndexFormat;
 
         return this;
@@ -136,7 +135,7 @@ public class RenderPipelineSettings {
         return sampleCount;
     }
 
-    public RenderPipelineSettings setSampleCount(int sampleCount) {
+    public RenderPipelineConfig setSampleCount(int sampleCount) {
         this.sampleCount = sampleCount;
 
         return this;
@@ -146,7 +145,7 @@ public class RenderPipelineSettings {
         return sampleMask;
     }
 
-    public RenderPipelineSettings setSampleMask(int sampleMask) {
+    public RenderPipelineConfig setSampleMask(int sampleMask) {
         this.sampleMask = sampleMask;
 
         return this;
@@ -156,13 +155,13 @@ public class RenderPipelineSettings {
         return alphaToCoverage;
     }
 
-    public RenderPipelineSettings setAlphaToCoverage(boolean alphaToCoverage) {
+    public RenderPipelineConfig setAlphaToCoverage(boolean alphaToCoverage) {
         this.alphaToCoverage = alphaToCoverage;
 
         return this;
     }
 
-    public RenderPipelineSettings setBindGroupLayouts(long... bindGroupLayouts) {
+    public RenderPipelineConfig setBindGroupLayouts(long... bindGroupLayouts) {
         this.bindGroupLayouts = bindGroupLayouts;
 
         return this;

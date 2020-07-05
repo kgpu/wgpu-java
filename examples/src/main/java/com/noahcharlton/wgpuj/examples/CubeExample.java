@@ -91,9 +91,9 @@ public class CubeExample {
             var bindGroup = device.createBindGroup("matrix bind group", bindGroupLayout,
                             BindGroupUtils.bufferEntry(0, matrixBuffer));
 
-            RenderPipelineSettings renderPipelineSettings = createPipelineSettings(device);
-            renderPipelineSettings.setBindGroupLayouts(bindGroupLayout);
-            RenderPipeline pipeline = device.createRenderPipeline(renderPipelineSettings);
+            RenderPipelineConfig pipelineConfig = createPipelineConfig(device);
+            pipelineConfig.setBindGroupLayouts(bindGroupLayout);
+            RenderPipeline pipeline = device.createRenderPipeline(pipelineConfig);
             application.initializeSwapChain();
 
             while(!application.getWindow().isCloseRequested()) {
@@ -124,11 +124,11 @@ public class CubeExample {
         return MatrixUtils.generateTransMatrix(projection, view);
     }
 
-    private static RenderPipelineSettings createPipelineSettings(Device device) {
+    private static RenderPipelineConfig createPipelineConfig(Device device) {
         var vertex = ShaderConfig.fromRawClasspathFile("/cube.vert", "main");
         var fragment = ShaderConfig.fromRawClasspathFile("/cube.frag", "main");
 
-        return new RenderPipelineSettings()
+        return new RenderPipelineConfig()
                 .setVertexStage(device.createShaderModule(vertex))
                 .setFragmentStage(device.createShaderModule(fragment))
                 .setRasterizationState(RasterizationState.of(
