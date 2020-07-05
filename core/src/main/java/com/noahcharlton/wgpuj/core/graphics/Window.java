@@ -44,7 +44,7 @@ public class Window {
 
     public void setIcon(ImageData data){
         ByteBuffer buffer = ByteBuffer.allocateDirect(data.getPixels().length * Integer.BYTES);
-        buffer.order(ByteOrder.BIG_ENDIAN); //Red Channel comes first
+        buffer.order(ByteOrder.LITTLE_ENDIAN); //Red Channel comes first
 
         for(int pixel : data.getPixels()){
             buffer.putInt(pixel);
