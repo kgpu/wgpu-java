@@ -67,3 +67,20 @@ test {
         }
     }
 }
+
+task generateBookDocs(type: Javadoc) {
+    dependsOn project(":native").getTasksByName("classes", false)
+    dependsOn configurations.runtimeClasspath
+
+    source = sourceSets.main.allJava + project(":native").sourceSets.main.allJava
+    classpath = configurations.runtimeClasspath
+    destinationDir = new File(rootDir, "docs/book/javadoc")
+}
+
+task generateBook(type: Exec){
+    workingDir "${projectDir}/../docs"
+    commandLine 'mdbook', 'build'
+}
+
+generateBook.finalizedBy generateBookDocs
+
