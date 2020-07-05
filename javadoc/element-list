@@ -1,0 +1,9 @@
+com.noahcharlton.wgpuj
+com.noahcharlton.wgpuj.core
+com.noahcharlton.wgpuj.core.compute
+com.noahcharlton.wgpuj.core.graphics
+com.noahcharlton.wgpuj.core.input
+com.noahcharlton.wgpuj.core.math
+com.noahcharlton.wgpuj.core.util
+com.noahcharlton.wgpuj.jni
+com.noahcharlton.wgpuj.util
