@@ -8,34 +8,17 @@ Java bindings for [Wgpu](https://github.com/gfx-rs/wgpu) based on
 - Rust 
 - Java JDK 11+
 
-![Boid Example](images/boid_simulation.png)
-![Cube Example](images/cube.png)
-![Earth Example](images/earth.png)
+![Boid Example](docs/src/images/boid_simulation.png)
+![Cube Example](docs/src/images/cube.png)
+![Earth Example](docs/src/images/earth.png)
 
-### Structure :
-###### wgpu-java/core
-Libraries that make wgpu easier to use in Java.
-Includes a windowing library, rendering pipelines, swap chains, etc. Uses 
-LWJGL to get Glfw bindings 
+### Documentation
 
-###### wgpu-java/native: 
-Actual bindings with wgpu-native. Bindings are created at 
-runtime using [jnr-ffi](https://github.com/jnr/jnr-ffi)
+Documentation/Book: 
+[Link](https://devorc.github.io/wgpu-java/)
 
-###### wgpu-java/native/wgpu-native
-The [fork](https://github.com/DevOrc/wgpu-native/tree/jnr-compatible) of wgpu-native that this library uses.
-A fork is needed to add some functions to get around some problems with jnr-ffi 
-(the library that produces the bindings from java to rust)
-
-###### wgpu-java/native/wgpu-test
-A cargo crate that has functions used for unit testing the FFI code.
-
-###### wgpu-java/native/jnr-gen
-A tool to make java files out of the wgpu.h header file.
-[Click Here for more info](https://github.com/DevOrc/wgpu-java/blob/master/native/jnrgen/README.md)
-
-###### wgpu-java/examples
-Examples of how to use wgpu-java/core
+Javadocs:
+ [Link](https://devorc.github.io/wgpu-java/javadoc/index.html) 
 
 ### How to run:
 Gradle will automatically build the required dll/.so/.dylib when wgpu-java/natives 
@@ -63,20 +46,12 @@ gradlew runExample -Pexample=ComputeExample
  Boid Simulation | gradlew runExample -Pexample=BoidExample |
 
 ### Supported Platforms
-   API   |    Windows 7/10    |  Linux                 |    macOS               |
-  -----  | ------------------ | ------------------     | ------------------     |
-  DX11   | :heavy_check_mark: |                        |                        |
-  DX12   | :heavy_check_mark: |                        |                        |
-  Vulkan | :heavy_check_mark: | :heavy_check_mark:     |                        |
-  Metal  |                    |                        | :large_orange_diamond: |
-  OpenGL | :construction:     | :construction:         | :construction:         |
-  
-:heavy_check_mark: = Supported
+__Windows 7/10__: Vulkan, DX12, DX11
 
-:large_orange_diamond: = Intermediate Support: See [Issue #4](https://github.com/DevOrc/wgpu-java/issues/4)
+__MacOS__: Metal (See [Issue #4](https://github.com/DevOrc/wgpu-java/issues/4))
 
-:construction: = Wgpu support being worked on
-
+__Linux__:  Vulkan 
+ 
 ### Contributing
 I only have a windows/linux machine, so the best way to contribute is to write
 and test the platform specific code (i.e. window handling for rendering pipelines). For more details, see 
