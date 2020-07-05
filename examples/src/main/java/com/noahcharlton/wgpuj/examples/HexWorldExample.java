@@ -65,8 +65,8 @@ public class HexWorldExample implements AutoCloseable {
     private RenderPipeline pipeline;
     private long bindGroup;
 
-    public HexWorldExample(GraphicApplicationSettings settings) {
-        application = WgpuGraphicApplication.create(settings);
+    public HexWorldExample(GraphicApplicationConfig config) {
+        application = WgpuGraphicApplication.create(config);
         device = application.getDevice();
         queue = application.getDefaultQueue();
         viewMatrix = new Matrix4f();
@@ -162,9 +162,9 @@ public class HexWorldExample implements AutoCloseable {
     public static void main(String[] args) {
         WgpuCore.loadWgpuNative();
 
-        var settings = new GraphicApplicationSettings("HexWorld", DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
+        var config = new GraphicApplicationConfig("HexWorld", DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
 
-        try(var hexWorld = new HexWorldExample(settings)) {
+        try(var hexWorld = new HexWorldExample(config)) {
             hexWorld.init();
             hexWorld.run();
         }

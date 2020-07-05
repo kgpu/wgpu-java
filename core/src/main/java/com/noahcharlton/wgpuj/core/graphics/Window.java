@@ -27,8 +27,8 @@ public class Window {
     private SwapChain swapChain;
     private WindowEventHandler eventHandler;
 
-    public Window(GraphicApplicationSettings settings) {
-        this.handle = settings.createWindow();
+    public Window(GraphicApplicationConfig config) {
+        this.handle = config.createWindow();
 
         if(this.handle == NULL)
             throw new RuntimeException("Failed to create window!");
@@ -39,7 +39,7 @@ public class Window {
 
         surface = createSurface();
         eventHandler = new WindowEventHandler.EmptyWindowHandler();
-        device = Device.create(settings, surface);
+        device = Device.create(config, surface);
     }
 
     public void setIcon(ImageData data){

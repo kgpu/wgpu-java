@@ -141,28 +141,28 @@ public class Device {
         return new ShaderModule(module, config.getEntryPoint());
     }
 
-    public static Device create(DeviceSettings settings, long surface) {
+    public static Device create(DeviceConfig config, long surface) {
         var optionsDesc = WgpuRequestAdapterOptions.createDirect();
         optionsDesc.setCompatibleSurface(surface);
         optionsDesc.setPowerPreference(WgpuPowerPreference.DEFAULT);
 
-        var tracePath = RustCString.toPointer(settings.getTracePath());
+        var tracePath = RustCString.toPointer(config.getTracePath());
         var limitsDesc = WgpuCLimits.createDirect();
         limitsDesc.setMaxBindGroups(16);
 
-        var adapter = requestAdapter(optionsDesc, settings);
-        long id = WgpuJava.wgpuNative.wgpu_adapter_request_device(adapter, settings.getExtensions(),
+        var adapter = requestAdapter(optionsDesc, config);
+        long id = WgpuJava.wgpuNative.wgpu_adapter_request_device(adapter, config.getExtensions(),
                 limitsDesc.getPointerTo(), tracePath);
 
         return new Device(id);
     }
 
-    private static long requestAdapter(WgpuRequestAdapterOptions options, DeviceSettings settings) {
+    private static long requestAdapter(WgpuRequestAdapterOptions options, DeviceConfig config) {
         AtomicLong adapter = new AtomicLong(0);
 
         WgpuJava.wgpuNative.wgpu_request_adapter_async(
                 options.getPointerTo(),
-                settings.getBackend(),
+                config.getBackend(),
                 false,
                 (received, userData) -> {
                     adapter.set(received);

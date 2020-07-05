@@ -2,7 +2,6 @@ package com.noahcharlton.wgpuj.examples;
 
 import com.noahcharlton.wgpuj.core.Device;
 import com.noahcharlton.wgpuj.core.util.ShaderConfig;
-import com.noahcharlton.wgpuj.core.util.ShaderModule;
 import com.noahcharlton.wgpuj.core.WgpuCore;
 import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
 import com.noahcharlton.wgpuj.core.graphics.*;
@@ -21,9 +20,9 @@ public class TriangleExample {
     public static void main(String[] args){
         WgpuCore.loadWgpuNative();
 
-        GraphicApplicationSettings appSettings = new GraphicApplicationSettings("Wgpu-Java example", 640, 480);
+        GraphicApplicationConfig appConfig = new GraphicApplicationConfig("Wgpu-Java example", 640, 480);
 
-        try(var application = WgpuGraphicApplication.create(appSettings)) {
+        try(var application = WgpuGraphicApplication.create(appConfig)) {
             RenderPipelineSettings renderPipelineSettings = createPipelineSettings(application.getDevice());
             RenderPipeline pipeline = application.getDevice().createRenderPipeline(renderPipelineSettings);
             application.initializeSwapChain();

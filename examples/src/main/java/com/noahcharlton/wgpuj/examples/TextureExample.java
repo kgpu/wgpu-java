@@ -35,9 +35,9 @@ public class TextureExample {
         WgpuCore.loadWgpuNative();
 
         ImageData texture = loadTexture();
-        GraphicApplicationSettings appSettings = new GraphicApplicationSettings("Wgpu-Java Texture Example", 350, 350);
+        GraphicApplicationConfig appConfig = new GraphicApplicationConfig("Wgpu-Java Texture Example", 350, 350);
 
-        try(var application = WgpuGraphicApplication.create(appSettings)) {
+        try(var application = WgpuGraphicApplication.create(appConfig)) {
             Device device = application.getDevice();
             Queue queue = application.getDefaultQueue();
 

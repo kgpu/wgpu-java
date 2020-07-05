@@ -2,7 +2,6 @@ package com.noahcharlton.wgpuj.examples;
 
 import com.noahcharlton.wgpuj.core.Device;
 import com.noahcharlton.wgpuj.core.util.ShaderConfig;
-import com.noahcharlton.wgpuj.core.util.ShaderModule;
 import com.noahcharlton.wgpuj.core.WgpuCore;
 import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
 import com.noahcharlton.wgpuj.core.graphics.*;
@@ -49,9 +48,9 @@ public class VertexExample {
     public static void main(String[] args){
         WgpuCore.loadWgpuNative();
 
-        GraphicApplicationSettings appSettings = new GraphicApplicationSettings("Wgpu-Java vertex example", 302, 302);
+        GraphicApplicationConfig appConfig = new GraphicApplicationConfig("Wgpu-Java vertex example", 302, 302);
 
-        try(var application = WgpuGraphicApplication.create(appSettings)) {
+        try(var application = WgpuGraphicApplication.create(appConfig)) {
             Device device = application.getDevice();
             RenderPipelineSettings renderPipelineSettings = createPipelineSettings(device);
             RenderPipeline pipeline = device.createRenderPipeline(renderPipelineSettings);

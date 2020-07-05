@@ -67,7 +67,7 @@ public class CubeExample {
     public static void main(String[] args) {
         WgpuCore.loadWgpuNative();
 
-        GraphicApplicationSettings appSettings = new GraphicApplicationSettings("Wgpu-Java cube example", 302, 332);
+        GraphicApplicationConfig appConfig = new GraphicApplicationConfig("Wgpu-Java cube example", 302, 332);
 
         Matrix4f viewMatrix = new Matrix4f().lookAt(
                 new Vector3f(1.5f, -5f, 3.0f),
@@ -75,7 +75,7 @@ public class CubeExample {
                 MathUtils.UNIT_Z
         );
 
-        try(var application = WgpuGraphicApplication.create(appSettings)) {
+        try(var application = WgpuGraphicApplication.create(appConfig)) {
             Device device = application.getDevice();
             Queue queue = application.getDefaultQueue();
             Matrix4f matrix = updateMatrix(application.getWindow(), viewMatrix);

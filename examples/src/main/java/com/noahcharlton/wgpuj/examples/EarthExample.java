@@ -107,8 +107,8 @@ public class EarthExample {
     private final RenderPipeline pipeline;
     private final long bindGroupId;
 
-    public EarthExample(GraphicApplicationSettings settings) {
-        app = WgpuGraphicApplication.create(settings);
+    public EarthExample(GraphicApplicationConfig config) {
+        app = WgpuGraphicApplication.create(config);
         device = app.getDevice();
         window = app.getWindow();
         queue = app.getDefaultQueue();
@@ -227,12 +227,12 @@ public class EarthExample {
 
     public static void main(String[] args) {
         WgpuCore.loadWgpuNative();
-        GraphicApplicationSettings settings = new GraphicApplicationSettings();
-        settings.setTitle("Wgpuj: Model Earth");
-        settings.setWidth(400);
-        settings.setHeight(400);
+        GraphicApplicationConfig config = new GraphicApplicationConfig();
+        config.setTitle("Wgpuj: Model Earth");
+        config.setWidth(400);
+        config.setHeight(400);
 
-        new EarthExample(settings).run();
+        new EarthExample(config).run();
     }
 
     private static RenderPipelineSettings createPipelineSettings(Device device) {

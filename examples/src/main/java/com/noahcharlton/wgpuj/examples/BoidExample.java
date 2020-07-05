@@ -47,8 +47,8 @@ public class BoidExample {
 
     private final long bindGroup;
 
-    public BoidExample(GraphicApplicationSettings settings) {
-        app = WgpuGraphicApplication.create(settings);
+    public BoidExample(GraphicApplicationConfig config) {
+        app = WgpuGraphicApplication.create(config);
         device = app.getDevice();
         window = app.getWindow();
         boids = createBoids();
@@ -192,9 +192,9 @@ public class BoidExample {
     public static void main(String[] args) {
         WgpuCore.loadWgpuNative();
 
-        var settings = new GraphicApplicationSettings("Boid Simulation", 640, 640);
+        var config = new GraphicApplicationConfig("Boid Simulation", 640, 640);
 
-        new BoidExample(settings);
+        new BoidExample(config);
     }
 
     private static RenderPipelineSettings createPipelineSettings(Device device) {

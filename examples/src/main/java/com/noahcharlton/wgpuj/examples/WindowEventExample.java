@@ -56,9 +56,9 @@ public class WindowEventExample {
     private final EnumSet<Key> keysPressed = EnumSet.noneOf(Key.class);
 
     public WindowEventExample() {
-        GraphicApplicationSettings appSettings = new GraphicApplicationSettings("Wgpu-Java event example", 640, 480);
+        GraphicApplicationConfig appConfig = new GraphicApplicationConfig("Wgpu-Java event example", 640, 480);
 
-        try(var application = WgpuGraphicApplication.create(appSettings)) {
+        try(var application = WgpuGraphicApplication.create(appConfig)) {
             device = application.getDevice();
             window = application.getWindow();
             queue = application.getDefaultQueue();

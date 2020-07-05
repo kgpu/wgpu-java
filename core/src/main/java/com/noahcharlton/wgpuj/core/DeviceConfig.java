@@ -2,13 +2,13 @@ package com.noahcharlton.wgpuj.core;
 
 import com.noahcharlton.wgpuj.core.util.Backend;
 
-public class DeviceSettings {
+public class DeviceConfig {
 
     private int backend = Backend.of(Backend.DX12, Backend.VULKAN, Backend.METAL);
     private String tracePath;
     private int extensions;
 
-    public DeviceSettings setBackend(Backend... backends) {
+    public DeviceConfig setBackend(Backend... backends) {
         this.backend = Backend.of(backends);
 
         return this;

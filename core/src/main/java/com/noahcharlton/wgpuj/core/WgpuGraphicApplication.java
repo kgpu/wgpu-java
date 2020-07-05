@@ -1,6 +1,6 @@
 package com.noahcharlton.wgpuj.core;
 
-import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
+import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationConfig;
 import com.noahcharlton.wgpuj.core.graphics.RenderPass;
 import com.noahcharlton.wgpuj.core.graphics.Window;
 import com.noahcharlton.wgpuj.core.graphics.GlfwHandler;
@@ -21,9 +21,9 @@ public class WgpuGraphicApplication extends WgpuApplication implements AutoClose
         this.window = window;
     }
 
-    public static WgpuGraphicApplication create(GraphicApplicationSettings settings){
+    public static WgpuGraphicApplication create(GraphicApplicationConfig config){
         GlfwHandler.init();
-        Window window = new Window(settings);
+        Window window = new Window(config);
         window.setIcon(defaultWindowIcon);
 
         return new WgpuGraphicApplication(window);

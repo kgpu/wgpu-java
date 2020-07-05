@@ -21,7 +21,7 @@ public class ComputeExample {
         System.out.println("Calculating Collatz for: " + Arrays.toString(numbers));
         int bufferSize = numbers.length * Integer.BYTES;
 
-        Device device = Device.create(new DeviceSettings(), 0);
+        Device device = Device.create(new DeviceConfig(), 0);
 
         Buffer stagingBuffer = new BufferConfig()
                 .setLabel("Staging Buffer")
