@@ -3,11 +3,11 @@ package com.noahcharlton.wgpuj.core.util;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class BufferSettingsTests {
+public class BufferConfigTests {
 
     @Test
     void usagesBasicTest() {
-        BufferSettings settings = new BufferSettings()
+        BufferConfig settings = new BufferConfig()
                 .setUsages(BufferUsage.INDEX, BufferUsage.UNIFORM, BufferUsage.STORAGE);
 
         int actual = settings.calculateUsage();

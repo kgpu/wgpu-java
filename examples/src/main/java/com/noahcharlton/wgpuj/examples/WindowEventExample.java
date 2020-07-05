@@ -5,11 +5,7 @@ import com.noahcharlton.wgpuj.core.graphics.*;
 import com.noahcharlton.wgpuj.core.input.Key;
 import com.noahcharlton.wgpuj.core.math.MathUtils;
 import com.noahcharlton.wgpuj.core.math.MatrixUtils;
-import com.noahcharlton.wgpuj.core.util.BindGroupUtils;
-import com.noahcharlton.wgpuj.core.util.Buffer;
-import com.noahcharlton.wgpuj.core.util.BufferUsage;
-import com.noahcharlton.wgpuj.core.util.Color;
-import com.noahcharlton.wgpuj.core.util.Dimension;
+import com.noahcharlton.wgpuj.core.util.*;
 import com.noahcharlton.wgpuj.jni.Wgpu;
 import com.noahcharlton.wgpuj.jni.WgpuBindingType;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
@@ -60,7 +56,6 @@ public class WindowEventExample {
     private final EnumSet<Key> keysPressed = EnumSet.noneOf(Key.class);
 
     public WindowEventExample() {
-        RenderPipelineSettings renderPipelineSettings = createPipelineSettings();
         GraphicApplicationSettings appSettings = new GraphicApplicationSettings("Wgpu-Java event example", 640, 480);
 
         try(var application = WgpuGraphicApplication.create(appSettings)) {
@@ -84,6 +79,7 @@ public class WindowEventExample {
             bindGroup = device.createBindGroup("matrix bind group", bindGroupLayout,
                             BindGroupUtils.bufferEntry(0, matrixBuffer));
 
+            RenderPipelineSettings renderPipelineSettings = createPipelineSettings(device);
             renderPipelineSettings.setBindGroupLayouts(bindGroupLayout);
             application.initializeSwapChain();
 
@@ -163,13 +159,13 @@ public class WindowEventExample {
             updateMatrix();
     }
 
-    private RenderPipelineSettings createPipelineSettings() {
-        ShaderData vertex = ShaderData.fromRawClasspathFile("/window.vert", "main");
-        ShaderData fragment = ShaderData.fromRawClasspathFile("/window.frag", "main");
+    private RenderPipelineSettings createPipelineSettings(Device device) {
+        ShaderConfig vertex = ShaderConfig.fromRawClasspathFile("/window.vert", "main");
+        ShaderConfig fragment = ShaderConfig.fromRawClasspathFile("/window.frag", "main");
 
         return new RenderPipelineSettings()
-                .setVertexStage(vertex)
-                .setFragmentStage(fragment)
+                .setVertexStage(device.createShaderModule(vertex))
+                .setFragmentStage(device.createShaderModule(fragment))
                 .setRasterizationState(RasterizationState.of(
                         WgpuFrontFace.CCW,
                         WgpuCullMode.NONE,

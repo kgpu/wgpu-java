@@ -4,9 +4,7 @@ import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.core.graphics.RenderPipeline;
 import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
 import com.noahcharlton.wgpuj.core.graphics.SwapChain;
-import com.noahcharlton.wgpuj.core.util.Buffer;
-import com.noahcharlton.wgpuj.core.util.BufferSettings;
-import com.noahcharlton.wgpuj.core.util.BufferUsage;
+import com.noahcharlton.wgpuj.core.util.*;
 import com.noahcharlton.wgpuj.jni.*;
 import com.noahcharlton.wgpuj.util.RustCString;
 
@@ -79,7 +77,7 @@ public class Device {
     }
 
     public Buffer createFloatBuffer(String name, float[] data, BufferUsage... usages) {
-        var buffer = new BufferSettings()
+        var buffer = new BufferConfig()
                 .setLabel(name)
                 .setSize(data.length * Float.BYTES)
                 .setMapped(true)
@@ -100,7 +98,7 @@ public class Device {
     }
 
     public Buffer createIntBuffer(String name, int[] data, BufferUsage... usages) {
-        var buffer = new BufferSettings()
+        var buffer = new BufferConfig()
                 .setLabel(name)
                 .setSize(data.length * Integer.BYTES)
                 .setMapped(true)
@@ -118,7 +116,7 @@ public class Device {
     }
 
     public Buffer createShortBuffer(String name, short[] data, BufferUsage... usages) {
-        var buffer = new BufferSettings()
+        var buffer = new BufferConfig()
                 .setLabel(name)
                 .setSize(data.length * Short.BYTES)
                 .setMapped(true)
@@ -130,6 +128,17 @@ public class Device {
         buffer.unmap();
 
         return buffer;
+    }
+
+    public ShaderModule createShaderModule(ShaderConfig config) {
+        var shaderModule = WgpuShaderModuleDescriptor.createDirect();
+        var dataPtr = WgpuJava.createByteArrayPointer(config.getData());
+
+        shaderModule.getCode().setBytes(dataPtr);
+        shaderModule.getCode().setLength(config.getData().length / 4);
+        long module = WgpuJava.wgpuNative.wgpu_device_create_shader_module(deviceId, shaderModule.getPointerTo());
+
+        return new ShaderModule(module, config.getEntryPoint());
     }
 
     public static Device create(DeviceSettings settings, long surface) {

@@ -14,7 +14,7 @@ public class RenderPipeline {
 
         long pipelineLayoutID = device.createPipelineLayout(settings.getBindGroupLayouts());
 
-        WgpuRenderPipelineDescriptor pipelineDesc = settings.build(device, pipelineLayoutID);
+        WgpuRenderPipelineDescriptor pipelineDesc = settings.build(pipelineLayoutID);
         pipelineID = WgpuJava.wgpuNative.wgpu_device_create_render_pipeline(device.getId(),
                 pipelineDesc.getPointerTo());
     }

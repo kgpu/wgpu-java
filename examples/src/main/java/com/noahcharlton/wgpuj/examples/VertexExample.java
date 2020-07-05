@@ -1,7 +1,8 @@
 package com.noahcharlton.wgpuj.examples;
 
 import com.noahcharlton.wgpuj.core.Device;
-import com.noahcharlton.wgpuj.core.ShaderData;
+import com.noahcharlton.wgpuj.core.util.ShaderConfig;
+import com.noahcharlton.wgpuj.core.util.ShaderModule;
 import com.noahcharlton.wgpuj.core.WgpuCore;
 import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
 import com.noahcharlton.wgpuj.core.graphics.*;
@@ -48,11 +49,11 @@ public class VertexExample {
     public static void main(String[] args){
         WgpuCore.loadWgpuNative();
 
-        RenderPipelineSettings renderPipelineSettings = createPipelineSettings();
         GraphicApplicationSettings appSettings = new GraphicApplicationSettings("Wgpu-Java vertex example", 302, 302);
 
         try(var application = WgpuGraphicApplication.create(appSettings)) {
             Device device = application.getDevice();
+            RenderPipelineSettings renderPipelineSettings = createPipelineSettings(device);
             RenderPipeline pipeline = device.createRenderPipeline(renderPipelineSettings);
 
             var vertexBuffer = device.createVertexBuffer("Vertex Buffer", VERTICES);
@@ -74,13 +75,13 @@ public class VertexExample {
         }
     }
 
-    private static RenderPipelineSettings createPipelineSettings(){
-        ShaderData vertex = ShaderData.fromRawClasspathFile("/vertex.vert", "main");
-        ShaderData fragment = ShaderData.fromRawClasspathFile("/vertex.frag", "main");
+    private static RenderPipelineSettings createPipelineSettings(Device device){
+        ShaderConfig vertex = ShaderConfig.fromRawClasspathFile("/vertex.vert", "main");
+        ShaderConfig fragment = ShaderConfig.fromRawClasspathFile("/vertex.frag", "main");
 
         return new RenderPipelineSettings()
-                .setVertexStage(vertex)
-                .setFragmentStage(fragment)
+                .setVertexStage(device.createShaderModule(vertex))
+                .setFragmentStage(device.createShaderModule(fragment))
                 .setRasterizationState(RasterizationState.of(
                         WgpuFrontFace.CCW,
                         WgpuCullMode.NONE,

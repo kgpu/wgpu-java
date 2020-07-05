@@ -4,11 +4,7 @@ import com.noahcharlton.wgpuj.core.*;
 import com.noahcharlton.wgpuj.core.graphics.*;
 import com.noahcharlton.wgpuj.core.math.MathUtils;
 import com.noahcharlton.wgpuj.core.math.MatrixUtils;
-import com.noahcharlton.wgpuj.core.util.BindGroupUtils;
-import com.noahcharlton.wgpuj.core.util.Buffer;
-import com.noahcharlton.wgpuj.core.util.BufferUsage;
-import com.noahcharlton.wgpuj.core.util.Color;
-import com.noahcharlton.wgpuj.core.util.Dimension;
+import com.noahcharlton.wgpuj.core.util.*;
 import com.noahcharlton.wgpuj.jni.Wgpu;
 import com.noahcharlton.wgpuj.jni.WgpuBindingType;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
@@ -71,7 +67,6 @@ public class CubeExample {
     public static void main(String[] args) {
         WgpuCore.loadWgpuNative();
 
-        RenderPipelineSettings renderPipelineSettings = createPipelineSettings();
         GraphicApplicationSettings appSettings = new GraphicApplicationSettings("Wgpu-Java cube example", 302, 332);
 
         Matrix4f viewMatrix = new Matrix4f().lookAt(
@@ -96,6 +91,7 @@ public class CubeExample {
             var bindGroup = device.createBindGroup("matrix bind group", bindGroupLayout,
                             BindGroupUtils.bufferEntry(0, matrixBuffer));
 
+            RenderPipelineSettings renderPipelineSettings = createPipelineSettings(device);
             renderPipelineSettings.setBindGroupLayouts(bindGroupLayout);
             RenderPipeline pipeline = device.createRenderPipeline(renderPipelineSettings);
             application.initializeSwapChain();
@@ -128,13 +124,13 @@ public class CubeExample {
         return MatrixUtils.generateTransMatrix(projection, view);
     }
 
-    private static RenderPipelineSettings createPipelineSettings() {
-        ShaderData vertex = ShaderData.fromRawClasspathFile("/cube.vert", "main");
-        ShaderData fragment = ShaderData.fromRawClasspathFile("/cube.frag", "main");
+    private static RenderPipelineSettings createPipelineSettings(Device device) {
+        var vertex = ShaderConfig.fromRawClasspathFile("/cube.vert", "main");
+        var fragment = ShaderConfig.fromRawClasspathFile("/cube.frag", "main");
 
         return new RenderPipelineSettings()
-                .setVertexStage(vertex)
-                .setFragmentStage(fragment)
+                .setVertexStage(device.createShaderModule(vertex))
+                .setFragmentStage(device.createShaderModule(fragment))
                 .setRasterizationState(RasterizationState.of(
                         WgpuFrontFace.CCW,
                         WgpuCullMode.BACK,

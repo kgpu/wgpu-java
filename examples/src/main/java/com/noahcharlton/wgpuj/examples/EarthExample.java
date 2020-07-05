@@ -178,7 +178,7 @@ public class EarthExample {
                 BindGroupUtils.bufferEntry(4, modelMatrixBuffer),
                 BindGroupUtils.bufferEntry(5, normalMatrixBuffer));
 
-        var pipelineSettings = createPipelineSettings();
+        var pipelineSettings = createPipelineSettings(device);
         pipelineSettings.setBindGroupLayouts(bindGroupLayout);
 
         pipeline = device.createRenderPipeline(pipelineSettings);
@@ -235,13 +235,13 @@ public class EarthExample {
         new EarthExample(settings).run();
     }
 
-    private static RenderPipelineSettings createPipelineSettings() {
-        ShaderData vertex = ShaderData.fromRawClasspathFile("/earth.vert", "main");
-        ShaderData fragment = ShaderData.fromRawClasspathFile("/earth.frag", "main");
+    private static RenderPipelineSettings createPipelineSettings(Device device) {
+        ShaderConfig vertex = ShaderConfig.fromRawClasspathFile("/earth.vert", "main");
+        ShaderConfig fragment = ShaderConfig.fromRawClasspathFile("/earth.frag", "main");
 
         return new RenderPipelineSettings()
-                .setVertexStage(vertex)
-                .setFragmentStage(fragment)
+                .setVertexStage(device.createShaderModule(vertex))
+                .setFragmentStage(device.createShaderModule(fragment))
                 .setRasterizationState(RasterizationState.of(
                         WgpuFrontFace.CCW,
                         WgpuCullMode.BACK,

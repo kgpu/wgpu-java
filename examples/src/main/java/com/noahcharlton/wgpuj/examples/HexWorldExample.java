@@ -4,11 +4,7 @@ import com.noahcharlton.wgpuj.core.*;
 import com.noahcharlton.wgpuj.core.graphics.*;
 import com.noahcharlton.wgpuj.core.math.MathUtils;
 import com.noahcharlton.wgpuj.core.math.MatrixUtils;
-import com.noahcharlton.wgpuj.core.util.BindGroupUtils;
-import com.noahcharlton.wgpuj.core.util.Buffer;
-import com.noahcharlton.wgpuj.core.util.BufferUsage;
-import com.noahcharlton.wgpuj.core.util.Color;
-import com.noahcharlton.wgpuj.core.util.Dimension;
+import com.noahcharlton.wgpuj.core.util.*;
 import com.noahcharlton.wgpuj.jni.Wgpu;
 import com.noahcharlton.wgpuj.jni.WgpuBindingType;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
@@ -107,7 +103,7 @@ public class HexWorldExample implements AutoCloseable {
                 BindGroupUtils.bufferEntry(1, modelsBuffer),
                 BindGroupUtils.bufferEntry(2, colorsBuffer));
 
-        var pipelineSettings = createRenderPipelineSettings();
+        var pipelineSettings = createRenderPipelineSettings(device);
         pipelineSettings.setBindGroupLayouts(bindGroupLayout);
 
         vertexBuffer = device.createVertexBuffer("Vertices", VERTICES);
@@ -116,13 +112,13 @@ public class HexWorldExample implements AutoCloseable {
         application.initializeSwapChain();
     }
 
-    private RenderPipelineSettings createRenderPipelineSettings() {
-        ShaderData vertex = ShaderData.fromRawClasspathFile("/hex_world.vert", "main");
-        ShaderData fragment = ShaderData.fromRawClasspathFile("/hex_world.frag", "main");
+    private RenderPipelineSettings createRenderPipelineSettings(Device device) {
+        ShaderConfig vertex = ShaderConfig.fromRawClasspathFile("/hex_world.vert", "main");
+        ShaderConfig fragment = ShaderConfig.fromRawClasspathFile("/hex_world.frag", "main");
 
         return new RenderPipelineSettings()
-                .setVertexStage(vertex)
-                .setFragmentStage(fragment)
+                .setVertexStage(device.createShaderModule(vertex))
+                .setFragmentStage(device.createShaderModule(fragment))
                 .setRasterizationState(RasterizationState.of(
                         WgpuFrontFace.CCW,
                         WgpuCullMode.NONE,

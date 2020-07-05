@@ -64,7 +64,7 @@ public class BoidExample {
         bindGroup = device.createBindGroup("Bind Group", bindGroupLayout,
                 BindGroupUtils.bufferEntry(0, boidPositionBuffer));
 
-        var pipelineSettings = createPipelineSettings();
+        var pipelineSettings = createPipelineSettings(device);
         pipelineSettings.setBindGroupLayouts(bindGroupLayout);
 
         pipeline = device.createRenderPipeline(pipelineSettings);
@@ -197,13 +197,13 @@ public class BoidExample {
         new BoidExample(settings);
     }
 
-    private static RenderPipelineSettings createPipelineSettings() {
-        ShaderData vertex = ShaderData.fromRawClasspathFile("/boid.vert", "main");
-        ShaderData fragment = ShaderData.fromRawClasspathFile("/boid.frag", "main");
+    private static RenderPipelineSettings createPipelineSettings(Device device) {
+        var vertex = ShaderConfig.fromRawClasspathFile("/boid.vert", "main");
+        var fragment = ShaderConfig.fromRawClasspathFile("/boid.frag", "main");
 
         return new RenderPipelineSettings()
-                .setVertexStage(vertex)
-                .setFragmentStage(fragment)
+                .setVertexStage(device.createShaderModule(vertex))
+                .setFragmentStage(device.createShaderModule(fragment))
                 .setRasterizationState(RasterizationState.of(
                         WgpuFrontFace.CCW,
                         WgpuCullMode.NONE,

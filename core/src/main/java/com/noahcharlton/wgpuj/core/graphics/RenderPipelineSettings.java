@@ -1,7 +1,7 @@
 package com.noahcharlton.wgpuj.core.graphics;
 
 import com.noahcharlton.wgpuj.core.Device;
-import com.noahcharlton.wgpuj.core.ShaderData;
+import com.noahcharlton.wgpuj.core.util.ShaderModule;
 import com.noahcharlton.wgpuj.jni.WgpuColorStateDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuDepthStencilStateDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuIndexFormat;
@@ -12,8 +12,8 @@ import com.noahcharlton.wgpuj.jni.WgpuVertexBufferLayoutDescriptor;
 
 public class RenderPipelineSettings {
 
-    private ShaderData vertexStage;
-    private ShaderData fragmentStage;
+    private ShaderModule vertexStage;
+    private ShaderModule fragmentStage;
     private WgpuPrimitiveTopology primitiveTopology;
     private WgpuRasterizationStateDescriptor rasterizationState;
     private WgpuColorStateDescriptor[] colorStates;
@@ -29,11 +29,11 @@ public class RenderPipelineSettings {
 
     }
 
-    public WgpuRenderPipelineDescriptor build(Device device, long layout){
+    public WgpuRenderPipelineDescriptor build(long layout){
         var descriptor = WgpuRenderPipelineDescriptor.createDirect();
 
-        var fragment = fragmentStage.build(device);
-        long vertexModule = vertexStage.createModule(device);
+        var fragment = fragmentStage.toDescriptor();
+        long vertexModule = vertexStage.getModule();
 
         descriptor.setLayout(layout);
         descriptor.getVertexStage().setModule(vertexModule);
@@ -54,20 +54,20 @@ public class RenderPipelineSettings {
         return descriptor;
     }
 
-    public ShaderData getVertexStage() {
+    public ShaderModule getVertexStage() {
         return vertexStage;
     }
 
-    public RenderPipelineSettings setVertexStage(ShaderData vertexStage) {
+    public RenderPipelineSettings setVertexStage(ShaderModule vertexStage) {
         this.vertexStage = vertexStage;
         return this;
     }
 
-    public ShaderData getFragmentStage() {
+    public ShaderModule getFragmentStage() {
         return fragmentStage;
     }
 
-    public RenderPipelineSettings setFragmentStage(ShaderData fragmentStage) {
+    public RenderPipelineSettings setFragmentStage(ShaderModule fragmentStage) {
         this.fragmentStage = fragmentStage;
         return this;
     }

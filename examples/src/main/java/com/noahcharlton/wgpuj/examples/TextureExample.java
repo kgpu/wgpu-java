@@ -3,11 +3,7 @@ package com.noahcharlton.wgpuj.examples;
 import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.core.*;
 import com.noahcharlton.wgpuj.core.graphics.*;
-import com.noahcharlton.wgpuj.core.util.BindGroupUtils;
-import com.noahcharlton.wgpuj.core.util.Buffer;
-import com.noahcharlton.wgpuj.core.util.BufferUsage;
-import com.noahcharlton.wgpuj.core.util.Color;
-import com.noahcharlton.wgpuj.core.util.ImageData;
+import com.noahcharlton.wgpuj.core.util.*;
 import com.noahcharlton.wgpuj.jni.*;
 
 import java.io.IOException;
@@ -39,7 +35,6 @@ public class TextureExample {
         WgpuCore.loadWgpuNative();
 
         ImageData texture = loadTexture();
-        RenderPipelineSettings renderPipelineSettings = createPipelineSettings();
         GraphicApplicationSettings appSettings = new GraphicApplicationSettings("Wgpu-Java Texture Example", 350, 350);
 
         try(var application = WgpuGraphicApplication.create(appSettings)) {
@@ -92,6 +87,7 @@ public class TextureExample {
                     BindGroupUtils.textureViewEntry(0, textureView),
                     BindGroupUtils.samplerEntry(1, sampler));
 
+            RenderPipelineSettings renderPipelineSettings = createPipelineSettings(device);
             renderPipelineSettings.setBindGroupLayouts(textureBindGroup);
             application.initializeSwapChain();
             RenderPipeline pipeline = device.createRenderPipeline(renderPipelineSettings);
@@ -118,13 +114,13 @@ public class TextureExample {
         }
     }
 
-    private static RenderPipelineSettings createPipelineSettings() {
-        ShaderData vertex = ShaderData.fromRawClasspathFile("/texture.vert", "main");
-        ShaderData fragment = ShaderData.fromRawClasspathFile("/texture.frag", "main");
+    private static RenderPipelineSettings createPipelineSettings(Device device) {
+        ShaderConfig vertex = ShaderConfig.fromRawClasspathFile("/texture.vert", "main");
+        ShaderConfig fragment = ShaderConfig.fromRawClasspathFile("/texture.frag", "main");
 
         return new RenderPipelineSettings()
-                .setVertexStage(vertex)
-                .setFragmentStage(fragment)
+                .setVertexStage(device.createShaderModule(vertex))
+                .setFragmentStage(device.createShaderModule(fragment))
                 .setRasterizationState(RasterizationState.of(
                         WgpuFrontFace.CCW,
                         WgpuCullMode.NONE,

@@ -4,10 +4,7 @@ import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.core.*;
 import com.noahcharlton.wgpuj.core.compute.ComputePass;
 import com.noahcharlton.wgpuj.core.compute.ComputePipeline;
-import com.noahcharlton.wgpuj.core.util.BindGroupUtils;
-import com.noahcharlton.wgpuj.core.util.Buffer;
-import com.noahcharlton.wgpuj.core.util.BufferSettings;
-import com.noahcharlton.wgpuj.core.util.BufferUsage;
+import com.noahcharlton.wgpuj.core.util.*;
 import com.noahcharlton.wgpuj.jni.*;
 import jnr.ffi.Pointer;
 
@@ -26,7 +23,7 @@ public class ComputeExample {
 
         Device device = Device.create(new DeviceSettings(), 0);
 
-        Buffer stagingBuffer = new BufferSettings()
+        Buffer stagingBuffer = new BufferConfig()
                 .setLabel("Staging Buffer")
                 .setSize(bufferSize)
                 .setUsages(BufferUsage.MAP_READ, BufferUsage.COPY_DST)
@@ -42,7 +39,7 @@ public class ComputeExample {
                 BindGroupUtils.bufferEntry(0, storageBuffer));
 
         long pipelineLayout = device.createPipelineLayout(bindGroupLayout);
-        ShaderData shader = ShaderData.fromRawClasspathFile("/collatz.comp", "main");
+        ShaderConfig shader = ShaderConfig.fromRawClasspathFile("/collatz.comp", "main");
         long pipelineId = ComputePipeline.create(device, pipelineLayout, shader);
 
         CommandEncoder encoder = device.createCommandEncoder("command encoder");

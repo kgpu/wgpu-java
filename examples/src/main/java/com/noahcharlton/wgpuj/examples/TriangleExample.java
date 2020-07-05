@@ -1,6 +1,8 @@
 package com.noahcharlton.wgpuj.examples;
 
-import com.noahcharlton.wgpuj.core.ShaderData;
+import com.noahcharlton.wgpuj.core.Device;
+import com.noahcharlton.wgpuj.core.util.ShaderConfig;
+import com.noahcharlton.wgpuj.core.util.ShaderModule;
 import com.noahcharlton.wgpuj.core.WgpuCore;
 import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
 import com.noahcharlton.wgpuj.core.graphics.*;
@@ -19,10 +21,10 @@ public class TriangleExample {
     public static void main(String[] args){
         WgpuCore.loadWgpuNative();
 
-        RenderPipelineSettings renderPipelineSettings = createPipelineSettings();
         GraphicApplicationSettings appSettings = new GraphicApplicationSettings("Wgpu-Java example", 640, 480);
 
         try(var application = WgpuGraphicApplication.create(appSettings)) {
+            RenderPipelineSettings renderPipelineSettings = createPipelineSettings(application.getDevice());
             RenderPipeline pipeline = application.getDevice().createRenderPipeline(renderPipelineSettings);
             application.initializeSwapChain();
 
@@ -37,13 +39,13 @@ public class TriangleExample {
         }
     }
 
-    private static RenderPipelineSettings createPipelineSettings(){
-        ShaderData vertex = ShaderData.fromRawClasspathFile("/triangle.vert", "main");
-        ShaderData fragment = ShaderData.fromRawClasspathFile("/triangle.frag", "main");
+    private static RenderPipelineSettings createPipelineSettings(Device device){
+        ShaderConfig vertex = ShaderConfig.fromRawClasspathFile("/triangle.vert", "main");
+        ShaderConfig fragment = ShaderConfig.fromRawClasspathFile("/triangle.frag", "main");
 
         return new RenderPipelineSettings()
-                .setVertexStage(vertex)
-                .setFragmentStage(fragment)
+                .setVertexStage(device.createShaderModule(vertex))
+                .setFragmentStage(device.createShaderModule(fragment))
                 .setRasterizationState(RasterizationState.of(
                         WgpuFrontFace.CCW,
                         WgpuCullMode.NONE,
