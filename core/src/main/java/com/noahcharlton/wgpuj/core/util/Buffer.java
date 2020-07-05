@@ -2,10 +2,7 @@ package com.noahcharlton.wgpuj.core.util;
 
 import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.jni.BufferMapCallback;
-import com.noahcharlton.wgpuj.jni.WgpuBufferCopyView;
-import com.noahcharlton.wgpuj.jni.WgpuExtent3d;
 import com.noahcharlton.wgpuj.jni.WgpuInputStepMode;
-import com.noahcharlton.wgpuj.jni.WgpuTextureCopyView;
 import com.noahcharlton.wgpuj.jni.WgpuVertexAttributeDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuVertexBufferLayoutDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuVertexFormat;

@@ -1,6 +1,5 @@
 package com.noahcharlton.wgpuj.core.compute;
 
-import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.core.RawPass;
 import com.noahcharlton.wgpuj.jni.WgpuRawPass;
 import jnr.ffi.Pointer;

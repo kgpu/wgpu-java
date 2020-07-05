@@ -104,6 +104,7 @@ public class EarthExample {
     private final Buffer vertexBuffer;
     private final Buffer modelMatrixBuffer;
     private final Buffer normalMatrixBuffer;
+    private final RenderPipeline pipeline;
     private final long bindGroupId;
 
     public EarthExample(GraphicApplicationSettings settings) {
@@ -177,10 +178,11 @@ public class EarthExample {
                 BindGroupUtils.bufferEntry(4, modelMatrixBuffer),
                 BindGroupUtils.bufferEntry(5, normalMatrixBuffer));
 
-        var pipeline = createPipelineSettings();
-        pipeline.setBindGroupLayouts(bindGroupLayout);
+        var pipelineSettings = createPipelineSettings();
+        pipelineSettings.setBindGroupLayouts(bindGroupLayout);
 
-        app.init(pipeline);
+        pipeline = device.createRenderPipeline(pipelineSettings);
+        app.initializeSwapChain();
     }
 
     private ImageData loadTexture() {
@@ -193,12 +195,14 @@ public class EarthExample {
 
     private void run() {
         while (!window.isCloseRequested()) {
-            RenderPass pass = app.renderStart();
+            RenderPass pass = app.renderStart(Color.BLACK);
+            pass.setPipeline(pipeline);
             pass.setBindGroup(0, bindGroupId);
             pass.setIndexBuffer(indexBuffer);
             pass.setVertexBuffer(vertexBuffer, 0);
             pass.drawIndexed((int) indexBuffer.getSize() / 2, 1, 0);
             app.renderEnd();
+            app.update();
 
             modelMatrix.rotate(.01f, MathUtils.UNIT_Z);
             queue.writeFloatsToBuffer(modelMatrixBuffer, MatrixUtils.toFloats(modelMatrix));
@@ -262,7 +266,6 @@ public class EarthExample {
                 .setSampleCount(1)
                 .setSampleMask(0)
                 .setAlphaToCoverage(false)
-                .setBindGroupLayouts()
-                .setClearColor(Color.BLACK);
+                .setBindGroupLayouts();
     }
 }

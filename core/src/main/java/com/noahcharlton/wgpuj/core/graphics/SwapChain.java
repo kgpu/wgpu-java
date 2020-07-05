@@ -22,16 +22,9 @@ public class SwapChain {
         this.device = device;
     }
 
-    public void renderStart(RenderPipeline pipeline){
-        rawPass = beginRenderPass(pipeline.getClearColor());
-
-        rawPass.setPipeline(pipeline);
-    }
-
-    private RenderPass beginRenderPass(Color clearColor) {
-        encoder = device.createCommandEncoder("command encoder");
-
-        return RenderPass.create(encoder, getSwapChainTexture(), clearColor);
+    public void renderStart(Color clearColor){
+        encoder = device.createCommandEncoder("Swap Chain Command Encoder");
+        rawPass = RenderPass.create(encoder, getSwapChainTexture(), clearColor);
     }
 
     private long getSwapChainTexture() {

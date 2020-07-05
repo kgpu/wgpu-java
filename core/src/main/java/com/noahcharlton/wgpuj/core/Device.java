@@ -1,13 +1,14 @@
 package com.noahcharlton.wgpuj.core;
 
 import com.noahcharlton.wgpuj.WgpuJava;
+import com.noahcharlton.wgpuj.core.graphics.RenderPipeline;
+import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
 import com.noahcharlton.wgpuj.core.graphics.SwapChain;
 import com.noahcharlton.wgpuj.core.util.Buffer;
 import com.noahcharlton.wgpuj.core.util.BufferSettings;
 import com.noahcharlton.wgpuj.core.util.BufferUsage;
 import com.noahcharlton.wgpuj.jni.*;
 import com.noahcharlton.wgpuj.util.RustCString;
-import jnr.ffi.Pointer;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -34,6 +35,10 @@ public class Device {
         desc.setBindGroupLayoutsLength(bindGroupLayouts.length);
 
         return natives.wgpu_device_create_pipeline_layout(deviceId, desc.getPointerTo());
+    }
+
+    public RenderPipeline createRenderPipeline(RenderPipelineSettings settings){
+        return new RenderPipeline(settings, this);
     }
 
     public CommandEncoder createCommandEncoder(String name){

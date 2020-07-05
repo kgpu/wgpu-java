@@ -1,5 +1,7 @@
-package com.noahcharlton.wgpuj.core.util;
+package com.noahcharlton.wgpuj.core.graphics;
 
+import com.noahcharlton.wgpuj.core.util.Dimension;
+import com.noahcharlton.wgpuj.core.util.Platform;
 import org.lwjgl.glfw.*;
 import org.lwjgl.system.MemoryStack;
 

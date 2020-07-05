@@ -4,11 +4,7 @@ import com.noahcharlton.wgpuj.core.Device;
 import com.noahcharlton.wgpuj.core.ShaderData;
 import com.noahcharlton.wgpuj.core.WgpuCore;
 import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
-import com.noahcharlton.wgpuj.core.graphics.BlendDescriptor;
-import com.noahcharlton.wgpuj.core.graphics.ColorState;
-import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
-import com.noahcharlton.wgpuj.core.graphics.RasterizationState;
-import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
+import com.noahcharlton.wgpuj.core.graphics.*;
 import com.noahcharlton.wgpuj.core.util.Buffer;
 import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.jni.Wgpu;
@@ -57,20 +53,23 @@ public class VertexExample {
 
         try(var application = WgpuGraphicApplication.create(appSettings)) {
             Device device = application.getDevice();
+            RenderPipeline pipeline = device.createRenderPipeline(renderPipelineSettings);
 
             var vertexBuffer = device.createVertexBuffer("Vertex Buffer", VERTICES);
             var indexBuffer = device.createIndexBuffer("Index Buffer", INDICES);
 
-            application.init(renderPipelineSettings);
+            application.initializeSwapChain();
 
             while(!application.getWindow().isCloseRequested()){
-                var renderPass = application.renderStart();
+                var renderPass = application.renderStart(Color.BLACK);
                 renderPass.setIndexBuffer(indexBuffer);
                 renderPass.setVertexBuffer(vertexBuffer, 0);
+                renderPass.setPipeline(pipeline);
 
                 renderPass.drawIndexed(INDICES.length, 1, 0);
 
                 application.renderEnd();
+                application.update();
             }
         }
     }
@@ -103,7 +102,6 @@ public class VertexExample {
                 .setSampleCount(1)
                 .setSampleMask(0)
                 .setAlphaToCoverage(false)
-                .setBindGroupLayouts()
-                .setClearColor(Color.BLACK);
+                .setBindGroupLayouts();
     }
 }

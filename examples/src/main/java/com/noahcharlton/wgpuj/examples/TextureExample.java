@@ -2,11 +2,7 @@ package com.noahcharlton.wgpuj.examples;
 
 import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.core.*;
-import com.noahcharlton.wgpuj.core.graphics.BlendDescriptor;
-import com.noahcharlton.wgpuj.core.graphics.ColorState;
-import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
-import com.noahcharlton.wgpuj.core.graphics.RasterizationState;
-import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
+import com.noahcharlton.wgpuj.core.graphics.*;
 import com.noahcharlton.wgpuj.core.util.BindGroupUtils;
 import com.noahcharlton.wgpuj.core.util.Buffer;
 import com.noahcharlton.wgpuj.core.util.BufferUsage;
@@ -97,16 +93,19 @@ public class TextureExample {
                     BindGroupUtils.samplerEntry(1, sampler));
 
             renderPipelineSettings.setBindGroupLayouts(textureBindGroup);
-            application.init(renderPipelineSettings);
+            application.initializeSwapChain();
+            RenderPipeline pipeline = device.createRenderPipeline(renderPipelineSettings);
 
             while(!application.getWindow().isCloseRequested()) {
-                var renderPass = application.renderStart();
+                RenderPass renderPass = application.renderStart(Color.BLACK);
+                renderPass.setPipeline(pipeline);
                 renderPass.setBindGroup(0, textureBindGroup);
                 renderPass.setIndexBuffer(indexBuffer);
                 renderPass.setVertexBuffer(vertexBuffer, 0);
                 renderPass.drawIndexed(INDICES.length, 1, 0);
 
                 application.renderEnd();
+                application.update();
             }
         }
     }
@@ -149,7 +148,6 @@ public class TextureExample {
                 .setSampleCount(1)
                 .setSampleMask(0xFFFFFFFF)
                 .setAlphaToCoverage(false)
-                .setBindGroupLayouts()
-                .setClearColor(Color.BLACK);
+                .setBindGroupLayouts();
     }
 }

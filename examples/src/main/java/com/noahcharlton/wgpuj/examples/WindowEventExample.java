@@ -1,14 +1,7 @@
 package com.noahcharlton.wgpuj.examples;
 
-import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.core.*;
-import com.noahcharlton.wgpuj.core.graphics.BlendDescriptor;
-import com.noahcharlton.wgpuj.core.graphics.ColorState;
-import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
-import com.noahcharlton.wgpuj.core.graphics.RasterizationState;
-import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
-import com.noahcharlton.wgpuj.core.graphics.Window;
-import com.noahcharlton.wgpuj.core.graphics.WindowEventHandler;
+import com.noahcharlton.wgpuj.core.graphics.*;
 import com.noahcharlton.wgpuj.core.input.Key;
 import com.noahcharlton.wgpuj.core.math.MathUtils;
 import com.noahcharlton.wgpuj.core.math.MatrixUtils;
@@ -18,7 +11,6 @@ import com.noahcharlton.wgpuj.core.util.BufferUsage;
 import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.core.util.Dimension;
 import com.noahcharlton.wgpuj.jni.Wgpu;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupEntry;
 import com.noahcharlton.wgpuj.jni.WgpuBindingType;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
 import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
@@ -29,7 +21,6 @@ import com.noahcharlton.wgpuj.jni.WgpuInputStepMode;
 import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
 import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
 import com.noahcharlton.wgpuj.jni.WgpuVertexFormat;
-import jnr.ffi.Pointer;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -94,9 +85,9 @@ public class WindowEventExample {
                             BindGroupUtils.bufferEntry(0, matrixBuffer));
 
             renderPipelineSettings.setBindGroupLayouts(bindGroupLayout);
-            application.init(renderPipelineSettings);
+            application.initializeSwapChain();
 
-            runMainLoop(application);
+            runMainLoop(application, device.createRenderPipeline(renderPipelineSettings));
         }
     }
 
@@ -116,11 +107,12 @@ public class WindowEventExample {
         queue.writeFloatsToBuffer(matrixBuffer, MatrixUtils.toFloats(transformationMatrix));
     }
 
-    private void runMainLoop(WgpuGraphicApplication application) {
+    private void runMainLoop(WgpuGraphicApplication application, RenderPipeline pipeline) {
         while(!application.getWindow().isCloseRequested()) {
             updateInput();
 
-            var renderPass = application.renderStart();
+            var renderPass = application.renderStart(Color.BLACK);
+            renderPass.setPipeline(pipeline);
             renderPass.setBindGroup(0, bindGroup);
             renderPass.setIndexBuffer(indexBuffer);
             renderPass.setVertexBuffer(vertexBuffer, 0);
@@ -128,6 +120,7 @@ public class WindowEventExample {
             renderPass.drawIndexed(INDICES.length, 1, 0);
 
             application.renderEnd();
+            application.update();
         }
     }
 
@@ -199,8 +192,7 @@ public class WindowEventExample {
                 .setSampleCount(1)
                 .setSampleMask(0)
                 .setAlphaToCoverage(false)
-                .setBindGroupLayouts()
-                .setClearColor(Color.BLACK);
+                .setBindGroupLayouts();
     }
 
     public static void main(String[] args) {

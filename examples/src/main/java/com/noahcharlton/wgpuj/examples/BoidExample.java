@@ -1,13 +1,11 @@
 package com.noahcharlton.wgpuj.examples;
 
-import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.core.*;
 import com.noahcharlton.wgpuj.core.graphics.*;
 import com.noahcharlton.wgpuj.core.math.MathUtils;
 import com.noahcharlton.wgpuj.core.math.MatrixUtils;
 import com.noahcharlton.wgpuj.core.util.*;
 import com.noahcharlton.wgpuj.jni.*;
-import jnr.ffi.Pointer;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 
@@ -45,6 +43,7 @@ public class BoidExample {
     private final Buffer vertexBuffer;
     private final Boid[] boids;
     private final Buffer boidPositionBuffer;
+    private final RenderPipeline pipeline;
 
     private final long bindGroup;
 
@@ -68,7 +67,8 @@ public class BoidExample {
         var pipelineSettings = createPipelineSettings();
         pipelineSettings.setBindGroupLayouts(bindGroupLayout);
 
-        app.init(pipelineSettings);
+        pipeline = device.createRenderPipeline(pipelineSettings);
+        app.initializeSwapChain();
         run();
     }
 
@@ -179,12 +179,14 @@ public class BoidExample {
     }
 
     private void render() {
-        var renderPass = app.renderStart();
+        var renderPass = app.renderStart(Color.BLACK);
+        renderPass.setPipeline(pipeline);
         renderPass.setBindGroup(0, bindGroup);
         renderPass.setVertexBuffer(vertexBuffer, 0);
         renderPass.draw(3, boids.length);
 
         app.renderEnd();
+        app.update();
     }
 
     public static void main(String[] args) {
@@ -224,7 +226,6 @@ public class BoidExample {
                 .setSampleCount(1)
                 .setSampleMask(0)
                 .setAlphaToCoverage(false)
-                .setBindGroupLayouts()
-                .setClearColor(Color.BLACK);
+                .setBindGroupLayouts();
     }
 }

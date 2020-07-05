@@ -43,10 +43,7 @@ public class ComputeExample {
 
         long pipelineLayout = device.createPipelineLayout(bindGroupLayout);
         ShaderData shader = ShaderData.fromRawClasspathFile("/collatz.comp", "main");
-        WgpuComputePipelineDescriptor pipelineDesc = ComputePipeline.of(device, pipelineLayout, shader);
-
-        long pipelineId = WgpuJava.wgpuNative.wgpu_device_create_compute_pipeline(device.getId(),
-                pipelineDesc.getPointerTo());
+        long pipelineId = ComputePipeline.create(device, pipelineLayout, shader);
 
         CommandEncoder encoder = device.createCommandEncoder("command encoder");
         ComputePass pass = encoder.beginComputePass(WgpuComputePassDescriptor.createDirect());

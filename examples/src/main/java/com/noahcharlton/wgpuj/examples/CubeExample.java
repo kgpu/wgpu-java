@@ -1,13 +1,7 @@
 package com.noahcharlton.wgpuj.examples;
 
-import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.core.*;
-import com.noahcharlton.wgpuj.core.graphics.BlendDescriptor;
-import com.noahcharlton.wgpuj.core.graphics.ColorState;
-import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
-import com.noahcharlton.wgpuj.core.graphics.RasterizationState;
-import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
-import com.noahcharlton.wgpuj.core.graphics.Window;
+import com.noahcharlton.wgpuj.core.graphics.*;
 import com.noahcharlton.wgpuj.core.math.MathUtils;
 import com.noahcharlton.wgpuj.core.math.MatrixUtils;
 import com.noahcharlton.wgpuj.core.util.BindGroupUtils;
@@ -16,7 +10,6 @@ import com.noahcharlton.wgpuj.core.util.BufferUsage;
 import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.core.util.Dimension;
 import com.noahcharlton.wgpuj.jni.Wgpu;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupEntry;
 import com.noahcharlton.wgpuj.jni.WgpuBindingType;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
 import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
@@ -27,7 +20,6 @@ import com.noahcharlton.wgpuj.jni.WgpuInputStepMode;
 import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
 import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
 import com.noahcharlton.wgpuj.jni.WgpuVertexFormat;
-import jnr.ffi.Pointer;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -105,10 +97,12 @@ public class CubeExample {
                             BindGroupUtils.bufferEntry(0, matrixBuffer));
 
             renderPipelineSettings.setBindGroupLayouts(bindGroupLayout);
-            application.init(renderPipelineSettings);
+            RenderPipeline pipeline = device.createRenderPipeline(renderPipelineSettings);
+            application.initializeSwapChain();
 
             while(!application.getWindow().isCloseRequested()) {
-                var renderPass = application.renderStart();
+                var renderPass = application.renderStart(Color.BLACK);
+                renderPass.setPipeline(pipeline);
                 renderPass.setBindGroup(0, bindGroup);
                 renderPass.setVertexBuffer(vertices, 0);
                 renderPass.setIndexBuffer(indices);
@@ -116,6 +110,7 @@ public class CubeExample {
                 renderPass.drawIndexed(INDICES.length, 1, 0);
 
                 application.renderEnd();
+                application.update();
 
                 var newMatrix = updateMatrix(application.getWindow(), viewMatrix);
                 queue.writeFloatsToBuffer(matrixBuffer, MatrixUtils.toFloats(newMatrix));
@@ -163,7 +158,6 @@ public class CubeExample {
                 .setSampleCount(1)
                 .setSampleMask(0)
                 .setAlphaToCoverage(false)
-                .setBindGroupLayouts()
-                .setClearColor(Color.BLACK);
+                .setBindGroupLayouts();
     }
 }

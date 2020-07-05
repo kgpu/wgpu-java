@@ -6,7 +6,6 @@ import com.noahcharlton.wgpuj.core.graphics.RenderPass;
 import com.noahcharlton.wgpuj.core.util.Buffer;
 import com.noahcharlton.wgpuj.core.util.ImageData;
 import com.noahcharlton.wgpuj.jni.*;
-import com.noahcharlton.wgpuj.util.WgpuJavaStruct;
 import jnr.ffi.Pointer;
 
 public class CommandEncoder {

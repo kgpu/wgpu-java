@@ -2,7 +2,6 @@ package com.noahcharlton.wgpuj.core.graphics;
 
 import com.noahcharlton.wgpuj.core.Device;
 import com.noahcharlton.wgpuj.core.ShaderData;
-import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.jni.WgpuColorStateDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuDepthStencilStateDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuIndexFormat;
@@ -21,7 +20,6 @@ public class RenderPipelineSettings {
     private WgpuDepthStencilStateDescriptor depthStencilState;
     private WgpuIndexFormat vertexIndexFormat;
     private WgpuVertexBufferLayoutDescriptor[] bufferLayouts;
-    private Color clearColor;
     private int sampleCount;
     private int sampleMask;
     private boolean alphaToCoverage;
@@ -168,16 +166,6 @@ public class RenderPipelineSettings {
         this.bindGroupLayouts = bindGroupLayouts;
 
         return this;
-    }
-
-    public RenderPipelineSettings setClearColor(Color clearColor) {
-        this.clearColor = clearColor;
-
-        return this;
-    }
-
-    public Color getClearColor() {
-        return clearColor;
     }
 
     public long[] getBindGroupLayouts() {

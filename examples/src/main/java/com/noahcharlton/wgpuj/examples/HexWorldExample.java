@@ -1,12 +1,7 @@
 package com.noahcharlton.wgpuj.examples;
 
-import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.core.*;
-import com.noahcharlton.wgpuj.core.graphics.BlendDescriptor;
-import com.noahcharlton.wgpuj.core.graphics.ColorState;
-import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
-import com.noahcharlton.wgpuj.core.graphics.RasterizationState;
-import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
+import com.noahcharlton.wgpuj.core.graphics.*;
 import com.noahcharlton.wgpuj.core.math.MathUtils;
 import com.noahcharlton.wgpuj.core.math.MatrixUtils;
 import com.noahcharlton.wgpuj.core.util.BindGroupUtils;
@@ -15,7 +10,6 @@ import com.noahcharlton.wgpuj.core.util.BufferUsage;
 import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.core.util.Dimension;
 import com.noahcharlton.wgpuj.jni.Wgpu;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupEntry;
 import com.noahcharlton.wgpuj.jni.WgpuBindingType;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
 import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
@@ -26,7 +20,6 @@ import com.noahcharlton.wgpuj.jni.WgpuInputStepMode;
 import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
 import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
 import com.noahcharlton.wgpuj.jni.WgpuVertexFormat;
-import jnr.ffi.Pointer;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
@@ -73,6 +66,7 @@ public class HexWorldExample implements AutoCloseable {
     private Buffer indexBuffer;
     private Buffer transMatrixBuffer;
     private Matrix4f viewMatrix;
+    private RenderPipeline pipeline;
     private long bindGroup;
 
     public HexWorldExample(GraphicApplicationSettings settings) {
@@ -116,10 +110,10 @@ public class HexWorldExample implements AutoCloseable {
         var pipelineSettings = createRenderPipelineSettings();
         pipelineSettings.setBindGroupLayouts(bindGroupLayout);
 
-        application.init(pipelineSettings);
-
         vertexBuffer = device.createVertexBuffer("Vertices", VERTICES);
         indexBuffer = device.createIndexBuffer("Indices", INDICES);
+        pipeline = device.createRenderPipeline(pipelineSettings);
+        application.initializeSwapChain();
     }
 
     private RenderPipelineSettings createRenderPipelineSettings() {
@@ -150,22 +144,22 @@ public class HexWorldExample implements AutoCloseable {
                 .setSampleCount(1)
                 .setSampleMask(0)
                 .setAlphaToCoverage(false)
-                .setBindGroupLayouts()
-                .setClearColor(Color.BLACK);
+                .setBindGroupLayouts();
     }
 
     private void run() {
         while(!application.getWindow().isCloseRequested()) {
-            queue.writeFloatsToBuffer(transMatrixBuffer, MatrixUtils.toFloats(createTransformationMatrix()));
+            var renderPass = application.renderStart(Color.BLACK);
 
-            var renderPass = application.renderStart();
-
+            renderPass.setPipeline(pipeline);
             renderPass.setBindGroup(0, bindGroup);
             renderPass.setVertexBuffer(vertexBuffer, 0);
             renderPass.setIndexBuffer(indexBuffer);
             renderPass.drawIndexed(INDICES.length, INSTANCES.length, 0);
 
             application.renderEnd();
+            application.update();
+            queue.writeFloatsToBuffer(transMatrixBuffer, MatrixUtils.toFloats(createTransformationMatrix()));
         }
     }
 
