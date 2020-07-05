@@ -26,6 +26,7 @@ public class JNRGenerator {
                 System.out.println("Failed to parse type from item " + item + ": " + e.getLocalizedMessage());
             }
         }
+        Hooks.preSave(outputHandler);
 
         for(Item item: items){
             try{

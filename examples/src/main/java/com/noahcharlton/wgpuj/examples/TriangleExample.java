@@ -1,13 +1,10 @@
 package com.noahcharlton.wgpuj.examples;
 
-import com.noahcharlton.wgpuj.core.ShaderData;
+import com.noahcharlton.wgpuj.core.Device;
+import com.noahcharlton.wgpuj.core.util.ShaderConfig;
 import com.noahcharlton.wgpuj.core.WgpuCore;
 import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
-import com.noahcharlton.wgpuj.core.graphics.BlendDescriptor;
-import com.noahcharlton.wgpuj.core.graphics.ColorState;
-import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
-import com.noahcharlton.wgpuj.core.graphics.RasterizationState;
-import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
+import com.noahcharlton.wgpuj.core.graphics.*;
 import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.jni.Wgpu;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
@@ -23,28 +20,31 @@ public class TriangleExample {
     public static void main(String[] args){
         WgpuCore.loadWgpuNative();
 
-        RenderPipelineSettings renderPipelineSettings = createPipelineSettings();
-        GraphicApplicationSettings appSettings = new GraphicApplicationSettings("Wgpu-Java example", 640, 480);
+        GraphicApplicationConfig appConfig = new GraphicApplicationConfig("Wgpu-Java example", 640, 480);
 
-        try(var application = WgpuGraphicApplication.create(appSettings)) {
-            application.init(renderPipelineSettings);
+        try(var application = WgpuGraphicApplication.create(appConfig)) {
+            RenderPipelineConfig pipelineConfig = createPipelineConfig(application.getDevice());
+            RenderPipeline pipeline = application.getDevice().createRenderPipeline(pipelineConfig);
+            application.initializeSwapChain();
 
             while(!application.getWindow().isCloseRequested()){
-                var renderPass = application.renderStart();
+                var renderPass = application.renderStart(Color.BLACK);
+                renderPass.setPipeline(pipeline);
                 renderPass.draw(3, 1);
 
                 application.renderEnd();
+                application.update();
             }
         }
     }
 
-    private static RenderPipelineSettings createPipelineSettings(){
-        ShaderData vertex = ShaderData.fromRawClasspathFile("/triangle.vert", "main");
-        ShaderData fragment = ShaderData.fromRawClasspathFile("/triangle.frag", "main");
+    private static RenderPipelineConfig createPipelineConfig(Device device){
+        ShaderConfig vertex = ShaderConfig.fromRawClasspathFile("/triangle.vert", "main");
+        ShaderConfig fragment = ShaderConfig.fromRawClasspathFile("/triangle.frag", "main");
 
-        return new RenderPipelineSettings()
-                .setVertexStage(vertex)
-                .setFragmentStage(fragment)
+        return new RenderPipelineConfig()
+                .setVertexStage(device.createShaderModule(vertex))
+                .setFragmentStage(device.createShaderModule(fragment))
                 .setRasterizationState(RasterizationState.of(
                         WgpuFrontFace.CCW,
                         WgpuCullMode.NONE,
@@ -63,8 +63,7 @@ public class TriangleExample {
                 .setSampleCount(1)
                 .setSampleMask(0)
                 .setAlphaToCoverage(false)
-                .setBindGroupLayouts()
-                .setClearColor(Color.BLACK);
+                .setBindGroupLayouts();
     }
 
 }

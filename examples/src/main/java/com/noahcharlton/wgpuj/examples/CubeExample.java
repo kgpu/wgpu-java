@@ -1,25 +1,11 @@
 package com.noahcharlton.wgpuj.examples;
 
-import com.noahcharlton.wgpuj.WgpuJava;
-import com.noahcharlton.wgpuj.core.Device;
-import com.noahcharlton.wgpuj.core.ShaderData;
-import com.noahcharlton.wgpuj.core.WgpuCore;
-import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
-import com.noahcharlton.wgpuj.core.graphics.BlendDescriptor;
-import com.noahcharlton.wgpuj.core.graphics.ColorState;
-import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
-import com.noahcharlton.wgpuj.core.graphics.RasterizationState;
-import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
-import com.noahcharlton.wgpuj.core.graphics.Window;
+import com.noahcharlton.wgpuj.core.*;
+import com.noahcharlton.wgpuj.core.graphics.*;
 import com.noahcharlton.wgpuj.core.math.MathUtils;
 import com.noahcharlton.wgpuj.core.math.MatrixUtils;
-import com.noahcharlton.wgpuj.core.util.BindGroupUtils;
-import com.noahcharlton.wgpuj.core.util.Buffer;
-import com.noahcharlton.wgpuj.core.util.BufferUsage;
-import com.noahcharlton.wgpuj.core.util.Color;
-import com.noahcharlton.wgpuj.core.util.Dimension;
+import com.noahcharlton.wgpuj.core.util.*;
 import com.noahcharlton.wgpuj.jni.Wgpu;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupEntry;
 import com.noahcharlton.wgpuj.jni.WgpuBindingType;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
 import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
@@ -30,7 +16,6 @@ import com.noahcharlton.wgpuj.jni.WgpuInputStepMode;
 import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
 import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
 import com.noahcharlton.wgpuj.jni.WgpuVertexFormat;
-import jnr.ffi.Pointer;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -82,8 +67,7 @@ public class CubeExample {
     public static void main(String[] args) {
         WgpuCore.loadWgpuNative();
 
-        RenderPipelineSettings renderPipelineSettings = createPipelineSettings();
-        GraphicApplicationSettings appSettings = new GraphicApplicationSettings("Wgpu-Java cube example", 302, 332);
+        GraphicApplicationConfig appConfig = new GraphicApplicationConfig("Wgpu-Java cube example", 302, 332);
 
         Matrix4f viewMatrix = new Matrix4f().lookAt(
                 new Vector3f(1.5f, -5f, 3.0f),
@@ -91,8 +75,9 @@ public class CubeExample {
                 MathUtils.UNIT_Z
         );
 
-        try(var application = WgpuGraphicApplication.create(appSettings)) {
+        try(var application = WgpuGraphicApplication.create(appConfig)) {
             Device device = application.getDevice();
+            Queue queue = application.getDefaultQueue();
             Matrix4f matrix = updateMatrix(application.getWindow(), viewMatrix);
 
             var vertices = device.createVertexBuffer("Vertices", VERTICES);
@@ -101,17 +86,19 @@ public class CubeExample {
                     BufferUsage.UNIFORM, BufferUsage.COPY_DST);
 
             var bindGroupLayout = device.createBindGroupLayout("matrix group layout",
-                    BindGroupUtils.partialLayout(0, Wgpu.ShaderStage.VERTEX,
-                            WgpuBindingType.UNIFORM_BUFFER));
+                    BindGroupUtils.partialLayout(0, Wgpu.ShaderStage.VERTEX, WgpuBindingType.UNIFORM_BUFFER));
 
             var bindGroup = device.createBindGroup("matrix bind group", bindGroupLayout,
-                            new WgpuBindGroupEntry().setBuffer(0, matrixBuffer.getId(), matrixBuffer.getSize()));
+                            BindGroupUtils.bufferEntry(0, matrixBuffer));
 
-            renderPipelineSettings.setBindGroupLayouts(bindGroupLayout);
-            application.init(renderPipelineSettings);
+            RenderPipelineConfig pipelineConfig = createPipelineConfig(device);
+            pipelineConfig.setBindGroupLayouts(bindGroupLayout);
+            RenderPipeline pipeline = device.createRenderPipeline(pipelineConfig);
+            application.initializeSwapChain();
 
             while(!application.getWindow().isCloseRequested()) {
-                var renderPass = application.renderStart();
+                var renderPass = application.renderStart(Color.BLACK);
+                renderPass.setPipeline(pipeline);
                 renderPass.setBindGroup(0, bindGroup);
                 renderPass.setVertexBuffer(vertices, 0);
                 renderPass.setIndexBuffer(indices);
@@ -119,14 +106,10 @@ public class CubeExample {
                 renderPass.drawIndexed(INDICES.length, 1, 0);
 
                 application.renderEnd();
+                application.update();
 
                 var newMatrix = updateMatrix(application.getWindow(), viewMatrix);
-                float[] matrixData = newMatrix.get(new float[16]);
-
-                Pointer pointer = WgpuJava.createDirectPointer(16 * Float.BYTES);
-                pointer.put(0, matrixData, 0, 16);
-                WgpuJava.wgpuNative.wgpu_queue_write_buffer(application.getQueue(), matrixBuffer.getId(), 0,
-                        pointer, 16 * Float.BYTES);
+                queue.writeFloatsToBuffer(matrixBuffer, MatrixUtils.toFloats(newMatrix));
             }
         }
     }
@@ -141,13 +124,13 @@ public class CubeExample {
         return MatrixUtils.generateTransMatrix(projection, view);
     }
 
-    private static RenderPipelineSettings createPipelineSettings() {
-        ShaderData vertex = ShaderData.fromRawClasspathFile("/cube.vert", "main");
-        ShaderData fragment = ShaderData.fromRawClasspathFile("/cube.frag", "main");
+    private static RenderPipelineConfig createPipelineConfig(Device device) {
+        var vertex = ShaderConfig.fromRawClasspathFile("/cube.vert", "main");
+        var fragment = ShaderConfig.fromRawClasspathFile("/cube.frag", "main");
 
-        return new RenderPipelineSettings()
-                .setVertexStage(vertex)
-                .setFragmentStage(fragment)
+        return new RenderPipelineConfig()
+                .setVertexStage(device.createShaderModule(vertex))
+                .setFragmentStage(device.createShaderModule(fragment))
                 .setRasterizationState(RasterizationState.of(
                         WgpuFrontFace.CCW,
                         WgpuCullMode.BACK,
@@ -171,7 +154,6 @@ public class CubeExample {
                 .setSampleCount(1)
                 .setSampleMask(0)
                 .setAlphaToCoverage(false)
-                .setBindGroupLayouts()
-                .setClearColor(Color.BLACK);
+                .setBindGroupLayouts();
     }
 }

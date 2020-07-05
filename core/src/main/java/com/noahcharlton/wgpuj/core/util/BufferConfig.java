@@ -4,7 +4,7 @@ import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.core.Device;
 import com.noahcharlton.wgpuj.jni.WgpuBufferDescriptor;
 
-public class BufferSettings {
+public class BufferConfig {
 
     private String label = "";
     private long size = 0;
@@ -41,7 +41,7 @@ public class BufferSettings {
         return label;
     }
 
-    public BufferSettings setLabel(String label) {
+    public BufferConfig setLabel(String label) {
         this.label = label;
         return this;
     }
@@ -50,7 +50,7 @@ public class BufferSettings {
         return size;
     }
 
-    public BufferSettings setSize(long size) {
+    public BufferConfig setSize(long size) {
         this.size = size;
         return this;
     }
@@ -59,7 +59,7 @@ public class BufferSettings {
         return usages;
     }
 
-    public BufferSettings setUsages(BufferUsage... usages) {
+    public BufferConfig setUsages(BufferUsage... usages) {
         this.usages = usages;
 
         return this;
@@ -69,7 +69,7 @@ public class BufferSettings {
         return mapped;
     }
 
-    public BufferSettings setMapped(boolean mapped) {
+    public BufferConfig setMapped(boolean mapped) {
         this.mapped = mapped;
         return this;
     }

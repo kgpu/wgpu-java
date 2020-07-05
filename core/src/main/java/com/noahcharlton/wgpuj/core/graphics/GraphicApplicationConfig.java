@@ -1,23 +1,23 @@
 package com.noahcharlton.wgpuj.core.graphics;
 
-import com.noahcharlton.wgpuj.core.DeviceSettings;
+import com.noahcharlton.wgpuj.core.DeviceConfig;
 import org.lwjgl.glfw.GLFW;
 
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-public class GraphicApplicationSettings extends DeviceSettings {
+public class GraphicApplicationConfig extends DeviceConfig {
 
     private int width;
     private int height;
     private String title;
 
-    public GraphicApplicationSettings(String title, int width, int height) {
+    public GraphicApplicationConfig(String title, int width, int height) {
         this.width = width;
         this.height = height;
         this.title = title;
     }
 
-    public GraphicApplicationSettings() {
+    public GraphicApplicationConfig() {
         this("", 0, 0);
     }
 
@@ -25,19 +25,19 @@ public class GraphicApplicationSettings extends DeviceSettings {
         return GLFW.glfwCreateWindow(width, height, title, NULL, NULL);
     }
 
-    public GraphicApplicationSettings setWidth(int width) {
+    public GraphicApplicationConfig setWidth(int width) {
         this.width = width;
 
         return this;
     }
 
-    public GraphicApplicationSettings setHeight(int height) {
+    public GraphicApplicationConfig setHeight(int height) {
         this.height = height;
 
         return this;
     }
 
-    public GraphicApplicationSettings setTitle(String title) {
+    public GraphicApplicationConfig setTitle(String title) {
         this.title = title;
 
         return this;

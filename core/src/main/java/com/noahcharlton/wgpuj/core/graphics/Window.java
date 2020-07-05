@@ -3,8 +3,8 @@ package com.noahcharlton.wgpuj.core.graphics;
 import com.noahcharlton.wgpuj.WgpuJava;
 import com.noahcharlton.wgpuj.core.Device;
 import com.noahcharlton.wgpuj.core.input.GlfwKeyHandler;
+import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.core.util.Dimension;
-import com.noahcharlton.wgpuj.core.util.GlfwHandler;
 import com.noahcharlton.wgpuj.core.util.ImageData;
 import com.noahcharlton.wgpuj.core.util.Platform;
 import org.lwjgl.glfw.Callbacks;
@@ -21,14 +21,14 @@ public class Window {
 
     private final long handle;
     private final long surface;
+    private final Device device;
 
-    private RenderPipeline renderPipeline;
     private Dimension currentDimension;
     private SwapChain swapChain;
     private WindowEventHandler eventHandler;
 
-    public Window(GraphicApplicationSettings settings) {
-        this.handle = settings.createWindow();
+    public Window(GraphicApplicationConfig config) {
+        this.handle = config.createWindow();
 
         if(this.handle == NULL)
             throw new RuntimeException("Failed to create window!");
@@ -39,11 +39,12 @@ public class Window {
 
         surface = createSurface();
         eventHandler = new WindowEventHandler.EmptyWindowHandler();
+        device = Device.create(config, surface);
     }
 
     public void setIcon(ImageData data){
         ByteBuffer buffer = ByteBuffer.allocateDirect(data.getPixels().length * Integer.BYTES);
-        buffer.order(ByteOrder.BIG_ENDIAN); //Red Channel comes first
+        buffer.order(ByteOrder.LITTLE_ENDIAN); //Red Channel comes first
 
         for(int pixel : data.getPixels()){
             buffer.putInt(pixel);
@@ -76,23 +77,24 @@ public class Window {
                 "https://github.com/DevOrc/wgpu-java/issues/4");
     }
 
-    public void initRenderPipeline(RenderPipelineSettings settings, Device device){
-        renderPipeline = new RenderPipeline(settings, device);
-
-        createNewSwapChain(device);
+    public void initializeSwapChain(){
+        createNewSwapChain();
     }
 
-    public RenderPass renderStart(Device device){
+    public void update(){
         GLFW.glfwPollEvents();
+
         var newDimension = GlfwHandler.getWindowDimension(handle);
 
         if(!newDimension.equals(currentDimension)){
             currentDimension = newDimension;
-            createNewSwapChain(device);
+            createNewSwapChain();
             eventHandler.onResize();
         }
+    }
 
-        swapChain.renderStart(renderPipeline);
+    public RenderPass renderStart(Color clearColor){
+        swapChain.renderStart(clearColor);
 
         return swapChain.getRenderPass();
     }
@@ -101,7 +103,7 @@ public class Window {
         swapChain.renderEnd();
     }
 
-    private void createNewSwapChain(Device device) {
+    private void createNewSwapChain() {
         swapChain = SwapChain.create(currentDimension, device, surface);
     }
 
@@ -128,5 +130,9 @@ public class Window {
 
     public WindowEventHandler getEventHandler() {
         return eventHandler;
+    }
+
+    public Device getDevice() {
+        return device;
     }
 }

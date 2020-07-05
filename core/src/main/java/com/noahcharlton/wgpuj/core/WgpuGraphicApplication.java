@@ -1,10 +1,10 @@
 package com.noahcharlton.wgpuj.core;
 
-import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
+import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationConfig;
 import com.noahcharlton.wgpuj.core.graphics.RenderPass;
-import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
 import com.noahcharlton.wgpuj.core.graphics.Window;
-import com.noahcharlton.wgpuj.core.util.GlfwHandler;
+import com.noahcharlton.wgpuj.core.graphics.GlfwHandler;
+import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.core.util.ImageData;
 
 import java.io.IOException;
@@ -15,26 +15,30 @@ public class WgpuGraphicApplication extends WgpuApplication implements AutoClose
 
     private final Window window;
 
-    private WgpuGraphicApplication(GraphicApplicationSettings settings, Window window) {
-        super(Device.create(settings, window.getSurface()));
+    private WgpuGraphicApplication(Window window) {
+        super(window.getDevice());
 
         this.window = window;
     }
 
-    public static WgpuGraphicApplication create(GraphicApplicationSettings settings){
+    public static WgpuGraphicApplication create(GraphicApplicationConfig config){
         GlfwHandler.init();
-        Window window = new Window(settings);
+        Window window = new Window(config);
         window.setIcon(defaultWindowIcon);
 
-        return new WgpuGraphicApplication(settings, window);
+        return new WgpuGraphicApplication(window);
     }
 
-    public void init(RenderPipelineSettings settings){
-        window.initRenderPipeline(settings, device);
+    public void initializeSwapChain(){
+        window.initializeSwapChain();
     }
 
-    public RenderPass renderStart(){
-        return window.renderStart(device);
+    public void update(){
+        window.update();
+    }
+
+    public RenderPass renderStart(Color clearColor){
+        return window.renderStart(clearColor);
     }
 
     public void renderEnd(){

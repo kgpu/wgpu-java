@@ -1,20 +1,11 @@
 package com.noahcharlton.wgpuj.examples;
 
 import com.noahcharlton.wgpuj.WgpuJava;
-import com.noahcharlton.wgpuj.core.Device;
-import com.noahcharlton.wgpuj.core.DeviceSettings;
-import com.noahcharlton.wgpuj.core.ShaderData;
-import com.noahcharlton.wgpuj.core.WgpuCore;
+import com.noahcharlton.wgpuj.core.*;
 import com.noahcharlton.wgpuj.core.compute.ComputePass;
-import com.noahcharlton.wgpuj.core.util.BindGroupUtils;
-import com.noahcharlton.wgpuj.core.util.Buffer;
-import com.noahcharlton.wgpuj.core.util.BufferSettings;
-import com.noahcharlton.wgpuj.core.util.BufferUsage;
-import com.noahcharlton.wgpuj.jni.Wgpu;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupEntry;
-import com.noahcharlton.wgpuj.jni.WgpuBindingType;
-import com.noahcharlton.wgpuj.jni.WgpuComputePipelineDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuLogLevel;
+import com.noahcharlton.wgpuj.core.compute.ComputePipeline;
+import com.noahcharlton.wgpuj.core.util.*;
+import com.noahcharlton.wgpuj.jni.*;
 import jnr.ffi.Pointer;
 
 import java.util.Arrays;
@@ -30,9 +21,9 @@ public class ComputeExample {
         System.out.println("Calculating Collatz for: " + Arrays.toString(numbers));
         int bufferSize = numbers.length * Integer.BYTES;
 
-        Device device = Device.create(new DeviceSettings(), 0);
+        Device device = Device.create(new DeviceConfig(), 0);
 
-        Buffer stagingBuffer = new BufferSettings()
+        Buffer stagingBuffer = new BufferConfig()
                 .setLabel("Staging Buffer")
                 .setSize(bufferSize)
                 .setUsages(BufferUsage.MAP_READ, BufferUsage.COPY_DST)
@@ -45,34 +36,24 @@ public class ComputeExample {
         long bindGroupLayout = device.createBindGroupLayout("bind group layout",
                 BindGroupUtils.partialLayout(0, Wgpu.ShaderStage.COMPUTE, WgpuBindingType.STORAGE_BUFFER));
         long bindGroup = device.createBindGroup("bind group", bindGroupLayout,
-                new WgpuBindGroupEntry().setBuffer(0, storageBuffer.getId(), bufferSize));
+                BindGroupUtils.bufferEntry(0, storageBuffer));
 
         long pipelineLayout = device.createPipelineLayout(bindGroupLayout);
-        long shader = ShaderData.fromRawClasspathFile("/collatz.comp", "main").createModule(device);
+        ShaderConfig shader = ShaderConfig.fromRawClasspathFile("/collatz.comp", "main");
+        long pipelineId = ComputePipeline.create(device, pipelineLayout, shader);
 
-        var pipelineDesc = WgpuComputePipelineDescriptor.createDirect();
-        pipelineDesc.setLayout(pipelineLayout);
-        pipelineDesc.getComputeStage().setEntryPoint("main");
-        pipelineDesc.getComputeStage().setModule(shader);
-
-        long pipelineId = WgpuJava.wgpuNative.wgpu_device_create_compute_pipeline(device.getId(),
-                pipelineDesc.getPointerTo());
-
-        long encoder = device.createCommandEncoder("command encoder");
-
-        ComputePass pass = ComputePass.create(encoder);
+        CommandEncoder encoder = device.createCommandEncoder("command encoder");
+        ComputePass pass = encoder.beginComputePass(WgpuComputePassDescriptor.createDirect());
 
         pass.setPipeline(pipelineId);
         pass.setBindGroup(0, bindGroup, WgpuJava.createNullPointer(), 0);
         pass.dispatch(numbers.length, 1, 1);
         pass.endPass();
 
-        long queue = device.getDefaultQueue();
-        long commandBuffer = WgpuJava.wgpuNative.wgpu_command_encoder_finish(encoder, WgpuJava.createNullPointer());
-
-        storageBuffer.copyTo(stagingBuffer, encoder);
-
-        WgpuJava.wgpuNative.wgpu_queue_submit(queue, WgpuJava.createDirectLongPointer(commandBuffer), 1);
+        Queue queue = device.getDefaultQueue();
+        encoder.copyBufferToBuffer(storageBuffer, stagingBuffer);
+        long commandBuffer = encoder.finish(WgpuCommandBufferDescriptor.createDirect());
+        queue.submit(commandBuffer);
 
         stagingBuffer.readAsync();
 

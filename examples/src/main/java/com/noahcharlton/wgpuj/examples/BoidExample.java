@@ -1,16 +1,11 @@
 package com.noahcharlton.wgpuj.examples;
 
-import com.noahcharlton.wgpuj.WgpuJava;
-import com.noahcharlton.wgpuj.core.Device;
-import com.noahcharlton.wgpuj.core.ShaderData;
-import com.noahcharlton.wgpuj.core.WgpuCore;
-import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
+import com.noahcharlton.wgpuj.core.*;
 import com.noahcharlton.wgpuj.core.graphics.*;
 import com.noahcharlton.wgpuj.core.math.MathUtils;
 import com.noahcharlton.wgpuj.core.math.MatrixUtils;
 import com.noahcharlton.wgpuj.core.util.*;
 import com.noahcharlton.wgpuj.jni.*;
-import jnr.ffi.Pointer;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 
@@ -43,18 +38,21 @@ public class BoidExample {
 
     private final WgpuGraphicApplication app;
     private final Device device;
+    private final Queue queue;
     private final Window window;
     private final Buffer vertexBuffer;
     private final Boid[] boids;
     private final Buffer boidPositionBuffer;
+    private final RenderPipeline pipeline;
 
     private final long bindGroup;
 
-    public BoidExample(GraphicApplicationSettings settings) {
-        app = WgpuGraphicApplication.create(settings);
+    public BoidExample(GraphicApplicationConfig config) {
+        app = WgpuGraphicApplication.create(config);
         device = app.getDevice();
         window = app.getWindow();
         boids = createBoids();
+        queue = app.getDefaultQueue();
 
         vertexBuffer = device.createVertexBuffer("Vertex Buffer", VERTICES);
         boidPositionBuffer = device.createFloatBuffer("Boid Position Buffer", getBoidPositionData(),
@@ -64,13 +62,13 @@ public class BoidExample {
                 BindGroupUtils.partialLayout(0, Wgpu.ShaderStage.VERTEX, WgpuBindingType.STORAGE_BUFFER));
 
         bindGroup = device.createBindGroup("Bind Group", bindGroupLayout,
-                new WgpuBindGroupEntry().setBuffer(0, boidPositionBuffer.getId(), boidPositionBuffer.getSize()));
+                BindGroupUtils.bufferEntry(0, boidPositionBuffer));
 
+        var pipelineConfig = createPipelineConfig(device);
+        pipelineConfig.setBindGroupLayouts(bindGroupLayout);
 
-        var pipelineSettings = createPipelineSettings();
-        pipelineSettings.setBindGroupLayouts(bindGroupLayout);
-
-        app.init(pipelineSettings);
+        pipeline = device.createRenderPipeline(pipelineConfig);
+        app.initializeSwapChain();
         run();
     }
 
@@ -80,7 +78,7 @@ public class BoidExample {
 
         for (int i = 0; i < boids.length; i++) {
             var boid = new Boid();
-            boid.position.x = 2 * rng.nextFloat() -1f;
+            boid.position.x = 2 * rng.nextFloat() - 1f;
             boid.position.y = 2 * rng.nextFloat() - 1f;
             boid.velocity.x = .2f * rng.nextFloat() -.1f;
             boid.velocity.y = .2f * rng.nextFloat() - .1f;
@@ -98,12 +96,12 @@ public class BoidExample {
         for (int i = 0; i < boids.length; i++) {
             float angle = (float) Math.atan2(boids[i].velocity.y, boids[i].velocity.x);
 
-            matrix.zero().m00(1.0f).m11(1.0f).m22(1.0f).m33(1.0f);
             matrix.translate(boids[i].position.x, boids[i].position.y, 0);
             matrix.rotate(angle, MathUtils.UNIT_Z);
 
             var matrixFloats = MatrixUtils.toFloats(matrix);
             System.arraycopy(matrixFloats, 0, output, i * 16, 16);
+            MatrixUtils.reset(matrix);
         }
 
         return output;
@@ -177,43 +175,35 @@ public class BoidExample {
             cohesionCount = 0;
         }
 
-        updateBuffers();
-    }
-
-    private void updateBuffers() {
-        long queue = device.getDefaultQueue();
-
-        Pointer peoplePosData = WgpuJava.createDirectPointer(16 * Float.BYTES * boids.length);
-        peoplePosData.put(0, getBoidPositionData(), 0, 16 * boids.length);
-
-        WgpuJava.wgpuNative.wgpu_queue_write_buffer(queue, boidPositionBuffer.getId(), 0, peoplePosData,
-                16 * Float.BYTES * boids.length);
+        queue.writeFloatsToBuffer(boidPositionBuffer, getBoidPositionData());
     }
 
     private void render() {
-        var renderPass = app.renderStart();
+        var renderPass = app.renderStart(Color.BLACK);
+        renderPass.setPipeline(pipeline);
         renderPass.setBindGroup(0, bindGroup);
         renderPass.setVertexBuffer(vertexBuffer, 0);
         renderPass.draw(3, boids.length);
 
         app.renderEnd();
+        app.update();
     }
 
     public static void main(String[] args) {
         WgpuCore.loadWgpuNative();
 
-        var settings = new GraphicApplicationSettings("Boid Simulation", 640, 640);
+        var config = new GraphicApplicationConfig("Boid Simulation", 640, 640);
 
-        new BoidExample(settings);
+        new BoidExample(config);
     }
 
-    private static RenderPipelineSettings createPipelineSettings() {
-        ShaderData vertex = ShaderData.fromRawClasspathFile("/boid.vert", "main");
-        ShaderData fragment = ShaderData.fromRawClasspathFile("/boid.frag", "main");
+    private static RenderPipelineConfig createPipelineConfig(Device device) {
+        var vertex = ShaderConfig.fromRawClasspathFile("/boid.vert", "main");
+        var fragment = ShaderConfig.fromRawClasspathFile("/boid.frag", "main");
 
-        return new RenderPipelineSettings()
-                .setVertexStage(vertex)
-                .setFragmentStage(fragment)
+        return new RenderPipelineConfig()
+                .setVertexStage(device.createShaderModule(vertex))
+                .setFragmentStage(device.createShaderModule(fragment))
                 .setRasterizationState(RasterizationState.of(
                         WgpuFrontFace.CCW,
                         WgpuCullMode.NONE,
@@ -236,7 +226,6 @@ public class BoidExample {
                 .setSampleCount(1)
                 .setSampleMask(0)
                 .setAlphaToCoverage(false)
-                .setBindGroupLayouts()
-                .setClearColor(Color.BLACK);
+                .setBindGroupLayouts();
     }
 }

@@ -1,8 +1,6 @@
 package com.noahcharlton.wgpuj.core.graphics;
 
-import com.noahcharlton.wgpuj.core.Device;
-import com.noahcharlton.wgpuj.core.ShaderData;
-import com.noahcharlton.wgpuj.core.util.Color;
+import com.noahcharlton.wgpuj.core.util.ShaderModule;
 import com.noahcharlton.wgpuj.jni.WgpuColorStateDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuDepthStencilStateDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuIndexFormat;
@@ -11,31 +9,30 @@ import com.noahcharlton.wgpuj.jni.WgpuRasterizationStateDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuRenderPipelineDescriptor;
 import com.noahcharlton.wgpuj.jni.WgpuVertexBufferLayoutDescriptor;
 
-public class RenderPipelineSettings {
+public class RenderPipelineConfig {
 
-    private ShaderData vertexStage;
-    private ShaderData fragmentStage;
+    private ShaderModule vertexStage;
+    private ShaderModule fragmentStage;
     private WgpuPrimitiveTopology primitiveTopology;
     private WgpuRasterizationStateDescriptor rasterizationState;
     private WgpuColorStateDescriptor[] colorStates;
     private WgpuDepthStencilStateDescriptor depthStencilState;
     private WgpuIndexFormat vertexIndexFormat;
     private WgpuVertexBufferLayoutDescriptor[] bufferLayouts;
-    private Color clearColor;
     private int sampleCount;
     private int sampleMask;
     private boolean alphaToCoverage;
     private long[] bindGroupLayouts;
 
-    public RenderPipelineSettings() {
+    public RenderPipelineConfig() {
 
     }
 
-    public WgpuRenderPipelineDescriptor build(Device device, long layout){
+    public WgpuRenderPipelineDescriptor build(long layout){
         var descriptor = WgpuRenderPipelineDescriptor.createDirect();
 
-        var fragment = fragmentStage.build(device);
-        long vertexModule = vertexStage.createModule(device);
+        var fragment = fragmentStage.toDescriptor();
+        long vertexModule = vertexStage.getModule();
 
         descriptor.setLayout(layout);
         descriptor.getVertexStage().setModule(vertexModule);
@@ -56,20 +53,20 @@ public class RenderPipelineSettings {
         return descriptor;
     }
 
-    public ShaderData getVertexStage() {
+    public ShaderModule getVertexStage() {
         return vertexStage;
     }
 
-    public RenderPipelineSettings setVertexStage(ShaderData vertexStage) {
+    public RenderPipelineConfig setVertexStage(ShaderModule vertexStage) {
         this.vertexStage = vertexStage;
         return this;
     }
 
-    public ShaderData getFragmentStage() {
+    public ShaderModule getFragmentStage() {
         return fragmentStage;
     }
 
-    public RenderPipelineSettings setFragmentStage(ShaderData fragmentStage) {
+    public RenderPipelineConfig setFragmentStage(ShaderModule fragmentStage) {
         this.fragmentStage = fragmentStage;
         return this;
     }
@@ -78,13 +75,13 @@ public class RenderPipelineSettings {
         return primitiveTopology;
     }
 
-    public RenderPipelineSettings setPrimitiveTopology(WgpuPrimitiveTopology primitiveTopology) {
+    public RenderPipelineConfig setPrimitiveTopology(WgpuPrimitiveTopology primitiveTopology) {
         this.primitiveTopology = primitiveTopology;
 
         return this;
     }
 
-    public RenderPipelineSettings setBufferLayouts(WgpuVertexBufferLayoutDescriptor... bufferLayouts) {
+    public RenderPipelineConfig setBufferLayouts(WgpuVertexBufferLayoutDescriptor... bufferLayouts) {
         this.bufferLayouts = bufferLayouts;
 
         return this;
@@ -98,7 +95,7 @@ public class RenderPipelineSettings {
         return rasterizationState;
     }
 
-    public RenderPipelineSettings setRasterizationState(WgpuRasterizationStateDescriptor rasterizationState) {
+    public RenderPipelineConfig setRasterizationState(WgpuRasterizationStateDescriptor rasterizationState) {
         this.rasterizationState = rasterizationState;
 
         return this;
@@ -108,7 +105,7 @@ public class RenderPipelineSettings {
         return colorStates;
     }
 
-    public RenderPipelineSettings setColorStates(WgpuColorStateDescriptor... colorStates) {
+    public RenderPipelineConfig setColorStates(WgpuColorStateDescriptor... colorStates) {
         this.colorStates = colorStates;
 
         return this;
@@ -118,7 +115,7 @@ public class RenderPipelineSettings {
         return depthStencilState;
     }
 
-    public RenderPipelineSettings setDepthStencilState(WgpuDepthStencilStateDescriptor depthStencilState) {
+    public RenderPipelineConfig setDepthStencilState(WgpuDepthStencilStateDescriptor depthStencilState) {
         this.depthStencilState = depthStencilState;
 
         return this;
@@ -128,7 +125,7 @@ public class RenderPipelineSettings {
         return vertexIndexFormat;
     }
 
-    public RenderPipelineSettings setVertexIndexFormat(WgpuIndexFormat vertexIndexFormat) {
+    public RenderPipelineConfig setVertexIndexFormat(WgpuIndexFormat vertexIndexFormat) {
         this.vertexIndexFormat = vertexIndexFormat;
 
         return this;
@@ -138,7 +135,7 @@ public class RenderPipelineSettings {
         return sampleCount;
     }
 
-    public RenderPipelineSettings setSampleCount(int sampleCount) {
+    public RenderPipelineConfig setSampleCount(int sampleCount) {
         this.sampleCount = sampleCount;
 
         return this;
@@ -148,7 +145,7 @@ public class RenderPipelineSettings {
         return sampleMask;
     }
 
-    public RenderPipelineSettings setSampleMask(int sampleMask) {
+    public RenderPipelineConfig setSampleMask(int sampleMask) {
         this.sampleMask = sampleMask;
 
         return this;
@@ -158,26 +155,16 @@ public class RenderPipelineSettings {
         return alphaToCoverage;
     }
 
-    public RenderPipelineSettings setAlphaToCoverage(boolean alphaToCoverage) {
+    public RenderPipelineConfig setAlphaToCoverage(boolean alphaToCoverage) {
         this.alphaToCoverage = alphaToCoverage;
 
         return this;
     }
 
-    public RenderPipelineSettings setBindGroupLayouts(long... bindGroupLayouts) {
+    public RenderPipelineConfig setBindGroupLayouts(long... bindGroupLayouts) {
         this.bindGroupLayouts = bindGroupLayouts;
 
         return this;
-    }
-
-    public RenderPipelineSettings setClearColor(Color clearColor) {
-        this.clearColor = clearColor;
-
-        return this;
-    }
-
-    public Color getClearColor() {
-        return clearColor;
     }
 
     public long[] getBindGroupLayouts() {

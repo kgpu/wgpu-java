@@ -1,10 +1,7 @@
 package com.noahcharlton.wgpuj.examples;
 
 import com.noahcharlton.wgpuj.WgpuJava;
-import com.noahcharlton.wgpuj.core.Device;
-import com.noahcharlton.wgpuj.core.ShaderData;
-import com.noahcharlton.wgpuj.core.WgpuCore;
-import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
+import com.noahcharlton.wgpuj.core.*;
 import com.noahcharlton.wgpuj.core.graphics.*;
 import com.noahcharlton.wgpuj.core.math.MathUtils;
 import com.noahcharlton.wgpuj.core.math.MatrixUtils;
@@ -93,6 +90,7 @@ public class EarthExample {
     private final WgpuGraphicApplication app;
     private final Window window;
     private final Device device;
+    private final Queue queue;
 
     private final Matrix4f modelMatrix = new Matrix4f().rotateY(0.2f);
     private final Matrix4f viewMatrix = new Matrix4f().lookAt(
@@ -106,12 +104,14 @@ public class EarthExample {
     private final Buffer vertexBuffer;
     private final Buffer modelMatrixBuffer;
     private final Buffer normalMatrixBuffer;
+    private final RenderPipeline pipeline;
     private final long bindGroupId;
 
-    public EarthExample(GraphicApplicationSettings settings) {
-        app = WgpuGraphicApplication.create(settings);
+    public EarthExample(GraphicApplicationConfig config) {
+        app = WgpuGraphicApplication.create(config);
         device = app.getDevice();
         window = app.getWindow();
+        queue = app.getDefaultQueue();
 
         var sphere = new Sphere(100, 100);
 
@@ -141,11 +141,10 @@ public class EarthExample {
         long textureId = device.createTexture(textureDesc);
         var textureBuffer = device.createIntBuffer("texture buffer", texture.getPixels(), BufferUsage.COPY_SRC);
 
-        long encoder = device.createCommandEncoder("Command Encoder");
-        textureBuffer.copyToTexture(encoder, textureId, texture);
-        long commandBuffer = WgpuJava.wgpuNative.wgpu_command_encoder_finish(encoder, WgpuJava.createNullPointer());
-        WgpuJava.wgpuNative.wgpu_queue_submit(device.getDefaultQueue(),
-                WgpuJava.createDirectLongPointer(commandBuffer), 1);
+        CommandEncoder encoder = device.createCommandEncoder("Command Encoder");
+        encoder.copyBufferToTexture(textureBuffer, textureId, texture);
+        long commandBuffer = encoder.finish(WgpuCommandBufferDescriptor.createDirect());
+        queue.submit(commandBuffer);
 
         var samplerDesc = WgpuSamplerDescriptor.createDirect();
         samplerDesc.setAddressModeU(WgpuAddressMode.MIRROR_REPEAT);
@@ -172,17 +171,18 @@ public class EarthExample {
                 BindGroupUtils.partialLayout(5, Wgpu.ShaderStage.VERTEX, WgpuBindingType.UNIFORM_BUFFER));
 
         bindGroupId = device.createBindGroup("Bind group", bindGroupLayout,
-                new WgpuBindGroupEntry().setBuffer(0, transMatrixBuffer.getId(), transMatrixBuffer.getSize()),
-                new WgpuBindGroupEntry().setTextureView(1, textureView),
-                new WgpuBindGroupEntry().setSampler(2, sampler),
-                new WgpuBindGroupEntry().setBuffer(3, lightSrcBuffer.getId(), lightSrcBuffer.getSize()),
-                new WgpuBindGroupEntry().setBuffer(4, modelMatrixBuffer.getId(), modelMatrixBuffer.getSize()),
-                new WgpuBindGroupEntry().setBuffer(5, normalMatrixBuffer.getId(), normalMatrixBuffer.getSize()));
+                BindGroupUtils.bufferEntry(0, transMatrixBuffer),
+                BindGroupUtils.textureViewEntry(1, textureView),
+                BindGroupUtils.samplerEntry(2, sampler),
+                BindGroupUtils.bufferEntry(3, lightSrcBuffer),
+                BindGroupUtils.bufferEntry(4, modelMatrixBuffer),
+                BindGroupUtils.bufferEntry(5, normalMatrixBuffer));
 
-        var pipeline = createPipelineSettings();
-        pipeline.setBindGroupLayouts(bindGroupLayout);
+        var pipelineConfig = createPipelineConfig(device);
+        pipelineConfig.setBindGroupLayouts(bindGroupLayout);
 
-        app.init(pipeline);
+        pipeline = device.createRenderPipeline(pipelineConfig);
+        app.initializeSwapChain();
     }
 
     private ImageData loadTexture() {
@@ -195,17 +195,19 @@ public class EarthExample {
 
     private void run() {
         while (!window.isCloseRequested()) {
-            RenderPass pass = app.renderStart();
+            RenderPass pass = app.renderStart(Color.BLACK);
+            pass.setPipeline(pipeline);
             pass.setBindGroup(0, bindGroupId);
             pass.setIndexBuffer(indexBuffer);
             pass.setVertexBuffer(vertexBuffer, 0);
             pass.drawIndexed((int) indexBuffer.getSize() / 2, 1, 0);
             app.renderEnd();
+            app.update();
 
             modelMatrix.rotate(.01f, MathUtils.UNIT_Z);
-            device.queueWriteFloatBuffer(modelMatrixBuffer, MatrixUtils.toFloats(modelMatrix));
-            device.queueWriteFloatBuffer(transMatrixBuffer, getTransformationMatrixData());
-            device.queueWriteFloatBuffer(normalMatrixBuffer, getNormalMatrixData());
+            queue.writeFloatsToBuffer(modelMatrixBuffer, MatrixUtils.toFloats(modelMatrix));
+            queue.writeFloatsToBuffer(transMatrixBuffer, getTransformationMatrixData());
+            queue.writeFloatsToBuffer(normalMatrixBuffer, getNormalMatrixData());
         }
     }
 
@@ -225,21 +227,21 @@ public class EarthExample {
 
     public static void main(String[] args) {
         WgpuCore.loadWgpuNative();
-        GraphicApplicationSettings settings = new GraphicApplicationSettings();
-        settings.setTitle("Wgpuj: Model Earth");
-        settings.setWidth(400);
-        settings.setHeight(400);
+        GraphicApplicationConfig config = new GraphicApplicationConfig();
+        config.setTitle("Wgpuj: Model Earth");
+        config.setWidth(400);
+        config.setHeight(400);
 
-        new EarthExample(settings).run();
+        new EarthExample(config).run();
     }
 
-    private static RenderPipelineSettings createPipelineSettings() {
-        ShaderData vertex = ShaderData.fromRawClasspathFile("/earth.vert", "main");
-        ShaderData fragment = ShaderData.fromRawClasspathFile("/earth.frag", "main");
+    private static RenderPipelineConfig createPipelineConfig(Device device) {
+        ShaderConfig vertex = ShaderConfig.fromRawClasspathFile("/earth.vert", "main");
+        ShaderConfig fragment = ShaderConfig.fromRawClasspathFile("/earth.frag", "main");
 
-        return new RenderPipelineSettings()
-                .setVertexStage(vertex)
-                .setFragmentStage(fragment)
+        return new RenderPipelineConfig()
+                .setVertexStage(device.createShaderModule(vertex))
+                .setFragmentStage(device.createShaderModule(fragment))
                 .setRasterizationState(RasterizationState.of(
                         WgpuFrontFace.CCW,
                         WgpuCullMode.BACK,
@@ -264,7 +266,6 @@ public class EarthExample {
                 .setSampleCount(1)
                 .setSampleMask(0)
                 .setAlphaToCoverage(false)
-                .setBindGroupLayouts()
-                .setClearColor(Color.BLACK);
+                .setBindGroupLayouts();
     }
 }

@@ -1,34 +1,24 @@
 package com.noahcharlton.wgpuj.core;
 
 import com.noahcharlton.wgpuj.WgpuJava;
-import com.noahcharlton.wgpuj.core.util.Buffer;
-import com.noahcharlton.wgpuj.core.util.BufferSettings;
-import com.noahcharlton.wgpuj.core.util.BufferUsage;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupEntry;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupLayoutEntry;
-import com.noahcharlton.wgpuj.jni.WgpuCLimits;
-import com.noahcharlton.wgpuj.jni.WgpuCommandEncoderDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuJNI;
-import com.noahcharlton.wgpuj.jni.WgpuPipelineLayoutDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuPowerPreference;
-import com.noahcharlton.wgpuj.jni.WgpuRequestAdapterOptions;
-import com.noahcharlton.wgpuj.jni.WgpuTextureDescriptor;
+import com.noahcharlton.wgpuj.core.graphics.RenderPipeline;
+import com.noahcharlton.wgpuj.core.graphics.RenderPipelineConfig;
+import com.noahcharlton.wgpuj.core.graphics.SwapChain;
+import com.noahcharlton.wgpuj.core.util.*;
+import com.noahcharlton.wgpuj.jni.*;
 import com.noahcharlton.wgpuj.util.RustCString;
-import jnr.ffi.Pointer;
 
 import java.util.concurrent.atomic.AtomicLong;
 
 public class Device {
 
     private final WgpuJNI natives = WgpuJava.wgpuNative;
+    private final Queue defaultQueue;
     private final long deviceId;
-    private final long defaultQueue;
 
     public Device(long id) {
         deviceId = id;
-        defaultQueue = natives.wgpu_device_get_default_queue(deviceId);
+        defaultQueue = new Queue(natives.wgpu_device_get_default_queue(deviceId));
     }
 
     public void poll(boolean forceWait){
@@ -45,11 +35,23 @@ public class Device {
         return natives.wgpu_device_create_pipeline_layout(deviceId, desc.getPointerTo());
     }
 
-    public long createCommandEncoder(String name){
+    public RenderPipeline createRenderPipeline(RenderPipelineConfig config){
+        long pipelineLayoutID = createPipelineLayout(config.getBindGroupLayouts());
+
+        WgpuRenderPipelineDescriptor pipelineDesc = config.build(pipelineLayoutID);
+        long pipelineID = WgpuJava.wgpuNative.wgpu_device_create_render_pipeline(deviceId,
+                pipelineDesc.getPointerTo());
+
+        return new RenderPipeline(pipelineID);
+    }
+
+    public CommandEncoder createCommandEncoder(String name){
         var desc = WgpuCommandEncoderDescriptor.createDirect();
         desc.setLabel(name);
 
-        return natives.wgpu_device_create_command_encoder(deviceId, desc.getPointerTo());
+        var encoderId = natives.wgpu_device_create_command_encoder(deviceId, desc.getPointerTo());
+
+        return new CommandEncoder(encoderId);
     }
 
     public long createTexture(WgpuTextureDescriptor descriptor){
@@ -81,7 +83,7 @@ public class Device {
     }
 
     public Buffer createFloatBuffer(String name, float[] data, BufferUsage... usages) {
-        var buffer = new BufferSettings()
+        var buffer = new BufferConfig()
                 .setLabel(name)
                 .setSize(data.length * Float.BYTES)
                 .setMapped(true)
@@ -94,8 +96,15 @@ public class Device {
         return buffer;
     }
 
+    public SwapChain createSwapChain(long surface, WgpuSwapChainDescriptor desc){
+        var swapChainID = WgpuJava.wgpuNative.wgpu_device_create_swap_chain(deviceId, surface,
+                desc.getPointerTo());
+
+        return new SwapChain(swapChainID, this);
+    }
+
     public Buffer createIntBuffer(String name, int[] data, BufferUsage... usages) {
-        var buffer = new BufferSettings()
+        var buffer = new BufferConfig()
                 .setLabel(name)
                 .setSize(data.length * Integer.BYTES)
                 .setMapped(true)
@@ -113,7 +122,7 @@ public class Device {
     }
 
     public Buffer createShortBuffer(String name, short[] data, BufferUsage... usages) {
-        var buffer = new BufferSettings()
+        var buffer = new BufferConfig()
                 .setLabel(name)
                 .setSize(data.length * Short.BYTES)
                 .setMapped(true)
@@ -127,35 +136,39 @@ public class Device {
         return buffer;
     }
 
-    public void queueWriteFloatBuffer(Buffer buffer, float[] data){
-        Pointer ptr = WgpuJava.createDirectPointer(data.length * Float.BYTES);
-        ptr.put(0, data, 0, data.length);
+    public ShaderModule createShaderModule(ShaderConfig config) {
+        var shaderModule = WgpuShaderModuleDescriptor.createDirect();
+        var dataPtr = WgpuJava.createByteArrayPointer(config.getData());
 
-        WgpuJava.wgpuNative.wgpu_queue_write_buffer(defaultQueue, buffer.getId(), 0, ptr, data.length * Float.BYTES);
+        shaderModule.getCode().setBytes(dataPtr);
+        shaderModule.getCode().setLength(config.getData().length / 4);
+        long module = WgpuJava.wgpuNative.wgpu_device_create_shader_module(deviceId, shaderModule.getPointerTo());
+
+        return new ShaderModule(module, config.getEntryPoint());
     }
 
-    public static Device create(DeviceSettings settings, long surface) {
+    public static Device create(DeviceConfig config, long surface) {
         var optionsDesc = WgpuRequestAdapterOptions.createDirect();
         optionsDesc.setCompatibleSurface(surface);
         optionsDesc.setPowerPreference(WgpuPowerPreference.DEFAULT);
 
-        var tracePath = RustCString.toPointer(settings.getTracePath());
+        var tracePath = RustCString.toPointer(config.getTracePath());
         var limitsDesc = WgpuCLimits.createDirect();
         limitsDesc.setMaxBindGroups(16);
 
-        var adapter = requestAdapter(optionsDesc, settings);
-        long id = WgpuJava.wgpuNative.wgpu_adapter_request_device(adapter, settings.getExtensions(),
+        var adapter = requestAdapter(optionsDesc, config);
+        long id = WgpuJava.wgpuNative.wgpu_adapter_request_device(adapter, config.getExtensions(),
                 limitsDesc.getPointerTo(), tracePath);
 
         return new Device(id);
     }
 
-    private static long requestAdapter(WgpuRequestAdapterOptions options, DeviceSettings settings) {
+    private static long requestAdapter(WgpuRequestAdapterOptions options, DeviceConfig config) {
         AtomicLong adapter = new AtomicLong(0);
 
         WgpuJava.wgpuNative.wgpu_request_adapter_async(
                 options.getPointerTo(),
-                settings.getBackend(),
+                config.getBackend(),
                 false,
                 (received, userData) -> {
                     adapter.set(received);
@@ -166,7 +179,7 @@ public class Device {
         return adapter.get();
     }
 
-    public long getDefaultQueue(){
+    public Queue getDefaultQueue() {
         return defaultQueue;
     }
 

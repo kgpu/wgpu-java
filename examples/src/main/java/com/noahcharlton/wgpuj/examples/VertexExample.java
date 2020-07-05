@@ -1,14 +1,10 @@
 package com.noahcharlton.wgpuj.examples;
 
 import com.noahcharlton.wgpuj.core.Device;
-import com.noahcharlton.wgpuj.core.ShaderData;
+import com.noahcharlton.wgpuj.core.util.ShaderConfig;
 import com.noahcharlton.wgpuj.core.WgpuCore;
 import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
-import com.noahcharlton.wgpuj.core.graphics.BlendDescriptor;
-import com.noahcharlton.wgpuj.core.graphics.ColorState;
-import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
-import com.noahcharlton.wgpuj.core.graphics.RasterizationState;
-import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
+import com.noahcharlton.wgpuj.core.graphics.*;
 import com.noahcharlton.wgpuj.core.util.Buffer;
 import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.jni.Wgpu;
@@ -52,36 +48,39 @@ public class VertexExample {
     public static void main(String[] args){
         WgpuCore.loadWgpuNative();
 
-        RenderPipelineSettings renderPipelineSettings = createPipelineSettings();
-        GraphicApplicationSettings appSettings = new GraphicApplicationSettings("Wgpu-Java vertex example", 302, 302);
+        GraphicApplicationConfig appConfig = new GraphicApplicationConfig("Wgpu-Java vertex example", 302, 302);
 
-        try(var application = WgpuGraphicApplication.create(appSettings)) {
+        try(var application = WgpuGraphicApplication.create(appConfig)) {
             Device device = application.getDevice();
+            RenderPipelineConfig pipelineConfig = createPipelineConfig(device);
+            RenderPipeline pipeline = device.createRenderPipeline(pipelineConfig);
 
             var vertexBuffer = device.createVertexBuffer("Vertex Buffer", VERTICES);
             var indexBuffer = device.createIndexBuffer("Index Buffer", INDICES);
 
-            application.init(renderPipelineSettings);
+            application.initializeSwapChain();
 
             while(!application.getWindow().isCloseRequested()){
-                var renderPass = application.renderStart();
+                var renderPass = application.renderStart(Color.BLACK);
                 renderPass.setIndexBuffer(indexBuffer);
                 renderPass.setVertexBuffer(vertexBuffer, 0);
+                renderPass.setPipeline(pipeline);
 
                 renderPass.drawIndexed(INDICES.length, 1, 0);
 
                 application.renderEnd();
+                application.update();
             }
         }
     }
 
-    private static RenderPipelineSettings createPipelineSettings(){
-        ShaderData vertex = ShaderData.fromRawClasspathFile("/vertex.vert", "main");
-        ShaderData fragment = ShaderData.fromRawClasspathFile("/vertex.frag", "main");
+    private static RenderPipelineConfig createPipelineConfig(Device device){
+        ShaderConfig vertex = ShaderConfig.fromRawClasspathFile("/vertex.vert", "main");
+        ShaderConfig fragment = ShaderConfig.fromRawClasspathFile("/vertex.frag", "main");
 
-        return new RenderPipelineSettings()
-                .setVertexStage(vertex)
-                .setFragmentStage(fragment)
+        return new RenderPipelineConfig()
+                .setVertexStage(device.createShaderModule(vertex))
+                .setFragmentStage(device.createShaderModule(fragment))
                 .setRasterizationState(RasterizationState.of(
                         WgpuFrontFace.CCW,
                         WgpuCullMode.NONE,
@@ -103,7 +102,6 @@ public class VertexExample {
                 .setSampleCount(1)
                 .setSampleMask(0)
                 .setAlphaToCoverage(false)
-                .setBindGroupLayouts()
-                .setClearColor(Color.BLACK);
+                .setBindGroupLayouts();
     }
 }

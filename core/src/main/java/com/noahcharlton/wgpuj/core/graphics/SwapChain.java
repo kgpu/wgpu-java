@@ -1,16 +1,11 @@
 package com.noahcharlton.wgpuj.core.graphics;
 
 import com.noahcharlton.wgpuj.WgpuJava;
+import com.noahcharlton.wgpuj.core.CommandEncoder;
 import com.noahcharlton.wgpuj.core.Device;
 import com.noahcharlton.wgpuj.core.util.Color;
 import com.noahcharlton.wgpuj.core.util.Dimension;
-import com.noahcharlton.wgpuj.jni.Wgpu;
-import com.noahcharlton.wgpuj.jni.WgpuJNI;
-import com.noahcharlton.wgpuj.jni.WgpuPresentMode;
-import com.noahcharlton.wgpuj.jni.WgpuSwapChainDescriptor;
-import com.noahcharlton.wgpuj.jni.WgpuSwapChainOutput;
-import com.noahcharlton.wgpuj.jni.WgpuSwapChainStatus;
-import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
+import com.noahcharlton.wgpuj.jni.*;
 
 public class SwapChain {
 
@@ -20,23 +15,16 @@ public class SwapChain {
     private final Device device;
 
     private RenderPass rawPass;
-    private long encoder;
+    private CommandEncoder encoder;
 
     public SwapChain(long chainID, Device device) {
         this.chainID = chainID;
         this.device = device;
     }
 
-    public void renderStart(RenderPipeline pipeline){
-        rawPass = beginRenderPass(pipeline.getClearColor());
-
-        rawPass.setPipeline(pipeline);
-    }
-
-    private RenderPass beginRenderPass(Color clearColor) {
-        encoder = device.createCommandEncoder("command encoder");
-
-        return RenderPass.create(encoder, getSwapChainTexture(), clearColor);
+    public void renderStart(Color clearColor){
+        encoder = device.createCommandEncoder("Swap Chain Command Encoder");
+        rawPass = RenderPass.create(encoder, getSwapChainTexture(), clearColor);
     }
 
     private long getSwapChainTexture() {
@@ -56,12 +44,12 @@ public class SwapChain {
     public void renderEnd(){
         rawPass.endPass();
 
-        long cmdBuffer = natives.wgpu_command_encoder_finish(encoder, WgpuJava.createNullPointer());
-        natives.wgpu_queue_submit(device.getDefaultQueue(), WgpuJava.createDirectLongPointer(cmdBuffer), 1);
+        long cmdBuffer = encoder.finish(WgpuCommandBufferDescriptor.createDirect());
+        device.getDefaultQueue().submit(cmdBuffer);
         natives.wgpu_swap_chain_present(chainID);
 
         rawPass = null;
-        encoder = 0;
+        encoder = null;
     }
 
     public static SwapChain create(Dimension dimension, Device device, long surface){
@@ -72,10 +60,7 @@ public class SwapChain {
         descriptor.setHeight(dimension.getHeight());
         descriptor.setPresentMode(WgpuPresentMode.FIFO);
 
-        var id = WgpuJava.wgpuNative.wgpu_device_create_swap_chain(device.getId(), surface,
-                descriptor.getPointerTo());
-
-        return new SwapChain(id, device);
+        return device.createSwapChain(surface, descriptor);
     }
 
     public RenderPass getRenderPass() {

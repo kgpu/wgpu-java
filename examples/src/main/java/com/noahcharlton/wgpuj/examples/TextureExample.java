@@ -1,20 +1,9 @@
 package com.noahcharlton.wgpuj.examples;
 
 import com.noahcharlton.wgpuj.WgpuJava;
-import com.noahcharlton.wgpuj.core.Device;
-import com.noahcharlton.wgpuj.core.ShaderData;
-import com.noahcharlton.wgpuj.core.WgpuCore;
-import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
-import com.noahcharlton.wgpuj.core.graphics.BlendDescriptor;
-import com.noahcharlton.wgpuj.core.graphics.ColorState;
-import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
-import com.noahcharlton.wgpuj.core.graphics.RasterizationState;
-import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
-import com.noahcharlton.wgpuj.core.util.BindGroupUtils;
-import com.noahcharlton.wgpuj.core.util.Buffer;
-import com.noahcharlton.wgpuj.core.util.BufferUsage;
-import com.noahcharlton.wgpuj.core.util.Color;
-import com.noahcharlton.wgpuj.core.util.ImageData;
+import com.noahcharlton.wgpuj.core.*;
+import com.noahcharlton.wgpuj.core.graphics.*;
+import com.noahcharlton.wgpuj.core.util.*;
 import com.noahcharlton.wgpuj.jni.*;
 
 import java.io.IOException;
@@ -46,17 +35,17 @@ public class TextureExample {
         WgpuCore.loadWgpuNative();
 
         ImageData texture = loadTexture();
-        RenderPipelineSettings renderPipelineSettings = createPipelineSettings();
-        GraphicApplicationSettings appSettings = new GraphicApplicationSettings("Wgpu-Java Texture Example", 350, 350);
+        GraphicApplicationConfig appConfig = new GraphicApplicationConfig("Wgpu-Java Texture Example", 350, 350);
 
-        try(var application = WgpuGraphicApplication.create(appSettings)) {
+        try(var application = WgpuGraphicApplication.create(appConfig)) {
             Device device = application.getDevice();
+            Queue queue = application.getDefaultQueue();
 
             var vertexBuffer = device.createVertexBuffer("Vertex Buffer", VERTICES);
             var indexBuffer = device.createIndexBuffer("index buffer", INDICES);
 
             var textureDesc = WgpuTextureDescriptor.createDirect();
-            textureDesc.setLabel("Wgpuj Icon");
+            textureDesc.setLabel("Texture");
             textureDesc.setDimension(WgpuTextureDimension.D2);
             textureDesc.getSize().setWidth(texture.getWidth());
             textureDesc.getSize().setHeight(texture.getHeight());
@@ -68,11 +57,10 @@ public class TextureExample {
             long textureId = device.createTexture(textureDesc);
             var textureBuffer = device.createIntBuffer("texture buffer", texture.getPixels(), BufferUsage.COPY_SRC);
 
-            long encoder = device.createCommandEncoder("Command Encoder");
-            textureBuffer.copyToTexture(encoder, textureId, texture);
-            long commandBuffer = WgpuJava.wgpuNative.wgpu_command_encoder_finish(encoder, WgpuJava.createNullPointer());
-            WgpuJava.wgpuNative.wgpu_queue_submit(device.getDefaultQueue(),
-                    WgpuJava.createDirectLongPointer(commandBuffer), 1);
+            CommandEncoder encoder = device.createCommandEncoder("Command Encoder");
+            encoder.copyBufferToTexture(textureBuffer, textureId, texture);
+            long commandBuffer = encoder.finish(WgpuCommandBufferDescriptor.createDirect());
+            queue.submit(commandBuffer);
 
             var samplerDesc = WgpuSamplerDescriptor.createDirect();
             samplerDesc.setAddressModeU(WgpuAddressMode.CLAMP_TO_EDGE);
@@ -96,20 +84,24 @@ public class TextureExample {
                                     WgpuBindingType.SAMPLER, false));
 
             var textureBindGroup = device.createBindGroup("texture bind group", textureBindGroupLayout,
-                    new WgpuBindGroupEntry().setTextureView(0, textureView),
-                    new WgpuBindGroupEntry().setSampler(1, sampler));
+                    BindGroupUtils.textureViewEntry(0, textureView),
+                    BindGroupUtils.samplerEntry(1, sampler));
 
-            renderPipelineSettings.setBindGroupLayouts(textureBindGroup);
-            application.init(renderPipelineSettings);
+            RenderPipelineConfig pipelineConfig = createPipelineConfig(device);
+            pipelineConfig.setBindGroupLayouts(textureBindGroup);
+            application.initializeSwapChain();
+            RenderPipeline pipeline = device.createRenderPipeline(pipelineConfig);
 
             while(!application.getWindow().isCloseRequested()) {
-                var renderPass = application.renderStart();
+                RenderPass renderPass = application.renderStart(Color.BLACK);
+                renderPass.setPipeline(pipeline);
                 renderPass.setBindGroup(0, textureBindGroup);
                 renderPass.setIndexBuffer(indexBuffer);
                 renderPass.setVertexBuffer(vertexBuffer, 0);
                 renderPass.drawIndexed(INDICES.length, 1, 0);
 
                 application.renderEnd();
+                application.update();
             }
         }
     }
@@ -122,13 +114,13 @@ public class TextureExample {
         }
     }
 
-    private static RenderPipelineSettings createPipelineSettings() {
-        ShaderData vertex = ShaderData.fromRawClasspathFile("/texture.vert", "main");
-        ShaderData fragment = ShaderData.fromRawClasspathFile("/texture.frag", "main");
+    private static RenderPipelineConfig createPipelineConfig(Device device) {
+        ShaderConfig vertex = ShaderConfig.fromRawClasspathFile("/texture.vert", "main");
+        ShaderConfig fragment = ShaderConfig.fromRawClasspathFile("/texture.frag", "main");
 
-        return new RenderPipelineSettings()
-                .setVertexStage(vertex)
-                .setFragmentStage(fragment)
+        return new RenderPipelineConfig()
+                .setVertexStage(device.createShaderModule(vertex))
+                .setFragmentStage(device.createShaderModule(fragment))
                 .setRasterizationState(RasterizationState.of(
                         WgpuFrontFace.CCW,
                         WgpuCullMode.NONE,
@@ -152,7 +144,6 @@ public class TextureExample {
                 .setSampleCount(1)
                 .setSampleMask(0xFFFFFFFF)
                 .setAlphaToCoverage(false)
-                .setBindGroupLayouts()
-                .setClearColor(Color.BLACK);
+                .setBindGroupLayouts();
     }
 }

@@ -1,27 +1,12 @@
 package com.noahcharlton.wgpuj.examples;
 
-import com.noahcharlton.wgpuj.WgpuJava;
-import com.noahcharlton.wgpuj.core.Device;
-import com.noahcharlton.wgpuj.core.ShaderData;
-import com.noahcharlton.wgpuj.core.WgpuCore;
-import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
-import com.noahcharlton.wgpuj.core.graphics.BlendDescriptor;
-import com.noahcharlton.wgpuj.core.graphics.ColorState;
-import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
-import com.noahcharlton.wgpuj.core.graphics.RasterizationState;
-import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
-import com.noahcharlton.wgpuj.core.graphics.Window;
-import com.noahcharlton.wgpuj.core.graphics.WindowEventHandler;
+import com.noahcharlton.wgpuj.core.*;
+import com.noahcharlton.wgpuj.core.graphics.*;
 import com.noahcharlton.wgpuj.core.input.Key;
 import com.noahcharlton.wgpuj.core.math.MathUtils;
 import com.noahcharlton.wgpuj.core.math.MatrixUtils;
-import com.noahcharlton.wgpuj.core.util.BindGroupUtils;
-import com.noahcharlton.wgpuj.core.util.Buffer;
-import com.noahcharlton.wgpuj.core.util.BufferUsage;
-import com.noahcharlton.wgpuj.core.util.Color;
-import com.noahcharlton.wgpuj.core.util.Dimension;
+import com.noahcharlton.wgpuj.core.util.*;
 import com.noahcharlton.wgpuj.jni.Wgpu;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupEntry;
 import com.noahcharlton.wgpuj.jni.WgpuBindingType;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
 import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
@@ -32,7 +17,6 @@ import com.noahcharlton.wgpuj.jni.WgpuInputStepMode;
 import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
 import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
 import com.noahcharlton.wgpuj.jni.WgpuVertexFormat;
-import jnr.ffi.Pointer;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -63,22 +47,22 @@ public class WindowEventExample {
     );
 
     private final Window window;
+    private final Device device;
+    private final Queue queue;
     private final Buffer vertexBuffer;
     private final Buffer indexBuffer;
     private final Buffer matrixBuffer;
     private final long bindGroup;
-    private final long queue;
     private final EnumSet<Key> keysPressed = EnumSet.noneOf(Key.class);
 
     public WindowEventExample() {
-        RenderPipelineSettings renderPipelineSettings = createPipelineSettings();
-        GraphicApplicationSettings appSettings = new GraphicApplicationSettings("Wgpu-Java event example", 640, 480);
+        GraphicApplicationConfig appConfig = new GraphicApplicationConfig("Wgpu-Java event example", 640, 480);
 
-        try(var application = WgpuGraphicApplication.create(appSettings)) {
-            Device device = application.getDevice();
+        try(var application = WgpuGraphicApplication.create(appConfig)) {
+            device = application.getDevice();
             window = application.getWindow();
+            queue = application.getDefaultQueue();
             window.setEventHandler(new WindowHandler(this));
-            queue = application.getQueue();
 
             vertexBuffer = device.createVertexBuffer("Vertex buffer", VERTICES);
             indexBuffer = device.createIndexBuffer("Index buffer", INDICES);
@@ -93,12 +77,13 @@ public class WindowEventExample {
                     BindGroupUtils.partialLayout(0, Wgpu.ShaderStage.VERTEX, WgpuBindingType.UNIFORM_BUFFER));
 
             bindGroup = device.createBindGroup("matrix bind group", bindGroupLayout,
-                            new WgpuBindGroupEntry().setBuffer(0, matrixBuffer.getId(), matrixBuffer.getSize()));
+                            BindGroupUtils.bufferEntry(0, matrixBuffer));
 
-            renderPipelineSettings.setBindGroupLayouts(bindGroupLayout);
-            application.init(renderPipelineSettings);
+            RenderPipelineConfig pipelineConfig = createPipelineConfig(device);
+            pipelineConfig.setBindGroupLayouts(bindGroupLayout);
+            application.initializeSwapChain();
 
-            runMainLoop(application);
+            runMainLoop(application, device.createRenderPipeline(pipelineConfig));
         }
     }
 
@@ -115,17 +100,15 @@ public class WindowEventExample {
         Matrix4f projection = createProjectionMatrix();
         Matrix4f transformationMatrix = MatrixUtils.generateTransMatrix(projection, viewMatrix);
 
-        Pointer pointer = WgpuJava.createDirectPointer(16 * Float.BYTES);
-        pointer.put(0, MatrixUtils.toFloats(transformationMatrix), 0, 16);
-
-        WgpuJava.wgpuNative.wgpu_queue_write_buffer(queue, matrixBuffer.getId(), 0, pointer, 16 * Float.BYTES);
+        queue.writeFloatsToBuffer(matrixBuffer, MatrixUtils.toFloats(transformationMatrix));
     }
 
-    private void runMainLoop(WgpuGraphicApplication application) {
+    private void runMainLoop(WgpuGraphicApplication application, RenderPipeline pipeline) {
         while(!application.getWindow().isCloseRequested()) {
             updateInput();
 
-            var renderPass = application.renderStart();
+            var renderPass = application.renderStart(Color.BLACK);
+            renderPass.setPipeline(pipeline);
             renderPass.setBindGroup(0, bindGroup);
             renderPass.setIndexBuffer(indexBuffer);
             renderPass.setVertexBuffer(vertexBuffer, 0);
@@ -133,6 +116,7 @@ public class WindowEventExample {
             renderPass.drawIndexed(INDICES.length, 1, 0);
 
             application.renderEnd();
+            application.update();
         }
     }
 
@@ -175,13 +159,13 @@ public class WindowEventExample {
             updateMatrix();
     }
 
-    private RenderPipelineSettings createPipelineSettings() {
-        ShaderData vertex = ShaderData.fromRawClasspathFile("/window.vert", "main");
-        ShaderData fragment = ShaderData.fromRawClasspathFile("/window.frag", "main");
+    private RenderPipelineConfig createPipelineConfig(Device device) {
+        ShaderConfig vertex = ShaderConfig.fromRawClasspathFile("/window.vert", "main");
+        ShaderConfig fragment = ShaderConfig.fromRawClasspathFile("/window.frag", "main");
 
-        return new RenderPipelineSettings()
-                .setVertexStage(vertex)
-                .setFragmentStage(fragment)
+        return new RenderPipelineConfig()
+                .setVertexStage(device.createShaderModule(vertex))
+                .setFragmentStage(device.createShaderModule(fragment))
                 .setRasterizationState(RasterizationState.of(
                         WgpuFrontFace.CCW,
                         WgpuCullMode.NONE,
@@ -204,8 +188,7 @@ public class WindowEventExample {
                 .setSampleCount(1)
                 .setSampleMask(0)
                 .setAlphaToCoverage(false)
-                .setBindGroupLayouts()
-                .setClearColor(Color.BLACK);
+                .setBindGroupLayouts();
     }
 
     public static void main(String[] args) {

@@ -78,6 +78,6 @@ gradlew runExample -Pexample=ComputeExample
 :construction: = Wgpu support being worked on
 
 ### Contributing
-I only have a windows machine, so the best way to contribute is to write
-and test the platform specific code (i.e. window handling for rendering pipelines). For more details, file a github 
-issue about your platform.
+I only have a windows/linux machine, so the best way to contribute is to write
+and test the platform specific code (i.e. window handling for rendering pipelines). For more details, see 
+[issue #4](https://github.com/DevOrc/wgpu-java/issues/4)

@@ -14,6 +14,10 @@ public class MatrixUtils {
         return new Matrix4f(OPEN_GL_TO_WGPU).mul(projection).mul(view);
     }
 
+    public static void reset(Matrix4f matrix){
+        matrix.zero().m00(1.0f).m11(1.0f).m22(1.0f).m33(1.0f);
+    }
+
     public static float[] toFloats(Matrix4f matrix){
         return matrix.get(new float[16]);
     }

@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class OutputHandler {
@@ -20,9 +21,9 @@ public class OutputHandler {
     private final HashMap<String, Item> types = new HashMap<>();
     private final HashMap<String, String> aliases = new HashMap<>();
     private final HashMap<String, List<ConstantItem>> constants = new HashMap<>();
+    private final Map<String, Consumer<Item>> hooks = Hooks.getHooks();
 
     private static final List<String> excluded = Arrays.asList(
-            "WgpuBindGroupEntry",
             "WgpuBindingResource_WgpuBuffer_Body",
             "WgpuBindingResource_WgpuSampler_Body",
             "WgpuBindingResource_WgpuTextureView_Body",
@@ -95,6 +96,13 @@ public class OutputHandler {
         writer.write("\n");
 
         return writer;
+    }
+
+    public void runHooks(Item item) {
+        var hook = hooks.get(item.getJavaTypeName());
+
+        if(hook != null)
+            hook.accept(item);
     }
 
     public void registerType(String type, Item item){

@@ -10,7 +10,7 @@ public class ShaderCompiler {
     public static final int FRAGMENT = Shaderc.shaderc_fragment_shader;
     public static final int COMPUTE = Shaderc.shaderc_compute_shader;
 
-    public static byte[] compile(String sourceText, int stage){
+    public static byte[] compile(String fileName, String sourceText, int stage){
         long compiler = Shaderc.shaderc_compiler_initialize();
         long options = Shaderc.shaderc_compile_options_initialize();
 
@@ -18,7 +18,7 @@ public class ShaderCompiler {
                 compiler,
                 sourceText,
                 stage,
-                "javaCompiledShader.glsl",
+                fileName,
                 "main",
                 options);
 

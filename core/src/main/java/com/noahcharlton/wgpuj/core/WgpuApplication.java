@@ -3,15 +3,15 @@ package com.noahcharlton.wgpuj.core;
 public class WgpuApplication {
 
     protected final Device device;
-    protected final long queue;
+    protected final Queue defaultQueue;
 
     public WgpuApplication(Device device) {
         this.device = device;
-        this.queue = device.getDefaultQueue();
+        this.defaultQueue = device.getDefaultQueue();
     }
 
-    public long getQueue() {
-        return queue;
+    public Queue getDefaultQueue() {
+        return defaultQueue;
     }
 
     public Device getDevice() {

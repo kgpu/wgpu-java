@@ -1,24 +1,11 @@
 package com.noahcharlton.wgpuj.examples;
 
-import com.noahcharlton.wgpuj.WgpuJava;
-import com.noahcharlton.wgpuj.core.Device;
-import com.noahcharlton.wgpuj.core.ShaderData;
-import com.noahcharlton.wgpuj.core.WgpuCore;
-import com.noahcharlton.wgpuj.core.WgpuGraphicApplication;
-import com.noahcharlton.wgpuj.core.graphics.BlendDescriptor;
-import com.noahcharlton.wgpuj.core.graphics.ColorState;
-import com.noahcharlton.wgpuj.core.graphics.GraphicApplicationSettings;
-import com.noahcharlton.wgpuj.core.graphics.RasterizationState;
-import com.noahcharlton.wgpuj.core.graphics.RenderPipelineSettings;
+import com.noahcharlton.wgpuj.core.*;
+import com.noahcharlton.wgpuj.core.graphics.*;
 import com.noahcharlton.wgpuj.core.math.MathUtils;
 import com.noahcharlton.wgpuj.core.math.MatrixUtils;
-import com.noahcharlton.wgpuj.core.util.BindGroupUtils;
-import com.noahcharlton.wgpuj.core.util.Buffer;
-import com.noahcharlton.wgpuj.core.util.BufferUsage;
-import com.noahcharlton.wgpuj.core.util.Color;
-import com.noahcharlton.wgpuj.core.util.Dimension;
+import com.noahcharlton.wgpuj.core.util.*;
 import com.noahcharlton.wgpuj.jni.Wgpu;
-import com.noahcharlton.wgpuj.jni.WgpuBindGroupEntry;
 import com.noahcharlton.wgpuj.jni.WgpuBindingType;
 import com.noahcharlton.wgpuj.jni.WgpuBlendFactor;
 import com.noahcharlton.wgpuj.jni.WgpuBlendOperation;
@@ -29,7 +16,6 @@ import com.noahcharlton.wgpuj.jni.WgpuInputStepMode;
 import com.noahcharlton.wgpuj.jni.WgpuPrimitiveTopology;
 import com.noahcharlton.wgpuj.jni.WgpuTextureFormat;
 import com.noahcharlton.wgpuj.jni.WgpuVertexFormat;
-import jnr.ffi.Pointer;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
@@ -70,16 +56,19 @@ public class HexWorldExample implements AutoCloseable {
 
     private final WgpuGraphicApplication application;
     private final Device device;
+    private final Queue queue;
 
     private Buffer vertexBuffer;
     private Buffer indexBuffer;
     private Buffer transMatrixBuffer;
     private Matrix4f viewMatrix;
+    private RenderPipeline pipeline;
     private long bindGroup;
 
-    public HexWorldExample(GraphicApplicationSettings settings) {
-        application = WgpuGraphicApplication.create(settings);
+    public HexWorldExample(GraphicApplicationConfig config) {
+        application = WgpuGraphicApplication.create(config);
         device = application.getDevice();
+        queue = application.getDefaultQueue();
         viewMatrix = new Matrix4f();
     }
 
@@ -110,26 +99,26 @@ public class HexWorldExample implements AutoCloseable {
                 BindGroupUtils.partialLayout(2, Wgpu.ShaderStage.VERTEX, WgpuBindingType.STORAGE_BUFFER));
 
         bindGroup = device.createBindGroup("matrix bind group", bindGroupLayout,
-                new WgpuBindGroupEntry().setBuffer(0, transMatrixBuffer.getId(), transMatrixBuffer.getSize()),
-                new WgpuBindGroupEntry().setBuffer(1, modelsBuffer.getId(), modelsBuffer.getSize()),
-                new WgpuBindGroupEntry().setBuffer(2, colorsBuffer.getId(), colorsBuffer.getSize()));
+                BindGroupUtils.bufferEntry(0, transMatrixBuffer),
+                BindGroupUtils.bufferEntry(1, modelsBuffer),
+                BindGroupUtils.bufferEntry(2, colorsBuffer));
 
-        var pipelineSettings = createRenderPipelineSettings();
-        pipelineSettings.setBindGroupLayouts(bindGroupLayout);
-
-        application.init(pipelineSettings);
+        var pipelineConfig = createPipelineConfig(device);
+        pipelineConfig.setBindGroupLayouts(bindGroupLayout);
 
         vertexBuffer = device.createVertexBuffer("Vertices", VERTICES);
         indexBuffer = device.createIndexBuffer("Indices", INDICES);
+        pipeline = device.createRenderPipeline(pipelineConfig);
+        application.initializeSwapChain();
     }
 
-    private RenderPipelineSettings createRenderPipelineSettings() {
-        ShaderData vertex = ShaderData.fromRawClasspathFile("/hex_world.vert", "main");
-        ShaderData fragment = ShaderData.fromRawClasspathFile("/hex_world.frag", "main");
+    private RenderPipelineConfig createPipelineConfig(Device device) {
+        ShaderConfig vertex = ShaderConfig.fromRawClasspathFile("/hex_world.vert", "main");
+        ShaderConfig fragment = ShaderConfig.fromRawClasspathFile("/hex_world.frag", "main");
 
-        return new RenderPipelineSettings()
-                .setVertexStage(vertex)
-                .setFragmentStage(fragment)
+        return new RenderPipelineConfig()
+                .setVertexStage(device.createShaderModule(vertex))
+                .setFragmentStage(device.createShaderModule(fragment))
                 .setRasterizationState(RasterizationState.of(
                         WgpuFrontFace.CCW,
                         WgpuCullMode.NONE,
@@ -151,41 +140,31 @@ public class HexWorldExample implements AutoCloseable {
                 .setSampleCount(1)
                 .setSampleMask(0)
                 .setAlphaToCoverage(false)
-                .setBindGroupLayouts()
-                .setClearColor(Color.BLACK);
+                .setBindGroupLayouts();
     }
 
     private void run() {
         while(!application.getWindow().isCloseRequested()) {
-            updateTransMatrixBuffer();
+            var renderPass = application.renderStart(Color.BLACK);
 
-            var renderPass = application.renderStart();
-
+            renderPass.setPipeline(pipeline);
             renderPass.setBindGroup(0, bindGroup);
             renderPass.setVertexBuffer(vertexBuffer, 0);
             renderPass.setIndexBuffer(indexBuffer);
             renderPass.drawIndexed(INDICES.length, INSTANCES.length, 0);
 
             application.renderEnd();
+            application.update();
+            queue.writeFloatsToBuffer(transMatrixBuffer, MatrixUtils.toFloats(createTransformationMatrix()));
         }
-    }
-
-    private void updateTransMatrixBuffer() {
-        Pointer pointer = WgpuJava.createDirectPointer(16 * Float.BYTES);
-        pointer.put(0, MatrixUtils.toFloats(createTransformationMatrix()), 0, 16);
-
-        long queue = device.getDefaultQueue();
-        long bufferId = transMatrixBuffer.getId();
-
-        WgpuJava.wgpuNative.wgpu_queue_write_buffer(queue, bufferId, 0, pointer, 16 * Float.BYTES);
     }
 
     public static void main(String[] args) {
         WgpuCore.loadWgpuNative();
 
-        var settings = new GraphicApplicationSettings("HexWorld", DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
+        var config = new GraphicApplicationConfig("HexWorld", DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
 
-        try(var hexWorld = new HexWorldExample(settings)) {
+        try(var hexWorld = new HexWorldExample(config)) {
             hexWorld.init();
             hexWorld.run();
         }

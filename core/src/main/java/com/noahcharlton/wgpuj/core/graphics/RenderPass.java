@@ -1,6 +1,7 @@
 package com.noahcharlton.wgpuj.core.graphics;
 
 import com.noahcharlton.wgpuj.WgpuJava;
+import com.noahcharlton.wgpuj.core.CommandEncoder;
 import com.noahcharlton.wgpuj.core.RawPass;
 import com.noahcharlton.wgpuj.core.util.Buffer;
 import com.noahcharlton.wgpuj.core.util.Color;
@@ -12,7 +13,7 @@ import com.noahcharlton.wgpuj.jni.WgpuStoreOp;
 
 public class RenderPass extends RawPass {
 
-    private RenderPass(WgpuRawPass pass) {
+    public RenderPass(WgpuRawPass pass) {
         super(pass);
     }
 
@@ -47,21 +48,18 @@ public class RenderPass extends RawPass {
         passPointer = null;
     }
 
-    static RenderPass create(long commandEncoder, long swapchainTexture, Color clearColor){
+    static RenderPass create(CommandEncoder encoder, long swapchainTexture, Color clearColor){
         var colorDescriptor = WgpuRenderPassColorDescriptor.createDirect();
         colorDescriptor.setAttachment(swapchainTexture);
         colorDescriptor.setLoadOp(WgpuLoadOp.CLEAR);
         colorDescriptor.setStoreOp(WgpuStoreOp.STORE);
         colorDescriptor.getClearColor().setR(clearColor.r);
-        colorDescriptor.getClearColor().setR(clearColor.g);
-        colorDescriptor.getClearColor().setR(clearColor.b);
-        colorDescriptor.getClearColor().setR(clearColor.a);
+        colorDescriptor.getClearColor().setG(clearColor.g);
+        colorDescriptor.getClearColor().setB(clearColor.b);
+        colorDescriptor.getClearColor().setA(clearColor.a);
 
         var rawPassDescriptor = new WgpuRenderPassDescriptor(null, colorDescriptor);
 
-        var pass = WgpuJava.wgpuNative.wgpu_command_encoder_begin_render_pass(commandEncoder,
-                rawPassDescriptor.getPointerTo());
-
-        return new RenderPass(pass);
+        return encoder.beginRenderPass(rawPassDescriptor);
     }
 }
