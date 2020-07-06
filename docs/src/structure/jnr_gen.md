@@ -1,13 +1,9 @@
-# Jnr-gen
-Jnr-gen is a program to generate java files from a c header file. It is designed to be used with 
-the jnr library (hence the name).
-
-To build the natives run the following gradle command:
+# JNR Gen
+JNR Gen is a program to generate Java enums, structs, and constants from a c header file. 
+To run JNR Gen and update the java files, run the following command:
 ```
-gradlew native:jnrgen:generateBindings
+gradlew native:updateBindings
 ```
-
-The bindings will be located in the build/jnr-gen folder. 
 
 ## Example Enum
 ```java

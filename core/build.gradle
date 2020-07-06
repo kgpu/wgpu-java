@@ -68,7 +68,19 @@ test {
     }
 }
 
-task generateBookDocs(type: Javadoc) {
+task startDocServer(){
+    def port = 8080;
+    def path = "/docs/book"
+
+    doLast{
+        def server = new SimpleHttpFileServerFactory().start(new File(rootDir, path), port)
+
+        println "Server started in directory " + server.getContentRoot()
+        println "Link: http://localhost:" + server.getPort() + "/index.html\n\n"
+    }
+}
+
+task generateJavaDoc(type: Javadoc) {
     dependsOn project(":native").getTasksByName("classes", false)
     dependsOn configurations.runtimeClasspath
     options.addStringOption("Xdoclint:none", "-quiet")
@@ -83,5 +95,8 @@ task generateBook(type: Exec){
     commandLine 'mdbook', 'build'
 }
 
-generateBook.finalizedBy generateBookDocs
+task generateDocumentation{
+    dependsOn generateBook
+}
 
+generateDocumentation.finalizedBy generateJavaDoc
