@@ -119,6 +119,14 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 @Documented
 @Target(FIELD)
 public @interface <span class="memberNameLabel">CStrPointer</span></pre>
+<div class="block">This is simply a marker used by JNR-Gen to mark a pointer
+ as a string pointer. When a field is marked with this,
+ JNR-Gen will make the setters/getters automatically convert
+ from java strings to rust strings.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="RustCString.html" title="class in com.noahcharlton.wgpuj.util"><code>RustCString</code></a></dd>
+</dl>
 </li>
 </ul>
 </div>

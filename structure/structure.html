@@ -9,7 +9,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
-        <base href="">
+        <base href="../">
 
         <link rel="stylesheet" href="book.css">
         <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
@@ -69,7 +69,7 @@
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
-            <ol class="chapter"><li><a href="intro.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><a href="structure.html" class="active"><strong aria-hidden="true">2.</strong> Structure</a></li><li><a href="resources.html"><strong aria-hidden="true">3.</strong> Additional Resources</a></li></ol>
+            <ol class="chapter"><li><a href="intro.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><a href="structure/structure.html" class="active"><strong aria-hidden="true">2.</strong> Structure</a></li><li><ol class="section"><li><a href="structure/wgpuj_native.html"><strong aria-hidden="true">2.1.</strong> Wgpuj/native</a></li><li><a href="structure/jnr_gen.html"><strong aria-hidden="true">2.2.</strong> JNR Gen</a></li></ol></li><li><a href="resources.html"><strong aria-hidden="true">3.</strong> Additional Resources</a></li></ol>
         </nav>
 
         <div id="page-wrapper" class="page-wrapper">
@@ -118,25 +118,35 @@
 
                 <div id="content" class="content">
                     <main>
-                        <a class="header" href="structure.html#structure-" id="structure-"><h1>Structure :</h1></a>
-<a class="header" href="structure.html#wgpu-javacore" id="wgpu-javacore"><h3>wgpu-java/core</h3></a>
-<p>Libraries that make wgpu easier to use in Java.
+                        <a class="header" href="structure/structure.html#structure-" id="structure-"><h1>Structure :</h1></a>
+<a class="header" href="structure/structure.html#modules" id="modules"><h2>Modules</h2></a>
+<p><strong>wgpu-java/core</strong>:
+Libraries that make wgpu easier to use in Java.
 Includes a windowing library, rendering pipelines, swap chains, etc. Uses
 LWJGL to get Glfw bindings</p>
-<a class="header" href="structure.html#wgpu-javanative" id="wgpu-javanative"><h3>wgpu-java/native:</h3></a>
-<p>Actual bindings with wgpu-native. Bindings are created at
+<p><strong>wgpu-java/native</strong>:
+Actual bindings with wgpu-native. Bindings are created at
 runtime using <a href="https://github.com/jnr/jnr-ffi">jnr-ffi</a></p>
-<a class="header" href="structure.html#wgpu-javanativewgpu-native" id="wgpu-javanativewgpu-native"><h3>wgpu-java/native/wgpu-native</h3></a>
-<p>The <a href="https://github.com/DevOrc/wgpu-native/tree/jnr-compatible">fork</a> of wgpu-native that this library uses.
+<p><strong>wgpu-java/native/wgpu-native</strong>:
+The <a href="https://github.com/DevOrc/wgpu-native/tree/jnr-compatible">fork</a> of wgpu-native that this library uses.
 A fork is needed to add some functions to get around some problems with jnr-ffi
 (the library that produces the bindings from java to rust)</p>
-<a class="header" href="structure.html#wgpu-javanativewgpu-test" id="wgpu-javanativewgpu-test"><h3>wgpu-java/native/wgpu-test</h3></a>
-<p>A cargo crate that has functions used for unit testing the FFI code.</p>
-<a class="header" href="structure.html#wgpu-javanativejnr-gen" id="wgpu-javanativejnr-gen"><h3>wgpu-java/native/jnr-gen</h3></a>
-<p>A tool to make java files out of the wgpu.h header file.
-<a href="https://github.com/DevOrc/wgpu-java/blob/master/native/jnrgen/README.md">Click Here for more info</a></p>
-<a class="header" href="structure.html#wgpu-javaexamples" id="wgpu-javaexamples"><h3>wgpu-java/examples</h3></a>
-<p>Examples of how to use wgpu-java/core</p>
+<p><strong>wgpu-java/native/wgpu-test</strong>:
+A cargo crate that has functions used for unit testing the FFI code.</p>
+<p><strong>wgpu-java/native/jnr-gen</strong>:
+A tool to make java files out of the wgpu.h header file.</p>
+<p><strong>wgpu-java/examples</strong>:
+Examples of how to use wgpu-java/core</p>
+<a class="header" href="structure/structure.html#class-naming" id="class-naming"><h2>Class Naming</h2></a>
+<ul>
+<li>if a class ends with <code>Descriptor</code>, it is a direct binding to the Wgpu type.</li>
+<li>if a class ends with <code>Config</code> that is a class from Wgpuj/core (and is usually a wrapper around a descriptor)</li>
+</ul>
+<a class="header" href="structure/structure.html#notable-classes" id="notable-classes"><h2>Notable Classes</h2></a>
+<ul>
+<li><strong><a href="../javadoc/com/noahcharlton/wgpuj/jni/Wgpu.html">Wgpu:</a></strong> Constants from the Wgpu Library</li>
+<li><strong><a href="../javadoc/com/noahcharlton/wgpuj/util/WgpuJavaStruct.html">WgpuJavaStruct:</a></strong> The base class for all structs in wgpuj</li>
+</ul>
 
                     </main>
 
@@ -149,7 +159,7 @@ A fork is needed to add some functions to get around some problems with jnr-ffi
                         
 
                         
-                            <a rel="next" href="resources.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="structure/wgpuj_native.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -167,7 +177,7 @@ A fork is needed to add some functions to get around some problems with jnr-ffi
                 
 
                 
-                    <a href="resources.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a href="structure/wgpuj_native.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 

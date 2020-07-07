@@ -214,12 +214,16 @@ extends <a href="../util/WgpuJavaStruct.html" title="class in com.noahcharlton.w
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>static <a href="WgpuDepthStencilStateDescriptor.html" title="class in com.noahcharlton.wgpuj.jni">WgpuDepthStencilStateDescriptor</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createDirect()">createDirect</a></span>()</code></th>
-<td class="colLast">&nbsp;</td>
+<td class="colLast">
+<div class="block">Creates this struct in direct memory.</div>
+</td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>static <a href="WgpuDepthStencilStateDescriptor.html" title="class in com.noahcharlton.wgpuj.jni">WgpuDepthStencilStateDescriptor</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createHeap()">createHeap</a></span>()</code></th>
-<td class="colLast">&nbsp;</td>
+<td class="colLast">
+<div class="block">Creates this struct on the java heap.</div>
+</td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="WgpuCompareFunction.html" title="enum in com.noahcharlton.wgpuj.jni">WgpuCompareFunction</a></code></td>
@@ -347,6 +351,9 @@ public&nbsp;WgpuDepthStencilStateDescriptor&#8203;(jnr.ffi.Runtime&nbsp;runtime)
 <li class="blockList">
 <h4>createHeap</h4>
 <pre class="methodSignature">public static&nbsp;<a href="WgpuDepthStencilStateDescriptor.html" title="class in com.noahcharlton.wgpuj.jni">WgpuDepthStencilStateDescriptor</a>&nbsp;createHeap()</pre>
+<div class="block">Creates this struct on the java heap.
+ In general, this should <b>not</b> be used because these structs
+ cannot be directly passed into native code.</div>
 </li>
 </ul>
 <a id="createDirect()">
@@ -356,6 +363,13 @@ public&nbsp;WgpuDepthStencilStateDescriptor&#8203;(jnr.ffi.Runtime&nbsp;runtime)
 <li class="blockList">
 <h4>createDirect</h4>
 <pre class="methodSignature">public static&nbsp;<a href="WgpuDepthStencilStateDescriptor.html" title="class in com.noahcharlton.wgpuj.jni">WgpuDepthStencilStateDescriptor</a>&nbsp;createDirect()</pre>
+<div class="block">Creates this struct in direct memory.
+ This is how most structs should be created (unless, they
+ are members of a nothing struct)</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../util/WgpuJavaStruct.html#useDirectMemory()"><code>WgpuJavaStruct.useDirectMemory()</code></a></dd>
+</dl>
 </li>
 </ul>
 <a id="getFormat()">

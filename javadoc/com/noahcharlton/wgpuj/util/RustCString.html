@@ -133,6 +133,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <hr>
 <pre>public class <span class="typeNameLabel">RustCString</span>
 extends java.lang.Object</pre>
+<div class="block">Utilities for converting between Rust CString and Java Strings.</div>
 </li>
 </ul>
 </div>
@@ -177,12 +178,16 @@ extends java.lang.Object</pre>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#fromPointer(jnr.ffi.Pointer)">fromPointer</a></span>&#8203;(jnr.ffi.Pointer&nbsp;pointer)</code></th>
-<td class="colLast">&nbsp;</td>
+<td class="colLast">
+<div class="block">returns a Java String made from the pointer using the <code>StandardCharsets.US_ASCII</code> charset.</div>
+</td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>static jnr.ffi.Pointer</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toPointer(java.lang.String)">toPointer</a></span>&#8203;(java.lang.String&nbsp;string)</code></th>
-<td class="colLast">&nbsp;</td>
+<td class="colLast">
+<div class="block">returns a pointer to direct memory of the string in <code>StandardCharsets.US_ASCII</code></div>
+</td>
 </tr>
 </table>
 <ul class="blockList">
@@ -234,6 +239,7 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>fromPointer</h4>
 <pre class="methodSignature">public static&nbsp;java.lang.String&nbsp;fromPointer&#8203;(jnr.ffi.Pointer&nbsp;pointer)</pre>
+<div class="block">returns a Java String made from the pointer using the <code>StandardCharsets.US_ASCII</code> charset.</div>
 </li>
 </ul>
 <a id="toPointer(java.lang.String)">
@@ -243,6 +249,7 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>toPointer</h4>
 <pre class="methodSignature">public static&nbsp;jnr.ffi.Pointer&nbsp;toPointer&#8203;(java.lang.String&nbsp;string)</pre>
+<div class="block">returns a pointer to direct memory of the string in <code>StandardCharsets.US_ASCII</code></div>
 </li>
 </ul>
 </li>
