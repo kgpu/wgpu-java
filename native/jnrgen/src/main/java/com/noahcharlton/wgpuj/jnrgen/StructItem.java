@@ -7,9 +7,22 @@ import java.util.List;
 public class StructItem implements Item {
 
     public static final String doNotUsePrefix = "_NO_USE_";
+    public static final String createDirectJavadoc = "\t/**" +
+            "\n\t* Creates this struct in direct memory." +
+            "\n\t* This is how most structs should be created (unless, they" +
+            "\n\t* are members of a nothing struct)" +
+            "\n\t* " +
+            "\n\t* @see WgpuJavaStruct#useDirectMemory" +
+            "\n\t*/\n";
+    public static final String createHeapJavaDoc = "\t/**" +
+            "\n\t* Creates this struct on the java heap." +
+            "\n\t* In general, this should <b>not</b> be used because these structs" +
+            "\n\t* cannot be directly passed into native code. " +
+            "\n\t*/\n";
 
     private final String name;
     private final List<StructField> fields;
+
 
     public StructItem(String name, List<StructField> fields) {
         this.name = OutputHandler.toExportName(name.replace("WGPU", "Wgpu"));
@@ -24,7 +37,7 @@ public class StructItem implements Item {
 
     @Override
     public void save(OutputHandler outputHandler) throws IOException {
-        if(OutputHandler.isExcluded(name)){
+        if (OutputHandler.isExcluded(name)) {
             return;
         }
 
@@ -40,15 +53,15 @@ public class StructItem implements Item {
         writer.write(name);
         writer.write(" extends WgpuJavaStruct {\n\n");
 
-        for(StructField field : fields) {
+        for (StructField field : fields) {
             field.convertTypes(outputHandler);
             field.writeDeclaration(writer);
         }
 
         writeConstructors(writer);
 
-        for(StructField field : fields) {
-            if(!field.name.startsWith(doNotUsePrefix)){
+        for (StructField field : fields) {
+            if (!field.name.startsWith(doNotUsePrefix)) {
                 field.writeGetter(writer, outputHandler);
                 field.writeSetter(writer, outputHandler);
             }
@@ -71,12 +84,14 @@ public class StructItem implements Item {
         writer.write(name);
         writer.write("(Runtime runtime){\n        super(runtime);\n    }\n\n");
 
+        writer.write(createHeapJavaDoc);
         writer.write("    public static ");
         writer.write(name);
         writer.write(" createHeap(){\n        return new ");
         writer.write(name);
         writer.write("();\n    }\n\n");
 
+        writer.write(createDirectJavadoc);
         writer.write("    public static ");
         writer.write(name);
         writer.write(" createDirect(){\n        var struct = new ");
@@ -111,37 +126,37 @@ public class StructItem implements Item {
         }
 
         public void convertTypes(OutputHandler handler) {
-            if(type.equals("const char") || (type.equals("char") && name.startsWith("*"))) {
+            if (type.equals("const char") || (type.equals("char") && name.startsWith("*"))) {
                 type = "@CStrPointer Struct.Pointer";
                 createType = "new Struct.Pointer();";
                 name = name.replace("*", "");
-            } else if(name.startsWith("*")) {
+            } else if (name.startsWith("*")) {
                 name = name.substring(1);
 
-                if(handler.containsType(type)) {
+                if (handler.containsType(type)) {
                     var type = handler.resolveType(this.type).getJavaTypeName();
                     this.type = "DynamicStructRef<" + type + ">";
                     this.createType = "new DynamicStructRef<>(" + type + ".class);";
                 } else {
                     type = "Struct.Pointer";
                 }
-            } else if(type.equals("uintptr_t") || type.equals("uint64_t") || type.equals("unsigned long long")) {
+            } else if (type.equals("uintptr_t") || type.equals("uint64_t") || type.equals("unsigned long long")) {
                 type = "Struct.Unsigned64";
-            } else if(type.equals("uint32_t")) {
+            } else if (type.equals("uint32_t")) {
                 type = "Struct.Unsigned32";
-            } else if(type.equals("int32_t")) {
+            } else if (type.equals("int32_t")) {
                 type = "Struct.Signed32";
-            } else if(type.equals("uint8_t")){
+            } else if (type.equals("uint8_t")) {
                 type = "Struct.Unsigned8";
-            }else if(type.equals("bool")) {
+            } else if (type.equals("bool")) {
                 type = "Struct.Boolean";
-            } else if(type.equals("float")) {
+            } else if (type.equals("float")) {
                 type = "Struct.Float";
-            } else if(type.equals("double")) {
+            } else if (type.equals("double")) {
                 type = "Struct.Double";
-            } else if(handler.containsType(type)) {
+            } else if (handler.containsType(type)) {
                 resolveType(handler.resolveType(type));
-            } else if(handler.containsAlias(type)) {
+            } else if (handler.containsAlias(type)) {
                 type = handler.getAlias(type);
                 convertTypes(handler);
             } else {
@@ -150,10 +165,10 @@ public class StructItem implements Item {
         }
 
         private void resolveType(Item item) {
-            if(item instanceof EnumItem) {
+            if (item instanceof EnumItem) {
                 type = "Struct.Enum<" + item.getJavaTypeName() + ">";
                 createType = "new Struct.Enum<>(" + item.getJavaTypeName() + ".class);";
-            } else if(item instanceof StructItem || item instanceof MockStructItem) {
+            } else if (item instanceof StructItem || item instanceof MockStructItem) {
                 type = item.getJavaTypeName();
                 createType = "inner(" + item.getJavaTypeName() + ".createHeap());";
             }
@@ -166,7 +181,7 @@ public class StructItem implements Item {
             writer.write(name);
             writer.write(" = ");
 
-            if(createType == null) {
+            if (createType == null) {
                 writer.write("new ");
                 writer.write(type);
                 writer.write("();");
@@ -181,10 +196,10 @@ public class StructItem implements Item {
             StringBuilder output = new StringBuilder();
 
             boolean wasUnderscore = false;
-            for(char c : name.toCharArray()) {
-                if(c == '_') {
+            for (char c : name.toCharArray()) {
+                if (c == '_') {
                     wasUnderscore = true;
-                } else if(wasUnderscore) {
+                } else if (wasUnderscore) {
                     wasUnderscore = false;
                     output.append(Character.toUpperCase(c));
                 } else {
@@ -196,7 +211,7 @@ public class StructItem implements Item {
         }
 
         public void writeGetter(BufferedWriter writer, OutputHandler handler) throws IOException {
-            if(type.startsWith("@CStrPointer")) {
+            if (type.startsWith("@CStrPointer")) {
                 writeStringGetter(writer);
                 return;
             }
@@ -210,7 +225,7 @@ public class StructItem implements Item {
             writer.write("(){\n        return ");
             writer.write(name);
 
-            if(type.startsWith("Struct.")) {
+            if (type.startsWith("Struct.")) {
                 writer.write(".get()");
             }
 
@@ -218,13 +233,13 @@ public class StructItem implements Item {
         }
 
         public void writeSetter(BufferedWriter writer, OutputHandler handler) throws IOException {
-            if(type.startsWith("@CStrPointer")) {
+            if (type.startsWith("@CStrPointer")) {
                 writeStringSetter(writer);
                 return;
-            } else if(type.startsWith("DynamicStructRef")) {
+            } else if (type.startsWith("DynamicStructRef")) {
                 writeStructRefSetter(writer, handler);
                 return;
-            } else if(!type.startsWith("Struct.")) {
+            } else if (!type.startsWith("Struct.")) {
                 //Must be an inner struct
                 return;
             }
@@ -271,25 +286,25 @@ public class StructItem implements Item {
         }
 
         private String getGetterSetterType(String type, OutputHandler handler, boolean isGetter) {
-            if(type.equals("Struct.Unsigned64") || type.equals("Struct.Signed64") || type.equals("Struct.Unsigned32")) {
+            if (type.equals("Struct.Unsigned64") || type.equals("Struct.Signed64") || type.equals("Struct.Unsigned32")) {
                 return "long";
-            } else if(type.equals("Struct.Signed32")) {
+            } else if (type.equals("Struct.Signed32")) {
                 return "int";
-            } else if(type.equals("Struct.Unsigned8")){
+            } else if (type.equals("Struct.Unsigned8")) {
                 return "short";
-            }else if(type.equals("Struct.Boolean")) {
+            } else if (type.equals("Struct.Boolean")) {
                 return "boolean";
-            } else if(type.equals("Struct.Float")) {
+            } else if (type.equals("Struct.Float")) {
                 return "float";
-            } else if(type.equals("Struct.Double")) {
+            } else if (type.equals("Struct.Double")) {
                 return "double";
-            } else if(handler.containsType(type.replace("Wgpu", "WGPU"))) {
+            } else if (handler.containsType(type.replace("Wgpu", "WGPU"))) {
                 return type;
-            } else if(type.startsWith("Struct.Enum")) {
+            } else if (type.startsWith("Struct.Enum")) {
                 return type.split("<|>")[1];
-            } else if(type.equals("Struct.Pointer")) {
+            } else if (type.equals("Struct.Pointer")) {
                 return "jnr.ffi.Pointer";
-            } else if(type.startsWith("DynamicStructRef")) {
+            } else if (type.startsWith("DynamicStructRef")) {
                 String javaType = type.split("<|>")[1];
 
                 return isGetter ? type : javaType + "...";
