@@ -7,16 +7,26 @@ import jnr.ffi.Struct;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 
-public class WgpuJavaStruct extends Struct {
+/**
+ * The base class for all wgpuj structs.
+ */
+public abstract class WgpuJavaStruct extends Struct {
 
-    public WgpuJavaStruct() {
+    protected WgpuJavaStruct() {
         super(WgpuJava.getRuntime());
     }
 
-    public WgpuJavaStruct(Runtime runtime) {
+    protected WgpuJavaStruct(Runtime runtime) {
         super(runtime);
     }
 
+    /**
+     * Sets this struct to use direct memory.
+     *
+     * <br>
+     * <b>Note:</b> This does not copy the fields from the previous memory location, so
+     * all fields need to be reset
+     */
     public void useDirectMemory(){
         int size = Struct.size(this);
 
@@ -74,7 +84,7 @@ public class WgpuJavaStruct extends Struct {
         }
 
         /**
-         * @return struct from memory
+         * returns the struct from memory
          */
         public final T get() {
             T struct;
@@ -89,7 +99,7 @@ public class WgpuJavaStruct extends Struct {
         }
 
         /**
-         * @return struct from memory
+         * returns the struct from memory
          */
         public final T[] get(int length) {
             try {

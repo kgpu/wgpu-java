@@ -7,8 +7,14 @@ import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Utilities for converting between Rust CString and Java Strings.
+ */
 public class RustCString {
 
+    /**
+     * returns a Java String made from the pointer using the {@link StandardCharsets#US_ASCII} charset.
+     */
     public static String fromPointer(Pointer pointer){
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
@@ -22,9 +28,12 @@ public class RustCString {
             stream.write(nextChar);
         }
 
-        return stream.toString(StandardCharsets.UTF_8);
+        return stream.toString(StandardCharsets.US_ASCII);
     }
 
+    /**
+     * returns a pointer to direct memory of the string in {@link StandardCharsets#US_ASCII}
+     */
     public static Pointer toPointer(String string){
         if(string == null)
             return WgpuJava.createNullPointer();

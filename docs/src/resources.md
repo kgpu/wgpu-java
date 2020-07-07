@@ -1,7 +1,7 @@
 # Additional Resources
+[Javadoc](javadoc/index.html)
 
 ### Wgpu:
-- [Wgpuj Javadoc](javadoc/index.html)
 - [Wgpu-native Github Repo](https://github.com/gfx-rs/wgpu-native)
 - [Wgpu Github Repo](https://github.com/gfx-rs/wgpu)
 - [Learn Wgpu](https://sotrh.github.io/learn-wgpu/)
