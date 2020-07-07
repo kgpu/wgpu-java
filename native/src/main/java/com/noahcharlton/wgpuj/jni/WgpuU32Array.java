@@ -17,10 +17,22 @@ public class WgpuU32Array extends WgpuJavaStruct {
         super(runtime);
     }
 
+    /**
+    * Creates this struct on the java heap.
+    * In general, this should <b>not</b> be used because these structs
+    * cannot be directly passed into native code. 
+    */
     public static WgpuU32Array createHeap(){
         return new WgpuU32Array();
     }
 
+    /**
+    * Creates this struct in direct memory.
+    * This is how most structs should be created (unless, they
+    * are members of a nothing struct)
+    * 
+    * @see WgpuJavaStruct#useDirectMemory
+    */
     public static WgpuU32Array createDirect(){
         var struct = new WgpuU32Array();
         struct.useDirectMemory();

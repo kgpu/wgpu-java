@@ -24,10 +24,22 @@ public class WgpuRenderPassDepthStencilDescriptor extends WgpuJavaStruct {
         super(runtime);
     }
 
+    /**
+    * Creates this struct on the java heap.
+    * In general, this should <b>not</b> be used because these structs
+    * cannot be directly passed into native code. 
+    */
     public static WgpuRenderPassDepthStencilDescriptor createHeap(){
         return new WgpuRenderPassDepthStencilDescriptor();
     }
 
+    /**
+    * Creates this struct in direct memory.
+    * This is how most structs should be created (unless, they
+    * are members of a nothing struct)
+    * 
+    * @see WgpuJavaStruct#useDirectMemory
+    */
     public static WgpuRenderPassDepthStencilDescriptor createDirect(){
         var struct = new WgpuRenderPassDepthStencilDescriptor();
         struct.useDirectMemory();

@@ -9,6 +9,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.CRC32;
 
+/**
+ * Extracts native libraries from the classpath and stores them temporarily.
+ *
+ * @author mzechner
+ * @author Nathan Sweet
+ * @author Noah Charlton
+ */
 public class SharedLibraryLoader {
 
     private static final boolean isWindows = System.getProperty("os.name").contains("Windows");
@@ -40,13 +47,15 @@ public class SharedLibraryLoader {
         return libraryName;
     }
 
+    /**
+     * Extracts the source file and calls System.load.
+     */
     public File load(String libraryName) {
         String platformName = mapLibraryName(libraryName);
 
 
         try {
             var file = loadFile(platformName);
-            System.out.println("Loaded library: " + file.getAbsolutePath());
 
             return file;
         } catch(Throwable ex) {
@@ -62,7 +71,7 @@ public class SharedLibraryLoader {
 
     }
 
-    private File extractFile(String sourcePath, String sourceCrc, File extractedFile) throws IOException {
+    private File extractFile(String sourcePath, String sourceCrc, File extractedFile) {
         String extractedCrc = null;
         if(extractedFile.exists()) {
             try {
@@ -73,7 +82,6 @@ public class SharedLibraryLoader {
 
         // If file doesn't exist or the CRC doesn't match, extract it to the temp dir.
         if(extractedCrc == null || !extractedCrc.equals(sourceCrc)) {
-            System.out.println("Extracting library: " + sourcePath);
             InputStream input = null;
             FileOutputStream output = null;
             try {
@@ -109,10 +117,6 @@ public class SharedLibraryLoader {
         }
     }
 
-    /**
-     * Extracts the source file and calls System.load. Attemps to extract and load from multiple locations. Throws runtime
-     * exception if all fail.
-     */
     private File loadFile(String sourcePath) {
         String sourceCrc = crc(readFile(sourcePath));
 
