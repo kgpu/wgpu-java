@@ -1,6 +1,9 @@
 # Wgpu-Java
 ![CI](https://github.com/DevOrc/wgpu-java/workflows/CI/badge.svg)
 
+# NOTE: THIS IS THE ARCHIVED VERSION
+# NEW VERSION: [kgpu/kgpu](https://github.com/kgpu/kgpu) 
+
 Java bindings for [Wgpu](https://github.com/gfx-rs/wgpu) based on
 [Wgpu-native](https://github.com/gfx-rs/wgpu-native). 
 
